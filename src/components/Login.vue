@@ -16,7 +16,9 @@
                         <input type="password" id="password" name="password" required="">
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="login-button">Ingresar</button>
+                        <button type="submit" class="login-button"><router-link to="/menu" class="text-black">Ingresar</router-link></button>
+
+                        <router-view></router-view>
                     </div>
                 </form>
             </div>
@@ -26,6 +28,8 @@
 </template>
   
 <script setup>
+
+
 
 </script>
   
