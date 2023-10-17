@@ -37,7 +37,7 @@
   </template>
   
   <script>
-  import { ref} from 'vue'
+  import { ref, onMounted} from 'vue'
 
   let leftDrawerOpen = ref(false)
   

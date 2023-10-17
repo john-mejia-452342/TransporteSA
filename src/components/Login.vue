@@ -1,6 +1,6 @@
 <template>
     <div>
-        <q-btn color="secondary"><router-link to="/buses">Buses</router-link></q-btn>
+        <q-btn color="secondary"><router-link to="/menu">Menu</router-link></q-btn>
     </div>
   </template>
   
