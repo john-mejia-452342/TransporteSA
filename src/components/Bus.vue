@@ -33,7 +33,8 @@
             <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
                 <template v-slot:body-cell-estado="props">
                     <q-td :props="props">
-                        <label for="" >{{ props.estado}}</label>
+                        <label for="" v-if="props.row.estado == 1" style="color: green;" >Activo</label>
+                        <label for="" v-else style="color: red;">Inactivo</label>
 
                     </q-td>
 
@@ -69,12 +70,16 @@ let cantidad_asientos = ref('');
 let empresa_asignada = ref('');
 let cambio = ref(0)
 
-async function obtenerInfo() {
-    console.log(useBusStore.obtenerInfoBuses);
-    
-    // buses.value = useBusStore,obtenerInfo;
-    // rows.value = useBusStore,obtenerInfo;
-}
+onMounted(async () => {
+    try {
+        await busStore.obtenerInfoBuses();
+        console.log(busStore.buses);
+        buses.value = busStore.buses;
+        rows.value = busStore.buses;
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 const columns = [
     { name: 'placa', label: 'Placa', field: 'placa', sortable: true },
@@ -176,9 +181,9 @@ async function ActivarBus(id) {
     obtenerInfo();
 }
 
-onMounted(() => {
-    obtenerInfo();
-});
+// onMounted(() => {
+//     obtenerInfo();
+// });
 </script>
   
 <style scoped>
