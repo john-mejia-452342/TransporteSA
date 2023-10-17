@@ -4,4 +4,10 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  justify-content: center;
+  align-items: center; /* Centra verticalmente los elementos dentro del body */
+  background-image: url(https://img.freepik.com/foto-gratis/pareja-tiro-completo-caminando-equipaje_23-2149322005.jpg?w=1380&t=st=1697576609~exp=1697577209~hmac=fc636cb17e087127ea07ec07ea0c32d79fe169fc4f35d6e01d883ab649381e56);
+  background-size: cover; /* Ajusta la imagen de fondo para cubrir la ventana del navegador */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
