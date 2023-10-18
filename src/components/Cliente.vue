@@ -6,21 +6,21 @@
                 <q-card-section class="row items-center q-pb-none" style="color: black;">
                     <div class="text-h6">{{ text }}</div>
                     <q-space />
-                    <q-btn icon="close" flat round dense v-close-popup />
+                    <q-btn icon="close" flat round dense v-close-popup/>
                 </q-card-section>
                 <q-separator />
 
                 <q-card-section style="max-height: 50vh" class="scroll">
-                    <q-input v-model="cedula" label="Cedula" style="width: 300px;"/>
+                    <q-input type="number" v-model="cedula" label="Cedula" style="width: 300px;"/>
                     <q-input v-model="nombre" label="Nombre" style="width: 300px;"/>
-                    <q-input v-model="telefono" label="Telefono" style="width: 300px;" />
+                    <q-input type="number" v-model="telefono" label="Telefono" style="width: 300px;" />
                 </q-card-section>
 
                 <q-separator />
 
                 <q-card-actions align="right">
                     <q-btn flat label="Cerrar" color="primary" v-close-popup />
-                    <q-btn flat label="Guardar 💾" color="primary" @click="editaragregarCliente()" />
+                    <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarCliente()" />
                 </q-card-actions>
             </q-card>
         </q-dialog>
@@ -40,10 +40,10 @@
                 </template>
                 <template v-slot:body-cell-opciones="props">
                     <q-td :props="props" class="botones">
-                        <q-btn color="white" text-color="black" label="🖋️" @click="EditarBus(props.row._id)" />
-                        <q-btn color="white" text-color="black" label="❌" @click="InactivarBus(props.row._id)"
+                        <q-btn color="white" text-color="black" label="🖋️" @click="editarCliente(props.row._id)" />
+                        <q-btn color="white" text-color="black" label="❌" @click="inactivarCliente(props.row._id)"
                             v-if="props.row.estado == 1" />
-                        <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else />
+                        <q-btn color="white" text-color="black" label="✅" @click="activarCliente(props.row._id)" v-else />
                     </q-td>
                 </template>
             </q-table>
@@ -62,9 +62,9 @@ let clientes = ref([]);
 let rows = ref([]);
 let fixed = ref(false)
 let text = ref('')
-let cedula = ref('');
+let cedula = ref();
 let nombre = ref();
-let telefono = ref('');
+let telefono = ref();
 let cambio = ref(0)
 
 async function obtenerInfo(){
@@ -99,31 +99,28 @@ const columns = [
 
 function agregarCliente() {
     fixed.value = true;
-    text.value = "Agregar Bus";
+    text.value = "Agregar Cliente";
     cambio.value = 0
 }
 
-async function editaragregarCliente() {
+async function editarAgregarCliente() {
     if (cambio.value === 0) {
-        await clienteStore.postBus({
-            placa: placa.value,
-            numero_bus: numero_bus.value,
-            cantidad_asientos: cantidad_asientos.value,
-            empresa_asignada: empresa_asignada.value,
+        await clienteStore.postCliente({
+            cedula: cedula.value,
+            nombre: nombre.value,
+            telefono: telefono.value,
         })
         limpiar() 
         obtenerInfo()
 
     } else {
-        let id = idBus.value;
+        let id = idCliente.value;
         if (id) {
-            await clienteStore.putEditarBus(id,{
-                placa: placa.value,
-                numero_bus: numero_bus.value,
-                cantidad_asientos: cantidad_asientos.value,
-                empresa_asignada: empresa_asignada.value,
+            await clienteStore.putEditarCliente(id,{
+                cedula: cedula.value,
+                nombre: nombre.value,
+                telefono: telefono.value,
             });
-           
             limpiar(); 
             obtenerInfo()
             fixed.value = false;
@@ -133,33 +130,32 @@ async function editaragregarCliente() {
 
 
 function limpiar() {
-    placa.value = ""
-    numero_bus.value = ""
-    cantidad_asientos = ""
-    empresa_asignada = ""
+    cedula.value = ""
+    nombre.value = ""
+    telefono.value = ""
 }
 
-let idBus = ref('')
-async function EditarBus(id) {
+let idCliente= ref('')
+async function editarCliente(id) {
     cambio.value = 1;
-    const busSeleccionado = buses.value.find((bus) => bus._id === id);
-    if (busSeleccionado) {
-        idBus.value = String(busSeleccionado._id);
+    const clienteSeleccionado = clientes.value.find((cliente) => cliente._id === id);
+    if (clienteSeleccionado) {
+        idCliente.value = String(clienteSeleccionado._id);
         fixed.value = true;
-        text.value = "Editar Bus";
-        placa.value = busSeleccionado.placa;
-        numero_bus.value = busSeleccionado.numero_bus
-        cantidad_asientos.value = busSeleccionado.cantidad_asientos;
-        empresa_asignada.value = busSeleccionado.empresa_asignada;
+        text.value = "Editar Cliente";
+        cedula.value = clienteSeleccionado.cedula;
+        nombre.value = clienteSeleccionado.nombre
+        telefono.value = clienteSeleccionado.telefono;
     }
 }
 
-async function InactivarCliente(id) {
+async function inactivarCliente(id) {
+    console.log(id);
     await clienteStore.putInactivarCliente(id)
     obtenerInfo()
 }
 
-async function ActivarCliente(id) {
+async function activarCliente(id) {
     await clienteStore.putActivarCliente(id)
     obtenerInfo()
 }

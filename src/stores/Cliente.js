@@ -8,41 +8,41 @@ export const useClienteStore = defineStore('cliente', () => {
     const obtenerInfoClientes = async () => {
         try {
             let responseClientes = await axios.get('/cliente/cliente');
-            clientes.value = responseClientes.data.clientes; 
+            clientes.value = responseClientes.data.cliente; 
         } catch (error) {
             throw error
         }
     };
 
-    const postBus = async (data) =>{
+    const postCliente = async (data) =>{
         try {
-            let res = await axios.post("bus/bus/agregar", data);
+            let res = await axios.post('/cliente/cliente/agregar', data);
             return res
         } catch (error) {
             throw error
         }
     }
 
-    const putEditarBus = async (id, data) => {
+    const putEditarCliente = async (id, data) => {
         try {
-            let res = await axios.put(`bus/bus/${id}`, data);
+            let res = await axios.put(`/cliente/cliente/${id}`, data);
             return res
         } catch (error) {
             throw error;
         }
     };
 
-    const putInactivarBus = async (id)=>{
+    const putInactivarCliente = async (id)=>{
         try {
-            let r = await axios.put(`bus/inactivarBus/${id}`)
+            let r = await axios.put(`/cliente/inactivarCliente/${id}`)
             return r
         } catch (error) {
             console.log(error, "Error al cambiar el estado del bus");
         }
     }
-    const putActivarBus = async (id)=>{
+    const putActivarCliente = async (id)=>{
         try {
-            let r = await axios.put(`bus/activarBus/${id}`)
+            let r = await axios.put(`/cliente/activarCliente/${id}`)
             return r
         } catch (error) {
             console.log(error, "Error al cambiar el estado del bus");
@@ -51,6 +51,6 @@ export const useClienteStore = defineStore('cliente', () => {
 
     return {
         clientes,
-        obtenerInfoClientes,
+        obtenerInfoClientes, postCliente, putEditarCliente, putInactivarCliente, putActivarCliente
     };
 });
