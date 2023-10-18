@@ -99,7 +99,6 @@ function toggleLeftDrawer() {
 
 .contenedor2 {
     display: flex;
-    gap: 30px;
     text-align: center;
     justify-content: center;
     margin-top: 10%;
@@ -114,7 +113,7 @@ function toggleLeftDrawer() {
     width: 250px;
     height: 250px;
     color: rgb(0, 0, 0); 
-    gap: 30px;
+
 
 }
 .img{
