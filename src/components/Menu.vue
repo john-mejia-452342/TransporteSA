@@ -29,7 +29,7 @@
             <q-btn id="btnmenu"><i class="fa-solid fa-clock"></i><router-link to="/horario">Horarios</router-link></q-btn>
         </q-drawer>
         <q-page-container class="contenedor2">
-            <q-btn class="btn2"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU" alt="" class="img">  <router-link to="/vendedor">Vendedor</router-link></q-btn>
+            <q-btn class="btn2"> <router-link to="/vendedor">Vendedor</router-link></q-btn>
             <q-btn class="btn2"><router-link to="/bus">Bus</router-link></q-btn>
             <q-btn class="btn2"><router-link to="/bus">Conductores</router-link></q-btn>
             <q-btn class="btn2"><router-link to="/cliente">Clientes</router-link></q-btn>
@@ -75,7 +75,6 @@ function toggleLeftDrawer() {
     padding: 25px;
 
 }
-
 #btnmenu {
     background-color: rgba(0, 153, 255, 0.527);
     font-size: 5mm;
@@ -99,12 +98,13 @@ function toggleLeftDrawer() {
 
 .contenedor2 {
     display: flex;
+    gap: 30px;
     text-align: center;
     justify-content: center;
-    margin-top: 10%;
-    justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
-  
+
+
 
 }
 
@@ -113,13 +113,11 @@ function toggleLeftDrawer() {
     width: 250px;
     height: 250px;
     color: rgb(0, 0, 0); 
-
-
+    gap: 30px;    
 }
-.img{
-    height: 30px;
-    width: 30px;
-}
+
+.btn2 a{}
+
 
 
 
