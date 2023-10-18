@@ -1,8 +1,10 @@
 <template>
-    <div>
+    <div class="container">
         <div class="login-card">
             <div class="card-header">
-                <img id="fotol" src="https://png.pngtree.com/png-vector/20220912/ourmid/pngtree-high-detailed-bus-vector-png-image_6172563.png" alt="">
+                <img id="fotol"
+                    src="https://png.pngtree.com/png-vector/20220912/ourmid/pngtree-high-detailed-bus-vector-png-image_6172563.png"
+                    alt="">
                 <h1 id="Titulo">Ingresar</h1>
             </div>
             <div class="card-body">
@@ -16,7 +18,8 @@
                         <input type="password" id="password" name="password" required="">
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="login-button"><router-link to="/menu" class="text-black">Ingresar</router-link></button>
+                        <button type="submit" class="login-button"><router-link to="/menu"
+                                class="text-black">Ingresar</router-link></button>
 
                         <router-view></router-view>
                     </div>
@@ -34,19 +37,33 @@
 </script>
   
 <style scoped>
+.container {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-image: url(https://img.freepik.com/foto-gratis/pareja-tiro-completo-caminando-equipaje_23-2149322005.jpg?w=1380&t=st=1697576609~exp=1697577209~hmac=fc636cb17e087127ea07ec07ea0c32d79fe169fc4f35d6e01d883ab649381e56);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 
+}
 
-
-#fotol{
+#fotol {
     width: 300px;
     height: 300px;
 }
+
 #Titulo {
     font-size: 3em;
     position: relative;
     top: -30px;
-    margin: 0;    
+    margin: 0;
 }
+
 .login-card {
     background-color: #f8f8f8;
     border-radius: 10px;
@@ -56,14 +73,13 @@
     width: 500px;
     height: 750px;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 40%;
 
 }
 
 
 .card-header {
-        text-align: center;
-        
+    text-align: center;
+
 }
 
 .card-header h1 {
@@ -72,17 +88,18 @@
     text-shadow: 1px 1px #ddd;
 }
 
-.card-body{
+.card-body {
     display: flex;
     align-content: stretch;
     justify-content: space-evenly;
     position: relative;
-    top:  -40px;
+    top: -40px;
 }
+
 .form-group {
     margin-bottom: 10px;
 
-  
+
 }
 
 .form-group label {
@@ -147,6 +164,5 @@ input[type="submit"]:hover {
     -webkit-box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
     -moz-box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
     box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
-}
-</style>
+}</style>
   
