@@ -18,7 +18,7 @@
                         <input type="password" id="password" name="password" required="">
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="login-button"><router-link to="/menu"
+                        <button type="button" class="login-button"><router-link to="/menu"
                                 class="text-black">Ingresar</router-link></button>
 
                         <router-view></router-view>
@@ -30,11 +30,7 @@
     </div>
 </template>
   
-<script setup>
-
-
-
-</script>
+<script setup></script>
   
 <style scoped>
 .container {
@@ -49,7 +45,6 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
-
 }
 
 #fotol {
@@ -164,5 +159,6 @@ input[type="submit"]:hover {
     -webkit-box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
     -moz-box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
     box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
-}</style>
+}
+</style>
   

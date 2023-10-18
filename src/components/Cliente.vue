@@ -11,26 +11,25 @@
                 <q-separator />
 
                 <q-card-section style="max-height: 50vh" class="scroll">
-                    <q-input v-model="placa" label="Placa" style="width: 300px;"/>
-                    <q-input v-model="numero_bus" label="Número de Bus" style="width: 300px;"/>
-                    <q-input v-model="cantidad_asientos" label="Cantidad de Asientos" style="width: 300px;" />
-                    <q-input v-model="empresa_asignada" label="Empresa Asignada" style="width: 300px;" />
+                    <q-input v-model="cedula" label="Cedula" style="width: 300px;"/>
+                    <q-input v-model="nombre" label="Nombre" style="width: 300px;"/>
+                    <q-input v-model="telefono" label="Telefono" style="width: 300px;" />
                 </q-card-section>
 
                 <q-separator />
 
                 <q-card-actions align="right">
                     <q-btn flat label="Cerrar" color="primary" v-close-popup />
-                    <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarBus()" />
+                    <q-btn flat label="Guardar 💾" color="primary" @click="editaragregarCliente()" />
                 </q-card-actions>
             </q-card>
         </q-dialog>
         <div class="container-table">
-            <h1>Buses</h1>
+            <h1>Clientes</h1>
             <div class="btn-agregar">
-                <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
+                <q-btn color="secondary" label="Agregar ➕" @click="agregarCliente()" />
             </div>
-            <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
+            <q-table title="Clientes" :rows="rows" :columns="columns" row-key="name">
                 <template v-slot:body-cell-estado="props">
                     <q-td :props="props">
                         <label for="" v-if="props.row.estado == 1" style="color: green;" >Activo</label>
@@ -56,24 +55,23 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
-import { useBusStore } from '../stores/Bus.js';
-const busStore = useBusStore()
+import { useClienteStore } from '../stores/Cliente.js';
+const clienteStore = useClienteStore()
 
-let buses = ref([]);
+let clientes = ref([]);
 let rows = ref([]);
 let fixed = ref(false)
 let text = ref('')
-let placa = ref('');
-let numero_bus = ref();
-let cantidad_asientos = ref('');
-let empresa_asignada = ref('');
+let cedula = ref('');
+let nombre = ref();
+let telefono = ref('');
 let cambio = ref(0)
 
 async function obtenerInfo(){
     try {
-        await busStore.obtenerInfoBuses();
-        buses.value = busStore.buses;
-        rows.value = busStore.buses;
+        await clienteStore.obtenerInfoClientes();
+        clientes.value = clienteStore.clientes;
+        rows.value = clienteStore.clientes;
     } catch (error) {
         console.log(error);
     }
@@ -84,11 +82,10 @@ onMounted(async () => {
 });
 
 const columns = [
-    { name: 'placa', label: 'Placa', field: 'placa', sortable: true },
-    { name: 'numero_bus', label: 'Número de Bus', field: 'numero_bus', sortable: true },
-    { name: 'cantidad_asientos', label: 'Cantidad de Asientos', field: 'cantidad_asientos' },
-    { name: 'empresa_asignada', label: 'Empresa Asignada', field: 'empresa_asignada' },
-    { name: 'estado', label: 'Estado', field: 'estado', sortable: true, format: (val) => (val ? 'Activo' : 'Inactivo') },
+    { name: 'cedula', label: 'Cedula', field: 'cedula', sortable: true },
+    { name: 'nombre', label: 'Nombre', field: 'nombre', sortable: true },
+    { name: 'telefono', label: 'Telefono', field: 'telefono' },
+    { name: 'estado', label: 'Estado', field: 'estado', sortable: true},
     {
         name: 'createAT', label: 'Fecha de Creación', field: 'createAT', sortable: true,
         format: (val) => format(new Date(val), 'yyyy-MM-dd')
@@ -100,15 +97,15 @@ const columns = [
     },
 ];
 
-function agregarBus() {
+function agregarCliente() {
     fixed.value = true;
     text.value = "Agregar Bus";
     cambio.value = 0
 }
 
-async function editarAgregarBus() {
+async function editaragregarCliente() {
     if (cambio.value === 0) {
-        await busStore.postBus({
+        await clienteStore.postBus({
             placa: placa.value,
             numero_bus: numero_bus.value,
             cantidad_asientos: cantidad_asientos.value,
@@ -120,7 +117,7 @@ async function editarAgregarBus() {
     } else {
         let id = idBus.value;
         if (id) {
-            await busStore.putEditarBus(id,{
+            await clienteStore.putEditarBus(id,{
                 placa: placa.value,
                 numero_bus: numero_bus.value,
                 cantidad_asientos: cantidad_asientos.value,
@@ -157,13 +154,13 @@ async function EditarBus(id) {
     }
 }
 
-async function InactivarBus(id) {
-    await busStore.putInactivarBus(id)
+async function InactivarCliente(id) {
+    await clienteStore.putInactivarCliente(id)
     obtenerInfo()
 }
 
-async function ActivarBus(id) {
-    await busStore.putActivarBus(id)
+async function ActivarCliente(id) {
+    await clienteStore.putActivarCliente(id)
     obtenerInfo()
 }
 

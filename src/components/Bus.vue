@@ -89,7 +89,7 @@ const columns = [
     { name: 'numero_bus', label: 'Número de Bus', field: 'numero_bus', sortable: true },
     { name: 'cantidad_asientos', label: 'Cantidad de Asientos', field: 'cantidad_asientos' },
     { name: 'empresa_asignada', label: 'Empresa Asignada', field: 'empresa_asignada' },
-    { name: 'estado', label: 'Estado', field: 'estado', sortable: true, format: (val) => (val ? 'Activo' : 'Inactivo') },
+    { name: 'estado', label: 'Estado', field: 'estado', sortable: true},
     {
         name: 'createAT', label: 'Fecha de Creación', field: 'createAT', sortable: true,
         format: (val) => format(new Date(val), 'yyyy-MM-dd')
