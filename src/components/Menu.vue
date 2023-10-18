@@ -1,4 +1,3 @@
-
 <template>
     <q-layout view="hHh lpR fFf">
 
@@ -10,7 +9,7 @@
                     <q-avatar>
                         <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
                     </q-avatar>
-                    Title
+                    Terminal de buses
                 </q-toolbar-title>
             </q-toolbar>
         </q-header>
@@ -19,7 +18,7 @@
             <img id="logo"
                 src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg"
                 alt="">
-            <!-- <q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i> <router-link to="/menu">Menu</router-link></q-btn> -->
+            <q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i> <router-link to="/menu">Menu</router-link></q-btn>
             <q-btn id="btnmenu"><i class="fa-solid fa-wallet"></i> <router-link
                     to="/vendedor">Vendedor</router-link></q-btn>
             <q-btn id="btnmenu"><i class="fa-solid fa-bus"></i><router-link to="/bus">Bus</router-link></q-btn>
@@ -29,11 +28,21 @@
             <q-btn id="btnmenu"><i class="fa-solid fa-clock"></i><router-link to="/horario">Horarios</router-link></q-btn>
         </q-drawer>
         <q-page-container class="contenedor2">
-            <q-btn class="btn2"> <router-link to="/vendedor">Vendedor</router-link></q-btn>
-            <q-btn class="btn2"><router-link to="/bus">Bus</router-link></q-btn>
-            <q-btn class="btn2"><router-link to="/bus">Conductores</router-link></q-btn>
-            <q-btn class="btn2"><router-link to="/cliente">Clientes</router-link></q-btn>
-            <q-btn class="btn2"><router-link to="/horario">Horarios</router-link></q-btn>
+            <button class="btn2"><router-link to="/vendedor">Vendedor</router-link> <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    alt="" class="img"></button>
+            <button class="btn2"><router-link to="/bus">Bus</router-link> <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    alt="" class="img"></button>
+            <button class="btn2"><router-link to="/cliente">Cliente</router-link> <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    alt="" class="img"></button>
+            <button class="btn2"><router-link to="/horario">Horario</router-link> <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    alt="" class="img"></button>
+            <button class="btn2"><router-link to="/conductores">Conductor</router-link> <img
+                    src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png"
+                    alt="" class="img"></button>
             <router-view />
         </q-page-container>
 
@@ -73,8 +82,8 @@ function toggleLeftDrawer() {
     flex-direction: column;
     gap: 50px;
     padding: 25px;
-
 }
+
 #btnmenu {
     background-color: rgba(0, 153, 255, 0.527);
     font-size: 5mm;
@@ -82,7 +91,6 @@ function toggleLeftDrawer() {
     width: 150px;
     border-radius: 10px;
     color: black;
-
 }
 
 #btnmenu a {
@@ -104,22 +112,36 @@ function toggleLeftDrawer() {
     align-items: center;
     flex-wrap: wrap;
 
-
-
 }
 
 .contenedor2 a {
     text-decoration: none;
     width: 250px;
     height: 250px;
-    color: rgb(0, 0, 0); 
-    gap: 30px;    
+    color: rgb(0, 0, 0);
+    gap: 30px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 2em;
+    border-radius: 50px;
+
+
 }
 
-.btn2 a{}
+.btn2 {
+    display: flex;
+    margin-top: 100px;
+    flex-direction: column;
+    height: 400px;
+    display: grid;
+    justify-items: center;
+    border-radius: 30px;
+    background-color: rgb(0, 140, 255);
+
+}
 
 
-
-
-
+.img {
+    position: relative;
+    top: -100px;
+}
 </style>
