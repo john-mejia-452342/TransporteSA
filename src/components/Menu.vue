@@ -15,12 +15,25 @@
             </q-toolbar>
         </q-header>
 
-        <q-drawer v-model="leftDrawerOpen" side="left" overlay elevated>
-            <q-btn color="secondary"><router-link to="/vendedor">Vendedor</router-link></q-btn>
-            <q-btn color="secondary"><router-link to="/bus">Bus</router-link></q-btn>
-
+        <q-drawer id="menulateral" v-model="leftDrawerOpen" side="left" overlay elevated>
+            <img id="logo"
+                src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg"
+                alt="">
+            <!-- <q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i> <router-link to="/menu">Menu</router-link></q-btn> -->
+            <q-btn id="btnmenu"><i class="fa-solid fa-wallet"></i> <router-link
+                    to="/vendedor">Vendedor</router-link></q-btn>
+            <q-btn id="btnmenu"><i class="fa-solid fa-bus"></i><router-link to="/bus">Bus</router-link></q-btn>
+            <q-btn id="btnmenu"><i class="fa-regular fa-id-card"></i><router-link
+                    to="/bus">Conductores</router-link></q-btn>
+            <q-btn id="btnmenu"><i class="fa-solid fa-user"></i><router-link to="/cliente">Clientes</router-link></q-btn>
+            <q-btn id="btnmenu"><i class="fa-solid fa-clock"></i><router-link to="/horario">Horarios</router-link></q-btn>
         </q-drawer>
-        <q-page-container>
+        <q-page-container class="contenedor2">
+            <q-btn class="btn2"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU" alt="" class="img">  <router-link to="/vendedor">Vendedor</router-link></q-btn>
+            <q-btn class="btn2"><router-link to="/bus">Bus</router-link></q-btn>
+            <q-btn class="btn2"><router-link to="/bus">Conductores</router-link></q-btn>
+            <q-btn class="btn2"><router-link to="/cliente">Clientes</router-link></q-btn>
+            <q-btn class="btn2"><router-link to="/horario">Horarios</router-link></q-btn>
             <router-view />
         </q-page-container>
 
@@ -51,3 +64,65 @@ function toggleLeftDrawer() {
 
 
 </script>
+
+
+<style>
+#menulateral {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 50px;
+    padding: 25px;
+
+}
+
+#btnmenu {
+    background-color: rgba(0, 153, 255, 0.527);
+    font-size: 5mm;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    width: 150px;
+    border-radius: 10px;
+    color: black;
+
+}
+
+#btnmenu a {
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+}
+
+#logo {
+    border-radius: 30px;
+    width: 250px;
+    height: 250px;
+}
+
+.contenedor2 {
+    display: flex;
+    gap: 30px;
+    text-align: center;
+    justify-content: center;
+    margin-top: 10%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  
+
+}
+
+.contenedor2 a {
+    text-decoration: none;
+    width: 250px;
+    height: 250px;
+    color: rgb(0, 0, 0); 
+    gap: 30px;
+
+}
+.img{
+    height: 30px;
+    width: 30px;
+}
+
+
+
+
+</style>
