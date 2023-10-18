@@ -73,7 +73,6 @@ let cambio = ref(0)
 onMounted(async () => {
     try {
         await busStore.obtenerInfoBuses();
-        console.log(busStore.buses);
         buses.value = busStore.buses;
         rows.value = busStore.buses;
     } catch (error) {
@@ -106,40 +105,26 @@ function agregarBus() {
 
 async function editarAgregarBus() {
     if (cambio.value === 0) {
-        const data = {
+        await busStore.postBus({
             placa: placa.value,
             numero_bus: numero_bus.value,
             cantidad_asientos: cantidad_asientos.value,
             empresa_asignada: empresa_asignada.value,
-        };
-
-        try {
-            let res = await axios.post("bus/bus/agregar", data);
-            console.log(res);
-            limpiar();
-            obtenerInfo();
-        } catch (error) {
-            console.log(error);
-        }
+        })
+        limpiar()
     } else {
-        let id = idBus.value
+        let id = idBus.value;
         if (id) {
-            const data = {
+            await busStore.putEditarBus(id,{
                 cantidad_asientos: cantidad_asientos.value,
                 empresa_asignada: empresa_asignada.value,
-            };
-            try {
-                let r = await axios.put(`bus/bus/${id}`, data);
-                console.log(r);
-                obtenerInfo();
-                limpiar();
-                fixed.value = false;
-            } catch (error) {
-                console.log(error);
-            }
+            });
+            limpiar();
+            fixed.value = false;
         }
     }
 }
+
 
 function limpiar() {
     placa.value = ""
@@ -181,9 +166,7 @@ async function ActivarBus(id) {
     obtenerInfo();
 }
 
-// onMounted(() => {
-//     obtenerInfo();
-// });
+
 </script>
   
 <style scoped>

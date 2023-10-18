@@ -7,15 +7,32 @@ export const useBusStore = defineStore('bus', () => {
 
     const obtenerInfoBuses = async () => {
         try {
-            const responseBuses = await axios.get('bus/buses');
+            let responseBuses = await axios.get('bus/buses');
             buses.value = responseBuses.data.buses; 
         } catch (error) {
-            console.error('Error al obtener la información de los buses:', error);
+            throw error
+        }
+    };
+
+    const postBus = async (data) =>{
+        try {
+            let res = await axios.post("bus/bus/agregar", data);
+            return res
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const putEditarBus = async (id, data) => {
+        try {
+            let res = await axios.put(`bus/bus/${id}`, data);
+        } catch (error) {
+            throw error;
         }
     };
 
     return {
         buses,
-        obtenerInfoBuses,
+        obtenerInfoBuses, postBus, putEditarBus
     };
 });
