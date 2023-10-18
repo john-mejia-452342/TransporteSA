@@ -26,13 +26,31 @@ export const useBusStore = defineStore('bus', () => {
     const putEditarBus = async (id, data) => {
         try {
             let res = await axios.put(`bus/bus/${id}`, data);
+            return res
         } catch (error) {
             throw error;
         }
     };
 
+    const putInactivarBus = async (id)=>{
+        try {
+            let r = await axios.put(`bus/inactivarBus/${id}`)
+            return r
+        } catch (error) {
+            console.log(error, "Error al cambiar el estado del bus");
+        }
+    }
+    const putActivarBus = async (id)=>{
+        try {
+            let r = await axios.put(`bus/activarBus/${id}`)
+            return r
+        } catch (error) {
+            console.log(error, "Error al cambiar el estado del bus");
+        }
+    }
+
     return {
         buses,
-        obtenerInfoBuses, postBus, putEditarBus
+        obtenerInfoBuses, postBus, putEditarBus, putInactivarBus, putActivarBus
     };
 });
