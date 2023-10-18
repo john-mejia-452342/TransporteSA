@@ -29,16 +29,16 @@
         </q-drawer>
         <q-page-container class="contenedor2">
             <button class="btn2"><router-link to="/vendedor">Vendedor</router-link> <img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    src="https://i.pinimg.com/originals/4b/7e/25/4b7e2507375f65d1ca84654fa2db6e80.png"
                     alt="" class="img"></button>
             <button class="btn2"><router-link to="/bus">Bus</router-link> <img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    src="https://images.vexels.com/media/users/3/255197/isolated/preview/119b177c176fa0b55322a748c77159eb-escuela-escuelabus-handcutsimpleshapes-papercut-cr-8.png"
                     alt="" class="img"></button>
             <button class="btn2"><router-link to="/cliente">Cliente</router-link> <img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    src="https://cdn-icons-png.flaticon.com/512/1138/1138021.png"
                     alt="" class="img"></button>
             <button class="btn2"><router-link to="/horario">Horario</router-link> <img
-                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqw0-COL3qA_qIJ8CybJYOwxF4fZ0S-9sLOg&usqp=CAU"
+                    src="https://cdn-icons-png.flaticon.com/512/3094/3094927.png"
                     alt="" class="img"></button>
             <button class="btn2"><router-link to="/conductores">Conductor</router-link> <img
                     src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png"
@@ -131,17 +131,19 @@ function toggleLeftDrawer() {
     display: flex;
     margin-top: 100px;
     flex-direction: column;
-    height: 400px;
+    height: 300px;
     display: grid;
     justify-items: center;
     border-radius: 30px;
     background-color: rgb(0, 140, 255);
-
+border: none;
 }
 
 
-.img {
+.img{
     position: relative;
-    top: -100px;
+    top: -190px;
+    height: 200px;
+    width: 200px;
 }
 </style>
