@@ -26,7 +26,7 @@
             </q-card>
         </q-dialog>
         <div class="container-table">
-            <h1>Buses</h1>
+            <h1>Horario</h1>
             <div class="btn-agregar">
                 <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
             </div>
@@ -85,10 +85,10 @@ onMounted(async () => {
 });
 
 const columns = [
-    { name: 'placa', label: 'Placa', field: 'placa', sortable: true },
-    { name: 'numero_bus', label: 'Número de Bus', field: 'numero_bus', sortable: true },
-    { name: 'cantidad_asientos', label: 'Cantidad de Asientos', field: 'cantidad_asientos' },
-    { name: 'empresa_asignada', label: 'Empresa Asignada', field: 'empresa_asignada' },
+    { name: 'hora_partida', label: 'Hora Partida', field: 'hora_partida', sortable: true },
+    { name: 'hora_llegada', label: 'Hora Llegada', field: 'hora_llegada', sortable: true },
+    { name: 'fecha_partida', label: 'Fecha Partida', field: 'fecha_partida' },
+    { name: 'fecha_llegada', label: 'Fecha LLegada', field: 'fecha_llegada' },
     { name: 'estado', label: 'Estado', field: 'estado', sortable: true},
     {
         name: 'createAT', label: 'Fecha de Creación', field: 'createAT', sortable: true,
