@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container">
         <!-- Modal -->
         <q-dialog v-model="fixed">
             <q-card class="modal-content">
@@ -11,8 +11,8 @@
                 <q-separator />
 
                 <q-card-section style="max-height: 50vh" class="scroll">
-                    <q-input v-model="placa" label="Placa" style="width: 300px;" v-if="cambio == 0" />
-                    <q-input v-model="numero_bus" label="Número de Bus" style="width: 300px;" v-if="cambio == 0" />
+                    <q-input v-model="placa" label="Placa" style="width: 300px;"/>
+                    <q-input v-model="numero_bus" label="Número de Bus" style="width: 300px;"/>
                     <q-input v-model="cantidad_asientos" label="Cantidad de Asientos" style="width: 300px;" />
                     <q-input v-model="empresa_asignada" label="Empresa Asignada" style="width: 300px;" />
                 </q-card-section>
@@ -25,10 +25,10 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
-        <div>
+        <div class="container-table">
             <h1>Buses</h1>
             <div class="btn-agregar">
-                <q-btn color="secondary" label="Agregar" @click="agregarBus()" />
+                <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
             </div>
             <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
                 <template v-slot:body-cell-estado="props">
@@ -42,9 +42,9 @@
                 <template v-slot:body-cell-opciones="props">
                     <q-td :props="props" class="botones">
                         <q-btn color="white" text-color="black" label="🖋️" @click="EditarBus(props.row._id)" />
-                        <q-btn color="amber" glossy label="❌" @click="InactivarBus(props.row._id)"
+                        <q-btn color="white" text-color="black" label="❌" @click="InactivarBus(props.row._id)"
                             v-if="props.row.estado == 1" />
-                        <q-btn color="amber" glossy label="✅" @click="ActivarBus(props.row._id)" v-else />
+                        <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else />
                     </q-td>
                 </template>
             </q-table>
@@ -54,7 +54,7 @@
 </template>
   
 <script setup>
-import axios from 'axios';
+
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useBusStore } from '../stores/Bus.js';
@@ -70,7 +70,7 @@ let cantidad_asientos = ref('');
 let empresa_asignada = ref('');
 let cambio = ref(0)
 
-onMounted(async () => {
+async function obtenerInfo(){
     try {
         await busStore.obtenerInfoBuses();
         buses.value = busStore.buses;
@@ -78,6 +78,10 @@ onMounted(async () => {
     } catch (error) {
         console.log(error);
     }
+}
+
+onMounted(async () => {
+    obtenerInfo()
 });
 
 const columns = [
@@ -111,15 +115,21 @@ async function editarAgregarBus() {
             cantidad_asientos: cantidad_asientos.value,
             empresa_asignada: empresa_asignada.value,
         })
-        limpiar()
+        limpiar() 
+        obtenerInfo()
+
     } else {
         let id = idBus.value;
         if (id) {
             await busStore.putEditarBus(id,{
+                placa: placa.value,
+                numero_bus: numero_bus.value,
                 cantidad_asientos: cantidad_asientos.value,
                 empresa_asignada: empresa_asignada.value,
             });
-            limpiar();
+           
+            limpiar(); 
+            obtenerInfo()
             fixed.value = false;
         }
     }
@@ -141,35 +151,41 @@ async function EditarBus(id) {
         idBus.value = String(busSeleccionado._id);
         fixed.value = true;
         text.value = "Editar Bus";
+        placa.value = busSeleccionado.placa;
+        numero_bus.value = busSeleccionado.numero_bus
         cantidad_asientos.value = busSeleccionado.cantidad_asientos;
         empresa_asignada.value = busSeleccionado.empresa_asignada;
     }
 }
 
 async function InactivarBus(id) {
-    try {
-        let r = await axios.put(`bus/inactivarBus/${id}`)
-        console.log(r);
-    } catch (error) {
-        console.log(error, "Error al cambiar el estado del bus");
-    }
-    obtenerInfo();
+    await busStore.putInactivarBus(id)
+    obtenerInfo()
 }
 
 async function ActivarBus(id) {
-    try {
-        let r = await axios.put(`bus/activarBus/${id}`)
-        console.log(r);
-    } catch (error) {
-        console.log(error, "Error al cambiar el estado del bus");
-    }
-    obtenerInfo();
+    await busStore.putActivarBus(id)
+    obtenerInfo()
 }
 
 
 </script>
   
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Gabarito&display=swap');
+.container{
+    display: flex;
+    justify-content: center;
+}
+.container-table{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+}
+.container-table h1{
+    font-family: 'Gabarito', sans-serif;
+}
 .modal-content {
     width: 400px;
 }
