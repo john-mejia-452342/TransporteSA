@@ -18,31 +18,17 @@
             <img id="logo"
                 src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg"
                 alt="">
-            <q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i> <router-link to="/menu">Menu</router-link></q-btn>
+            <q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i> <router-link to="/main">Menu</router-link></q-btn>
             <q-btn id="btnmenu"><i class="fa-solid fa-wallet"></i> <router-link
                     to="/vendedor">Vendedor</router-link></q-btn>
             <q-btn id="btnmenu"><i class="fa-solid fa-bus"></i><router-link to="/bus">Bus</router-link></q-btn>
             <q-btn id="btnmenu"><i class="fa-regular fa-id-card"></i><router-link
-                    to="/bus">Conductores</router-link></q-btn>
+                    to="/conductores">Conductores</router-link></q-btn>
             <q-btn id="btnmenu"><i class="fa-solid fa-user"></i><router-link to="/cliente">Clientes</router-link></q-btn>
             <q-btn id="btnmenu"><i class="fa-solid fa-clock"></i><router-link to="/horario">Horarios</router-link></q-btn>
         </q-drawer>
         <q-page-container class="contenedor2">
-            <button class="btn2"><router-link to="/vendedor">Vendedor</router-link> <img
-                    src="https://i.pinimg.com/originals/4b/7e/25/4b7e2507375f65d1ca84654fa2db6e80.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/bus">Bus</router-link> <img
-                    src="https://images.vexels.com/media/users/3/255197/isolated/preview/119b177c176fa0b55322a748c77159eb-escuela-escuelabus-handcutsimpleshapes-papercut-cr-8.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/cliente">Cliente</router-link> <img
-                    src="https://cdn-icons-png.flaticon.com/512/1138/1138021.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/horario">Horario</router-link> <img
-                    src="https://cdn-icons-png.flaticon.com/512/3094/3094927.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/conductores">Conductor</router-link> <img
-                    src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png"
-                    alt="" class="img"></button>
+            
             <router-view />
         </q-page-container>
 
@@ -80,17 +66,22 @@ function toggleLeftDrawer() {
     display: flex;
     align-items: center;
     flex-direction: column;
-    gap: 50px;
+    gap: 7px;
     padding: 25px;
 }
-
 #btnmenu {
     background-color: rgba(0, 153, 255, 0.527);
     font-size: 5mm;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    width: 150px;
+    width: 250px;
     border-radius: 10px;
     color: black;
+    display: flex;
+    align-items: flex-start;
+}
+
+#btnmenu i {
+    margin: 10px;
 }
 
 #btnmenu a {
@@ -102,48 +93,5 @@ function toggleLeftDrawer() {
     border-radius: 30px;
     width: 250px;
     height: 250px;
-}
-
-.contenedor2 {
-    display: flex;
-    gap: 30px;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-
-}
-
-.contenedor2 a {
-    text-decoration: none;
-    width: 250px;
-    height: 250px;
-    color: rgb(0, 0, 0);
-    gap: 30px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: 2em;
-    border-radius: 50px;
-
-
-}
-
-.btn2 {
-    display: flex;
-    margin-top: 100px;
-    flex-direction: column;
-    height: 300px;
-    display: grid;
-    justify-items: center;
-    border-radius: 30px;
-    background-color: rgb(0, 140, 255);
-border: none;
-}
-
-
-.img{
-    position: relative;
-    top: -190px;
-    height: 200px;
-    width: 200px;
 }
 </style>
