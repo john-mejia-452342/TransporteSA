@@ -13,9 +13,11 @@
             <button class="btn2"><router-link to="/horario">Horario</router-link> <img
                     src="https://cdn-icons-png.flaticon.com/512/3094/3094927.png"
                     alt="" class="img"></button>
-            <button class="btn2"><router-link to="/conductor">Conductor</router-link> <img
-                    src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png"
-                    alt="" class="img"></button>
+            <button class="btn2"><router-link to="/conductor">
+                Conductor
+                <img src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png" alt="" class="img">
+            </router-link> 
+            </button>
         </q-page-container>
     </div>
    

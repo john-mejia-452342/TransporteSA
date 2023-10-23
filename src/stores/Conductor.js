@@ -9,28 +9,29 @@ export const useConductorStore = defineStore('conductor', () => {
         try {
             let responseConductores= await axios.get('conductor/conductor');
             conductores.value = responseConductores.data.conductor;
+            console.log(responseConductores);
         } catch (error) {
             throw error
         }
     };
 
-    // const postBus = async (data) =>{
-    //     try {
-    //         let res = await axios.post("bus/bus/agregar", data);
-    //         return res
-    //     } catch (error) {
-    //         throw error
-    //     }
-    // }
+    const postConductor = async (data) =>{
+        try {
+            let res = await axios.post("conductor/agregar", data);
+            return res
+        } catch (error) {
+            throw error
+        }
+    }
 
-    // const putEditarBus = async (id, data) => {
-    //     try {
-    //         let res = await axios.put(`bus/bus/${id}`, data);
-    //         return res
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // };
+    const putEditarConductor = async (id, data) => {
+        try {
+            let res = await axios.put(`/conductor/conductor/${id}`, data);
+            return res
+        } catch (error) {
+            throw error;
+        }
+    };
 
     // const putInactivarBus = async (id)=>{
     //     try {
@@ -51,6 +52,6 @@ export const useConductorStore = defineStore('conductor', () => {
 
     return {
         conductores,
-        obtenerInfoConductores,
+        obtenerInfoConductores, postConductor, putEditarConductor
     };
 });

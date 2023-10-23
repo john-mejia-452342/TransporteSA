@@ -11,13 +11,13 @@
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input type="text" v-model="cedula" label="cedula" style="width: 300px"/>
+          <q-input type="text" v-model="cedula" label="Cedula" style="width: 300px"/>
           <q-input type="text" v-model="nombre" label="Nombre" style="width: 300px" />
           <!-- <q-input type="text" v-model="id_bus" label="Bus" style="width: 300px" /> -->
           
-            <div class="q-pa" style="width: 300px">
-                <div class="q-gutter-md">
-                    <q-select v-model="bus" :options="options" label="Bus" /> 
+            <div class="q-pa" style="width: 300px;">
+                <div class="q-gutter">
+                  <q-select v-model="bus" :options="options" label="Bus"/> 
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
 </template>
   
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 import { useBusStore } from "../stores/Bus.js";
 import { useConductorStore } from "../stores/Conductor.js"
@@ -91,10 +91,13 @@ async function obtenerInfo() {
     console.log(error);
   }
 }
+
+
 async function obtenerBuses() {
     try {
         await busStore.obtenerInfoBuses();
-        options.value = busStore.buses.map((bus) => ({
+        options.value = busStore.buses.map((bus) => (
+          {
             label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
             value: String(bus._id)
         }));
@@ -102,6 +105,9 @@ async function obtenerBuses() {
         console.log(error);
     }
 }
+watch(bus, async () => {
+  console.log(bus._rawValue);
+})
 
 
 
@@ -111,13 +117,13 @@ onMounted(async () => {
 
 const columns = [
   { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
-  { name: "nombre", label: "Nombre", field: "nombre", sortable: true,},
-  { name: "id_bus", label: "Bus", field: "id_bus",},
-  { name: "experiencia", label: "Experiencia", field: "experiencia",},
-  { name: "telefono", label: "Telefono", field: "telefono",},
+  { name: "nombre", label: "Nombre", field: "nombre", sortable: true},
+  { name: "id_bus", label: "Bus", field: (row)=>row.id_bus.placa},
+  { name: "experiencia", label: "Experiencia", field: "experiencia"},
+  { name: "telefono", label: "Telefono", field: "telefono"},
   { name: "estado", label: "Estado", field: "estado", sortable: true },
   { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
+  { name: "opciones", label: "Opciones", sortable: false,},
 ];
 
 function agregarConductor() {
@@ -129,10 +135,10 @@ function agregarConductor() {
 
 async function editarAgregarConductor() {
   if (cambio.value === 0) {
-    await busStore.postBus({
-      placa: placa.value,
+    await conductorStore.postConductor({
+      cedula: cedula.value,
       nombre: nombre.value,
-      bus: bus.value,
+      id_bus: bus._rawValue.value,
       experiencia: experiencia.value,
       telefono: telefono.value
     });
@@ -141,10 +147,11 @@ async function editarAgregarConductor() {
   } else {
     let id = idConductor.value;
     if (id) {
-      await conductorStore.putEditarBus(id, {
+
+      await conductorStore.putEditarConductor(id, {
         cedula: cedula.value,
         nombre: nombre.value,
-        bus: bus.value,
+        id_bus: bus._rawValue.value,
         experiencia: experiencia.value,
         telefono: telefono.value
       });
@@ -166,7 +173,7 @@ function limpiar() {
 
 let idConductor = ref("");
 async function EditarConductor(id) {
-    obtenerBuses()
+  obtenerBuses()
   cambio.value = 1;
   const conductorSeleccionado = conductores.value.find((conductor) => conductor._id === id);
   if (conductorSeleccionado) {
