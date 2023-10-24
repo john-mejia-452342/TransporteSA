@@ -14,43 +14,43 @@ export const useHorarioStore = defineStore('horario', () => {
         }
     };
 
-    // const postCliente = async (data) =>{
-    //     try {
-    //         let res = await axios.post('/cliente/cliente/agregar', data);
-    //         return res
-    //     } catch (error) {
-    //         throw error
-    //     }
-    // }
+    const postHorario = async (data) =>{
+        try {
+            let res = await axios.post('/horario/agregar', data);
+            return res
+        } catch (error) {
+            throw error
+        }
+    }
 
-    // const putEditarCliente = async (id, data) => {
-    //     try {
-    //         let res = await axios.put(`/cliente/cliente/${id}`, data);
-    //         return res
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // };
+    const putEditarHorario = async (id, data) => {
+        try {
+            let res = await axios.put(`/horario/horario/${id}`, data);
+            return res
+        } catch (error) {
+            throw error;
+        }
+    };
 
-    // const putInactivarCliente = async (id)=>{
-    //     try {
-    //         let r = await axios.put(`/cliente/inactivarCliente/${id}`)
-    //         return r
-    //     } catch (error) {
-    //         console.log(error, "Error al cambiar el estado del bus");
-    //     }
-    // }
-    // const putActivarCliente = async (id)=>{
-    //     try {
-    //         let r = await axios.put(`/cliente/activarCliente/${id}`)
-    //         return r
-    //     } catch (error) {
-    //         console.log(error, "Error al cambiar el estado del bus");
-    //     }
-    // }
+    const putInactivarHorario = async (id)=>{
+        try {
+            let r = await axios.put(`/horario/inactivarHorario/${id}`)
+            return r
+        } catch (error) {
+            console.log(error, "Error al cambiar el estado del Horario");
+        }
+    }
+    const putActivarHorario = async (id)=>{
+        try {
+            let r = await axios.put(`/horario/activarHorario/${id}`)
+            return r
+        } catch (error) {
+            console.log(error, "Error al cambiar el estado del bus");
+        }
+    }
 
     return {
         horarios,
-        obtenerInfoHorarios,
+        obtenerInfoHorarios, postHorario, putEditarHorario, putInactivarHorario, putActivarHorario
     };
 });

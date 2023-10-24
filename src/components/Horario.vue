@@ -13,8 +13,6 @@
                 <q-card-section style="max-height: 50vh" class="scroll">
                     <q-input v-model="hora_partida" label="Hora de partida" style="width: 300px;"/>
                     <q-input v-model="hora_llegada" label="Hora de llegada" style="width: 300px;"/>
-                    <q-input v-model="fecha_partida" label="Fecha de partida" style="width: 300px;" />
-                    <q-input v-model="fecha_llegada" label="Fecha de llegada" style="width: 300px;" />
                 </q-card-section>
 
                 <q-separator />
@@ -28,7 +26,7 @@
         <div class="container-table">
             <h1>Horario</h1>
             <div class="btn-agregar">
-                <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
+                <q-btn color="secondary" label="Agregar ➕" @click="agregarHorario()" />
             </div>
             <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
                 <template v-slot:body-cell-estado="props">
@@ -41,10 +39,10 @@
                 </template>
                 <template v-slot:body-cell-opciones="props">
                     <q-td :props="props" class="botones">
-                        <q-btn color="white" text-color="black" label="🖋️" @click="EditarBus(props.row._id)" />
-                        <q-btn color="white" text-color="black" label="❌" @click="InactivarBus(props.row._id)"
+                        <q-btn color="white" text-color="black" label="🖋️" @click="editarHorario(props.row._id)" />
+                        <q-btn color="white" text-color="black" label="❌" @click="InactivarHorario(props.row._id)"
                             v-if="props.row.estado == 1" />
-                        <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else />
+                        <q-btn color="white" text-color="black" label="✅" @click="ActivarHorario(props.row._id)" v-else />
                     </q-td>
                 </template>
             </q-table>
@@ -66,8 +64,6 @@ let fixed = ref(false)
 let text = ref('')
 let hora_partida = ref();
 let hora_llegada = ref();
-let fecha_partida = ref();
-let fecha_llegada = ref();
 let cambio = ref(0)
 
 async function obtenerInfo(){
@@ -87,8 +83,6 @@ onMounted(async () => {
 const columns = [
     { name: 'hora_partida', label: 'Hora Partida', field: 'hora_partida', sortable: true },
     { name: 'hora_llegada', label: 'Hora Llegada', field: 'hora_llegada', sortable: true },
-    { name: 'fecha_partida', label: 'Fecha Partida', field: 'fecha_partida' },
-    { name: 'fecha_llegada', label: 'Fecha LLegada', field: 'fecha_llegada' },
     { name: 'estado', label: 'Estado', field: 'estado', sortable: true},
     {
         name: 'createAT', label: 'Fecha de Creación', field: 'createAT', sortable: true,
@@ -101,31 +95,27 @@ const columns = [
     },
 ];
 
-function agregarBus() {
+function agregarHorario() {
     fixed.value = true;
-    text.value = "Agregar Bus";
+    text.value = "Agregar Horario";
     cambio.value = 0
 }
 
 async function editarAgregarHorario() {
     if (cambio.value === 0) {
-        await busStore.postBus({
-            placa: placa.value,
-            numero_bus: numero_bus.value,
-            cantidad_asientos: cantidad_asientos.value,
-            empresa_asignada: empresa_asignada.value,
+        await horarioStore.postHorario({
+            hora_partida: hora_partida.value,
+            hora_llegada: hora_llegada.value,
         })
         limpiar() 
         obtenerInfo()
 
     } else {
-        let id = idBus.value;
+        let id = idHorario.value;
         if (id) {
-            await busStore.putEditarBus(id,{
-                placa: placa.value,
-                numero_bus: numero_bus.value,
-                cantidad_asientos: cantidad_asientos.value,
-                empresa_asignada: empresa_asignada.value,
+            await horarioStore.putEditarHorario(id,{
+                hora_partida: hora_partida.value,
+                hora_llegada: hora_llegada.value,
             });
            
             limpiar(); 
@@ -137,34 +127,31 @@ async function editarAgregarHorario() {
 
 
 function limpiar() {
-    placa.value = ""
-    numero_bus.value = ""
-    cantidad_asientos = ""
-    empresa_asignada = ""
+    hora_partida.value = ""
+    hora_llegada.value = ""
+
 }
 
-let idBus = ref('')
-async function EditarBus(id) {
+let idHorario = ref('')
+async function editarHorario(id) {
     cambio.value = 1;
-    const busSeleccionado = buses.value.find((bus) => bus._id === id);
-    if (busSeleccionado) {
-        idBus.value = String(busSeleccionado._id);
+    const horarioSelected = horarios.value.find((horario) => horario._id === id);
+    if (horarioSelected) {
+        idHorario.value = String(horarioSelected._id);
         fixed.value = true;
-        text.value = "Editar Bus";
-        placa.value = busSeleccionado.placa;
-        numero_bus.value = busSeleccionado.numero_bus
-        cantidad_asientos.value = busSeleccionado.cantidad_asientos;
-        empresa_asignada.value = busSeleccionado.empresa_asignada;
+        text.value = "Editar Horario";
+        hora_partida.value = horarioSelected.hora_partida
+        hora_llegada.value = horarioSelected.hora_llegada
     }
 }
 
-async function InactivarBus(id) {
-    await busStore.putInactivarBus(id)
+async function InactivarHorario(id) {
+    await horarioStore.putInactivarHorario(id)
     obtenerInfo()
 }
 
-async function ActivarBus(id) {
-    await busStore.putActivarBus(id)
+async function ActivarHorario(id) {
+    await horarioStore.putActivarHorario(id)
     obtenerInfo()
 }
 

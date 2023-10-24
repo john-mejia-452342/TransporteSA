@@ -13,7 +13,6 @@
         <q-card-section style="max-height: 50vh" class="scroll">
           <q-input type="text" v-model="cedula" label="Cedula" style="width: 300px"/>
           <q-input type="text" v-model="nombre" label="Nombre" style="width: 300px" />
-          <!-- <q-input type="text" v-model="id_bus" label="Bus" style="width: 300px" /> -->
           
             <div class="q-pa" style="width: 300px;">
                 <div class="q-gutter">
@@ -21,7 +20,7 @@
                 </div>
             </div>
 
-          <q-input type="text" v-model="experiencia" label="Experienca" style="width: 300px" />
+          <q-input type="text" v-model="experiencia" label="Experiencia" style="width: 300px" />
           <q-input type="text" v-model="telefono" label="Telefono" style="width: 300px" />
         </q-card-section>
         <q-separator />

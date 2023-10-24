@@ -7,7 +7,7 @@ export const useConductorStore = defineStore('conductor', () => {
 
     const obtenerInfoConductores = async () => {
         try {
-            let responseConductores= await axios.get('conductor/conductor');
+            let responseConductores= await axios.get('/conductor/conductor');
             conductores.value = responseConductores.data.conductor;
         } catch (error) {
             throw error
@@ -16,7 +16,7 @@ export const useConductorStore = defineStore('conductor', () => {
 
     const postConductor = async (data) =>{
         try {
-            let res = await axios.post("conductor/agregar", data);
+            let res = await axios.post("/conductor/agregar", data);
             return res
         } catch (error) {
             throw error
@@ -34,7 +34,7 @@ export const useConductorStore = defineStore('conductor', () => {
 
     const putInactivarConductor = async (id)=>{
         try {
-            let r = await axios.put(`conductor/inactivarConductor/${id}`)
+            let r = await axios.put(`/conductor/inactivarConductor/${id}`)
             return r
         } catch (error) {
             console.log(error, "Error al cambiar el estado del conductor");
@@ -42,7 +42,7 @@ export const useConductorStore = defineStore('conductor', () => {
     }
     const putActivarConductor = async (id)=>{
         try {
-            let r = await axios.put(`conductor/activarConductor/${id}`)
+            let r = await axios.put(`/conductor/activarConductor/${id}`)
             return r
         } catch (error) {
             console.log(error, "Error al cambiar el estado del conductor");

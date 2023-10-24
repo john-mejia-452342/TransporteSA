@@ -11,42 +11,22 @@
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input
-            type="text"
-            v-model="placa"
-            label="Placa"
-            style="width: 300px"
-          />
-          <q-input
-            type="number"
-            v-model="numero_bus"
-            label="Número de Bus"
-            style="width: 300px"
-          />
-          <q-input
-            type="text"
-            v-model="cantidad_asientos"
-            label="Cantidad de Asientos"
-            style="width: 300px"
-          />
-          <q-input
-            type="text"
-            v-model="empresa_asignada"
-            label="Empresa Asignada"
-            style="width: 300px"
-          />
+          <q-input type="text" v-model="placa" label="Placa" style="width: 300px"/>
+          <q-input type="number" v-model="numero_bus" label="Número de Bus" style="width: 300px"/>
+          <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" style="width: 300px"/>
+          <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" style="width: 300px"/>
+          <div class="q-pa" style="width: 300px;">
+            <div class="q-gutter">
+              <q-select v-model="ruta" :options="options" label="Rutas"/> 
+            </div>
+          </div>
         </q-card-section>
 
         <q-separator />
 
         <q-card-actions align="right">
           <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn
-            flat
-            label="Guardar 💾"
-            color="primary"
-            @click="editarAgregarBus()"
-          />
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarBus()"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -66,26 +46,9 @@
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn
-              color="white"
-              text-color="black"
-              label="🖋️"
-              @click="EditarBus(props.row._id)"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="❌"
-              @click="InactivarBus(props.row._id)"
-              v-if="props.row.estado == 1"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="✅"
-              @click="ActivarBus(props.row._id)"
-              v-else
-            />
+            <q-btn color="white" text-color="black" label="🖋️" @click="EditarBus(props.row._id)"/>
+            <q-btn color="white" text-color="black" label="❌" @click="InactivarBus(props.row._id)" v-if="props.row.estado == 1"/>
+            <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else />
           </q-td>
         </template>
       </q-table>
@@ -94,15 +57,20 @@
 </template>
   
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 import { useBusStore } from "../stores/Bus.js";
+import { useRutaStore } from "../stores/Ruta.js";
+
 const busStore = useBusStore();
+const rutaStore = useRutaStore()
 
 let buses = ref([]);
 let rows = ref([]);
 let fixed = ref(false);
 let text = ref("");
+let ruta = ref("")
+let options = ref([])
 let placa = ref("");
 let numero_bus = ref();
 let cantidad_asientos = ref("");
@@ -121,45 +89,45 @@ async function obtenerInfo() {
   }
 }
 
+watch(ruta, (newValue, oldValue) => {
+  console.log(ruta._rawValue.value);
+});
+
+async function obtenerRutas() {
+      try {
+          await rutaStore.obtenerInfoRutas();
+          options.value = rutaStore.rutas.map((ruta) => (
+            {
+              label: `${ruta.precio} - ${ruta.origen} - ${ruta.destino}`,
+              value: String(ruta._id)
+          }));
+      } catch (error) {
+          console.log(error);
+      }
+  }
+
 onMounted(async () => {
   obtenerInfo();
 });
 
 const columns = [
   { name: "placa", label: "Placa", field: "placa", sortable: true },
-  {
-    name: "numero_bus",
-    label: "Número de Bus",
-    field: "numero_bus",
-    sortable: true,
-  },
-  {
-    name: "cantidad_asientos",
-    label: "Cantidad de Asientos",
-    field: "cantidad_asientos",
-  },
-  {
-    name: "empresa_asignada",
-    label: "Empresa Asignada",
-    field: "empresa_asignada",
-  },
+  { name: "numero_bus",label: "Número de Bus",field: "numero_bus",sortable: true,},
+  { name: "cantidad_asientos",label: "Cantidad de Asientos",field: "cantidad_asientos",},
+  { name: "empresa_asignada",label: "Empresa Asignada",field: "empresa_asignada",},
+  { name: "precio", label: "Ruta Precio", field: (row)=>row.ruta_id.precio},
+  { name: "origen", label: "Ruta Origen", field: (row)=>row.ruta_id.origen},
+  { name: "destino", label: "Ruta Destino", field: (row)=>row.ruta_id.destino},
+  { name: "hora_partida", label: "Ruta Horario Partida", field: (row)=>row.ruta_id.horario_id.hora_partida},
+  { name: "hora_llegada", label: "Ruta Horario Llegada", field: (row)=>row.ruta_id.horario_id.hora_llegada},
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  {
-    name: "createAT",
-    label: "Fecha de Creación",
-    field: "createAT",
-    sortable: true,
-    format: (val) => format(new Date(val), "yyyy-MM-dd"),
-  },
-  {
-    name: "opciones",
-    label: "Opciones",
-    field: (row) => null,
-    sortable: false,
-  },
+  { name: "createAT",label: "Fecha de Creación",field: "createAT",sortable: true,
+  format: (val) => format(new Date(val), "yyyy-MM-dd"),},
+  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
 ];
 
 function agregarBus() {
+  obtenerRutas()
   fixed.value = true;
   text.value = "Agregar Bus";
   cambio.value = 0;
@@ -172,6 +140,7 @@ async function editarAgregarBus() {
       numero_bus: numero_bus.value,
       cantidad_asientos: cantidad_asientos.value,
       empresa_asignada: empresa_asignada.value,
+      ruta_id: ruta._rawValue.value,
     });
     limpiar();
     obtenerInfo();
@@ -183,6 +152,7 @@ async function editarAgregarBus() {
         numero_bus: numero_bus.value,
         cantidad_asientos: cantidad_asientos.value,
         empresa_asignada: empresa_asignada.value,
+        ruta_id: ruta._rawValue.value,
       });
 
       limpiar();
@@ -197,10 +167,12 @@ function limpiar() {
   numero_bus.value = "";
   cantidad_asientos.value = "";
   empresa_asignada.value = "";
+  ruta_id.value= ""
 }
 
 let idBus = ref("");
 async function EditarBus(id) {
+  obtenerRutas()
   cambio.value = 1;
   const busSeleccionado = buses.value.find((bus) => bus._id === id);
   if (busSeleccionado) {

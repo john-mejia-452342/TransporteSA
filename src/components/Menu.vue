@@ -13,42 +13,16 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      id="menulateral"
-      v-model="leftDrawerOpen"
-      side="left"
-      overlay
-      elevated
-    >
-      <img
-        id="logo"
-        src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg"
-        alt=""
-      />
-      <q-btn id="btnmenu"
-        ><i class="fa-solid fa-house-user"></i>
-        <router-link to="/main">Menu</router-link></q-btn
-      >
-      <q-btn id="btnmenu"
-        ><i class="fa-solid fa-wallet"></i>
-        <router-link to="/vendedor">Vendedor</router-link></q-btn
-      >
-      <q-btn id="btnmenu"
-        ><i class="fa-solid fa-bus"></i
-        ><router-link to="/bus">Bus</router-link></q-btn
-      >
-      <q-btn id="btnmenu"
-        ><i class="fa-regular fa-id-card"></i
-        ><router-link to="/conductor">Conductores</router-link></q-btn
-      >
-      <q-btn id="btnmenu"
-        ><i class="fa-solid fa-user"></i
-        ><router-link to="/cliente">Clientes</router-link></q-btn
-      >
-      <q-btn id="btnmenu"
-        ><i class="fa-solid fa-clock"></i
-        ><router-link to="/horario">Horarios</router-link></q-btn
-      >
+    <q-drawer id="menulateral" v-model="leftDrawerOpen" side="left" overlay elevated>
+      <img id="logo" src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg" alt=""/>
+      <q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i><router-link to="/main">Menu</router-link></q-btn>
+      <q-btn id="btnmenu"><i class="fa-solid fa-wallet"></i><router-link to="/vendedor">Vendedor</router-link></q-btn>
+      <q-btn id="btnmenu"><i class="fa-solid fa-bus"></i><router-link to="/bus">Bus</router-link></q-btn>
+      <q-btn id="btnmenu"><i class="fa-regular fa-id-card"></i><router-link to="/conductor">Conductores</router-link></q-btn>
+      <q-btn id="btnmenu"><i class="fa-solid fa-user"></i><router-link to="/cliente">Clientes</router-link></q-btn>
+      <q-btn id="btnmenu"><i class="fa-solid fa-clock"></i><router-link to="/horario">Horarios</router-link></q-btn>
+      <q-btn id="btnmenu"><i class="fa-solid fa-ticket"></i><router-link to="/ruta">Rutas</router-link></q-btn>
+      <q-btn id="btnmenu"><i class="fa-solid fa-ticket"></i><router-link to="/venta">Venta Ticket</router-link></q-btn>
     </q-drawer>
     <q-page-container class="contenedor2">
       <router-view/>
