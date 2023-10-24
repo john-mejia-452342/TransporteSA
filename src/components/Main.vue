@@ -15,7 +15,7 @@
                     alt="" class="img"></button>
             <button class="btn2"><router-link to="/conductor">
                 Conductor
-                <img src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png" alt="" class="img">
+                <img src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png" alt="" class="img1">
             </router-link> 
             </button>
         </q-page-container>
@@ -63,6 +63,12 @@
 .img{
     position: relative;
     top: -190px;
+    height: 200px;
+    width: 200px;
+}
+
+.img1{
+
     height: 200px;
     width: 200px;
 }

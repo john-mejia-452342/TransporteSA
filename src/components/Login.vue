@@ -8,29 +8,32 @@
                 <h1 id="Titulo">Ingresar</h1>
             </div>
             <div class="card-body">
-                <form>
+                <form @submit="validar">
                     <div class="form-group">
                         <label for="username">Usuario</label>
-                        <input type="text" id="username" name="username" required="">
+                        <input v-model="username" name="username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Contraseña</label>
-                        <input type="password" id="password" name="password" required="">
+                        <input v-model="password" name="password" required>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="login-button"><router-link to="/menu"
-                                class="text-black">Ingresar</router-link></button>
-
+                        <button type="button" class="login-button"><router-link to="/main" class="text-black">Ingresar</router-link></button>
                         <router-view></router-view>
                     </div>
                 </form>
             </div>
         </div>
-
     </div>
 </template>
-  
-<script setup></script>
+
+<script setup>
+import { ref } from "vue";
+
+
+</script>
+
+
   
 <style scoped>
 .container {
