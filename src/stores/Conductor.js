@@ -9,7 +9,6 @@ export const useConductorStore = defineStore('conductor', () => {
         try {
             let responseConductores= await axios.get('conductor/conductor');
             conductores.value = responseConductores.data.conductor;
-            console.log(responseConductores);
         } catch (error) {
             throw error
         }
@@ -33,25 +32,25 @@ export const useConductorStore = defineStore('conductor', () => {
         }
     };
 
-    // const putInactivarBus = async (id)=>{
-    //     try {
-    //         let r = await axios.put(`bus/inactivarBus/${id}`)
-    //         return r
-    //     } catch (error) {
-    //         console.log(error, "Error al cambiar el estado del bus");
-    //     }
-    // }
-    // const putActivarBus = async (id)=>{
-    //     try {
-    //         let r = await axios.put(`bus/activarBus/${id}`)
-    //         return r
-    //     } catch (error) {
-    //         console.log(error, "Error al cambiar el estado del bus");
-    //     }
-    // }
+    const putInactivarConductor = async (id)=>{
+        try {
+            let r = await axios.put(`conductor/inactivarConductor/${id}`)
+            return r
+        } catch (error) {
+            console.log(error, "Error al cambiar el estado del conductor");
+        }
+    }
+    const putActivarConductor = async (id)=>{
+        try {
+            let r = await axios.put(`conductor/activarConductor/${id}`)
+            return r
+        } catch (error) {
+            console.log(error, "Error al cambiar el estado del conductor");
+        }
+    }
 
     return {
         conductores,
-        obtenerInfoConductores, postConductor, putEditarConductor
+        obtenerInfoConductores, postConductor, putEditarConductor, putActivarConductor, putInactivarConductor
     };
 });

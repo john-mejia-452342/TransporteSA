@@ -59,7 +59,7 @@
 </template>
   
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { format } from "date-fns";
 import { useBusStore } from "../stores/Bus.js";
 import { useConductorStore } from "../stores/Conductor.js"
@@ -105,10 +105,6 @@ async function obtenerBuses() {
         console.log(error);
     }
 }
-watch(bus, async () => {
-  console.log(bus._rawValue);
-})
-
 
 
 onMounted(async () => {
@@ -118,7 +114,9 @@ onMounted(async () => {
 const columns = [
   { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
   { name: "nombre", label: "Nombre", field: "nombre", sortable: true},
-  { name: "id_bus", label: "Bus", field: (row)=>row.id_bus.placa},
+  { name: "id_bus", label: "Placa", field: (row)=>row.id_bus.placa},
+  { name: "id_bus", label: "Empresa Bus", field: (row)=>row.id_bus.empresa_asignada},
+  { name: "id_bus", label: "Numero Bus", field: (row)=>row.id_bus.numero_bus},
   { name: "experiencia", label: "Experiencia", field: "experiencia"},
   { name: "telefono", label: "Telefono", field: "telefono"},
   { name: "estado", label: "Estado", field: "estado", sortable: true },
@@ -147,7 +145,6 @@ async function editarAgregarConductor() {
   } else {
     let id = idConductor.value;
     if (id) {
-
       await conductorStore.putEditarConductor(id, {
         cedula: cedula.value,
         nombre: nombre.value,
@@ -155,7 +152,6 @@ async function editarAgregarConductor() {
         experiencia: experiencia.value,
         telefono: telefono.value
       });
-
       limpiar();
       obtenerInfo();
       fixed.value = false;
@@ -182,19 +178,19 @@ async function EditarConductor(id) {
     text.value = "Editar Conductor";
     cedula.value = conductorSeleccionado.cedula;
     nombre.value = conductorSeleccionado.nombre;
-    bus.value = conductorSeleccionado.id_bus;
+    bus.value = `${conductorSeleccionado.id_bus.placa} - ${conductorSeleccionado.id_bus.empresa_asignada} - ${conductorSeleccionado.id_bus.numero_bus}`
     experiencia.value = conductorSeleccionado.experiencia;
     telefono.value = conductorSeleccionado.telefono;
   }
 }
 
-async function InactivarBus(id) {
-  await busStore.putInactivarBus(id);
+async function InactivarConductor(id) {
+  await conductorStore.putInactivarConductor(id);
   obtenerInfo();
 }
 
-async function ActivarBus(id) {
-  await busStore.putActivarBus(id);
+async function ActivarConductor(id) {
+  await conductorStore.putActivarConductor(id);
   obtenerInfo();
 }
 </script>
