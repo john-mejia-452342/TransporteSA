@@ -56,6 +56,7 @@
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useClienteStore } from '../stores/Cliente.js';
+
 const clienteStore = useClienteStore()
 
 let clientes = ref([]);
@@ -110,8 +111,8 @@ async function editarAgregarCliente() {
             nombre: nombre.value,
             telefono: telefono.value,
         })
-        limpiar() 
-        obtenerInfo()
+        limpiar();
+        obtenerInfo();
 
     } else {
         let id = idCliente.value;
