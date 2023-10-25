@@ -167,7 +167,7 @@ function limpiar() {
   numero_bus.value = "";
   cantidad_asientos.value = "";
   empresa_asignada.value = "";
-  ruta_id.value= ""
+  ruta.value= ""
 }
 
 let idBus = ref("");
