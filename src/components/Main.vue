@@ -1,31 +1,53 @@
 <template>
-    <div>
-         <q-page-container class="contenedor2">
-            <button class="btn2"><router-link to="/vendedor">Vendedor</router-link> <img
-                    src="https://i.pinimg.com/originals/4b/7e/25/4b7e2507375f65d1ca84654fa2db6e80.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/bus">Bus</router-link> <img
-                    src="https://images.vexels.com/media/users/3/255197/isolated/preview/119b177c176fa0b55322a748c77159eb-escuela-escuelabus-handcutsimpleshapes-papercut-cr-8.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/cliente">Cliente</router-link> <img
-                    src="https://cdn-icons-png.flaticon.com/512/1138/1138021.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/horario">Horario</router-link> <img
-                    src="https://cdn-icons-png.flaticon.com/512/3094/3094927.png"
-                    alt="" class="img"></button>
-            <button class="btn2"><router-link to="/conductor">
-                Conductor
-                <img src="https://cdn-icons-png.flaticon.com/512/2481/2481723.png" alt="" class="img1">
-            </router-link> 
-            </button>
+    <div class="container" >
+         <q-page-container class="contenedor2" v-for="(item, index) in content" :key="index">
+            <router-link :to="item.ruta" >
+                <div class="card">
+                    <div class="tools">
+                        <div class="circle">
+                            <span class="blue box"></span>
+                        </div>
+                        <div class="circle">
+                            <span class="blue box"></span>
+                        </div>
+                        <div class="circle">
+                            <span class="blue box"></span>
+                        </div>
+                    </div>
+                    <div class="card__content">
+                        {{item.titulo}}
+                        <img :src="item.img" alt="" class="img">
+                    </div>
+                </div>
+            </router-link>
         </q-page-container>
     </div>
-   
-
 </template>
+
+<script setup>
+
+import { ref } from "vue"
+
+let content = ref([
+    {ruta: "/vendedor", titulo: "Vendedores", img: "https://i.pinimg.com/originals/4b/7e/25/4b7e2507375f65d1ca84654fa2db6e80.png"},
+    {ruta: "/bus", titulo: "Buses", img: "https://cdn-icons-png.flaticon.com/128/416/416597.png"},
+    {ruta: "/cliente", titulo: "Clientes", img: "https://cdn-icons-png.flaticon.com/512/1138/1138021.png"},
+    {ruta: "/horario", titulo: "Horarios", img: "https://cdn-icons-png.flaticon.com/512/3094/3094927.png"},
+    {ruta: "/conductor", titulo: "Conductores", img: "https://cdn-icons-png.flaticon.com/512/2481/2481723.png"},
+    {ruta:"/ruta", titulo: "Rutas", img:"https://cdn-icons-png.flaticon.com/512/8136/8136650.png" }
+])
+
+</script>
 
 <style>
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab&display=swap');
+
+.container{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
 .contenedor2 {
     display: flex;
@@ -33,6 +55,7 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .contenedor2 a {
@@ -46,31 +69,50 @@
     border-radius: 50px;
 }
 
-
-.btn2 {
-    display: flex;
-    margin-top: 100px;
-    flex-direction: column;
-    height: 300px;
-    display: grid;
-    justify-items: center;    
-    border-radius: 30px;
-    background-color: rgb(0, 140, 255);
-    border: none;
-}
-
-
 .img{
     position: relative;
-    top: -190px;
-    height: 200px;
-    width: 200px;
+    height: 150px;
+    width: 150px;
 }
 
-.img1{
-
-    height: 200px;
-    width: 200px;
+.card {
+    width: 190px;
+    height: 260px;
+    margin: 0 auto;
+    background-color: #F8FBFE;
+    border-radius: 8px;
+    z-index: 1;
+}
+   
+.tools {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+   
+.circle {
+    padding: 0 4px;
+}
+   
+.box {
+    display: inline-block;
+    align-items: center;
+    width: 10px;
+    height: 10px;
+    padding: 1px;
+    border-radius: 50%;
+}
+   
+.blue {
+    background-color: #1920e6;
+}
+   
+.card__content{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto Slab', serif;
 }
 
 </style>

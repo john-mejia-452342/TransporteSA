@@ -2,24 +2,23 @@
     <div class="container">
         <div class="login-card">
             <div class="card-header">
-                <img id="fotol"
-                    src="https://png.pngtree.com/png-vector/20220912/ourmid/pngtree-high-detailed-bus-vector-png-image_6172563.png"
-                    alt="">
-                <h1 id="Titulo">Ingresar</h1>
+                <img id="fotol" src="https://png.pngtree.com/png-vector/20220912/ourmid/pngtree-high-detailed-bus-vector-png-image_6172563.png" alt="">
+                <h1 id="Titulo">Login</h1>
             </div>
             <div class="card-body">
-                <form @submit="validar">
+                <form @submit.prevent="validar">
+                    <div class="input-container">
+                        <input placeholder="Usuario" class="input-field" type="text" v-model="username" name="username" required>
+                        <label for="input-field" class="input-label">Usuario</label>
+                        <span class="input-highlight"></span>
+                    </div>   
+                    <div class="input-container">
+                        <input placeholder="Password" class="input-field"  v-model="password" name="password" type="password" required>
+                        <label for="input-field" class="input-label">Password</label>
+                        <span class="input-highlight"></span>
+                    </div>                   
                     <div class="form-group">
-                        <label for="username">Usuario</label>
-                        <input v-model="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Contraseña</label>
-                        <input v-model="password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="login-button"><router-link to="/main" class="text-black">Ingresar</router-link></button>
-                        <router-view></router-view>
+                        <button type="submit" class="login-button">Ingresar</button>
                     </div>
                 </form>
             </div>
@@ -29,8 +28,28 @@
 
 <script setup>
 import { ref } from "vue";
+import { useLoginStore } from "../stores/Login.js"
 
+const loginStore = useLoginStore()
 
+const username = ref('');
+const password = ref('');
+
+async function validar() {
+    if (!username.value || !password.value) {
+        alert('Por favor complete todos los campos');
+        return;
+    }
+    try {
+        loginStore.Login({
+            cuenta: username.value,
+            clave: password.value
+        });
+
+    } catch (error) {
+        alert('Error en el servidor');
+    }
+}
 </script>
 
 
@@ -44,10 +63,6 @@ import { ref } from "vue";
     min-height: 100vh;
     justify-content: center;
     align-items: center;
-    background-image: url(https://img.freepik.com/foto-gratis/pareja-tiro-completo-caminando-equipaje_23-2149322005.jpg?w=1380&t=st=1697576609~exp=1697577209~hmac=fc636cb17e087127ea07ec07ea0c32d79fe169fc4f35d6e01d883ab649381e56);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
 }
 
 #fotol {
@@ -163,5 +178,57 @@ input[type="submit"]:hover {
     -moz-box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
     box-shadow: 0px 0px 30px 0px rgba(0, 105, 217, 1);
 }
+
+/* Input container */
+.input-container {
+    position: relative;
+    margin: 20px;
+  }
+  
+  /* Input field */
+  .input-field {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    outline: none;
+    background-color: transparent;
+  }
+  
+  /* Input label */
+  .input-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 16px;
+    color: rgba(204, 204, 204, 0);
+    pointer-events: none;
+    transition: all 0.3s ease;
+  }
+  
+  /* Input highlight */
+  .input-highlight {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background-color: #007bff;
+    transition: all 0.3s ease;
+  }
+  
+  /* Input field:focus styles */
+  .input-field:focus + .input-label {
+    top: -20px;
+    font-size: 12px;
+    color: #007bff;
+  }
+  
+  .input-field:focus + .input-label + .input-highlight {
+    width: 100%;
+  }
+  
 </style>
   

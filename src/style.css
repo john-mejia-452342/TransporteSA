@@ -4,6 +4,10 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  background-image: url('https://img.freepik.com/vector-gratis/fondo-onda-blanca-suave_52683-55288.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 #app{

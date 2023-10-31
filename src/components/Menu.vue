@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh lpR fFf">
+  <!-- <q-layout view="hHh lpR fFf">
     <q-header reveal elevated class="bg-primary text-white">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
@@ -15,14 +15,15 @@
 
     <q-drawer id="menulateral" v-model="leftDrawerOpen" side="left" overlay elevated>
       <img id="logo" src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg" alt=""/>
-      <q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i><router-link to="/main">Menu</router-link></q-btn>
-      <q-btn id="btnmenu"><i class="fa-solid fa-wallet"></i><router-link to="/vendedor">Vendedor</router-link></q-btn>
-      <q-btn id="btnmenu"><i class="fa-solid fa-bus"></i><router-link to="/bus">Bus</router-link></q-btn>
-      <q-btn id="btnmenu"><i class="fa-regular fa-id-card"></i><router-link to="/conductor">Conductores</router-link></q-btn>
-      <q-btn id="btnmenu"><i class="fa-solid fa-user"></i><router-link to="/cliente">Clientes</router-link></q-btn>
-      <q-btn id="btnmenu"><i class="fa-solid fa-clock"></i><router-link to="/horario">Horarios</router-link></q-btn>
-      <q-btn id="btnmenu"><i class="fa-solid fa-ticket"></i><router-link to="/ruta">Rutas</router-link></q-btn>
-      <q-btn id="btnmenu"><i class="fa-solid fa-ticket"></i><router-link to="/venta">Venta Ticket</router-link></q-btn>
+      <router-link class="link" to="/main"><q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i> Menu</q-btn></router-link>
+      <router-link class="link" to="/vendedor"><q-btn id="btnmenu"><i class="fa-solid fa-wallet"></i> Vendedor</q-btn></router-link>
+      <router-link class="link" to="/bus"><q-btn id="btnmenu"><i class="fa-solid fa-bus"></i> Bus</q-btn></router-link>
+      <router-link class="link" to="/conductor"><q-btn id="btnmenu"><i class="fa-regular fa-id-card"></i> Conductores</q-btn></router-link>
+      <router-link class="link" to="/cliente"><q-btn id="btnmenu"><i class="fa-solid fa-user"></i> Clientes</q-btn></router-link>
+      <router-link class="link" to="/horario"><q-btn id="btnmenu"><i class="fa-solid fa-clock"></i> Horarios</q-btn></router-link>
+      <router-link class="link" to="/ruta"><q-btn id="btnmenu"><i class="fa-solid fa-map-location-dot"></i> Rutas</q-btn></router-link>
+      <router-link class="link" to="/venta"><q-btn id="btnmenu"><i class="fa-solid fa-money-bill"></i> Venta Ticket</q-btn></router-link>
+      <router-link class="link" to="/ticket"><q-btn id="btnmenu"><i class="fa-solid fa-ticket"></i> Tickets</q-btn></router-link>
     </q-drawer>
     <q-page-container class="contenedor2">
       <router-view/>
@@ -38,6 +39,38 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-footer>
+  </q-layout> -->
+  <q-layout view="hHh lpR lFf">
+
+    <q-header reveal bordered class="bg-primary text-white">
+      <q-toolbar>
+        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
+
+        <q-toolbar-title>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
+          </q-avatar>
+          Title
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-header>
+    <q-drawer id="menulateral" v-model="leftDrawerOpen" side="left" overlay elevated>
+      <img id="logo" src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg" alt=""/>
+      <router-link class="link" to="/main"><q-btn id="btnmenu"><i class="fa-solid fa-house-user"></i> Menu</q-btn></router-link>
+      <router-link class="link" to="/vendedor"><q-btn id="btnmenu"><i class="fa-solid fa-wallet"></i> Vendedor</q-btn></router-link>
+      <router-link class="link" to="/bus"><q-btn id="btnmenu"><i class="fa-solid fa-bus"></i> Bus</q-btn></router-link>
+      <router-link class="link" to="/conductor"><q-btn id="btnmenu"><i class="fa-regular fa-id-card"></i> Conductores</q-btn></router-link>
+      <router-link class="link" to="/cliente"><q-btn id="btnmenu"><i class="fa-solid fa-user"></i> Clientes</q-btn></router-link>
+      <router-link class="link" to="/horario"><q-btn id="btnmenu"><i class="fa-solid fa-clock"></i> Horarios</q-btn></router-link>
+      <router-link class="link" to="/ruta"><q-btn id="btnmenu"><i class="fa-solid fa-map-location-dot"></i> Rutas</q-btn></router-link>
+      <router-link class="link" to="/venta"><q-btn id="btnmenu"><i class="fa-solid fa-money-bill"></i> Venta Ticket</q-btn></router-link>
+      <router-link class="link" to="/ticket"><q-btn id="btnmenu"><i class="fa-solid fa-ticket"></i> Tickets</q-btn></router-link>
+    </q-drawer>
+
+    <q-page-container>
+      <router-view />
+    </q-page-container>
+
   </q-layout>
 </template>
   
@@ -58,7 +91,6 @@ function toggleLeftDrawer() {
   align-items: center;
   flex-direction: column;
   gap: 7px;
-  padding: 25px;
 }
 #btnmenu {
   background-color: rgba(0, 153, 255, 0.527);
@@ -84,5 +116,9 @@ function toggleLeftDrawer() {
   border-radius: 30px;
   width: 250px;
   height: 250px;
+}
+
+.link{
+  text-decoration: none;
 }
 </style>
