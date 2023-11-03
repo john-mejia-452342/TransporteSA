@@ -53,9 +53,9 @@
   <script setup>
   import { ref, onMounted } from "vue";
   import { format } from "date-fns";
-  import { useVendedoresStore } from "../stores/Vendedor.js";
+  import { useVendedorStore } from "../stores/Vendedor.js";
   
-  const VendedoresStore = useVendedoresStore()
+  const VendedoresStore = useVendedorStore()
   
   let vendedores = ref([]);
   let rows = ref([]);

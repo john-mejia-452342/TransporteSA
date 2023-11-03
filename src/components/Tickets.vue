@@ -11,14 +11,14 @@
           <q-separator />
   
           <q-card-section style="max-height: 50vh" class="scroll">
-            <q-input type="text" v-model="vendedor_id" label="Placa" style="width: 300px"/>
-            <q-input type="number" v-model="cliente_id" label="Número de Bus" style="width: 300px"/>
-            <q-input type="text" v-model="bus_id" label="Cantidad de Asientos" style="width: 300px"/>
-            <q-input type="text" v-model="no_asiento" label="Empresa Asignada" style="width: 300px"/>
-            <q-input type="text" v-model="fecha_departida" label="Empresa Asignada" style="width: 300px"/>
             <div class="q-pa" style="width: 300px;">
               <div class="q-gutter">
-                <q-select v-model="ruta" :options="options" label="Rutas"/> 
+                <q-select v-model="vendedor" :optionsVendedor="optionsVendedor" label="Vendedor"/> 
+              </div>
+            </div>
+            <div class="q-pa" style="width: 300px;">
+              <div class="q-gutter">
+                <q-select v-model="cliente" :optionsCliente="optionsCliente" label="Cliente"/> 
               </div>
             </div>
           </q-card-section>
@@ -26,7 +26,7 @@
   
           <q-card-actions align="right">
             <q-btn flat label="Cerrar" color="primary" v-close-popup />
-            <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarTicket()"/>
+            <q-btn flat label="Guardar 💾" color="primary" @click="editarTicket()"/>
           </q-card-actions>
         </q-card>
       </q-dialog>
@@ -56,21 +56,25 @@
   import { ref, onMounted, watch } from "vue";
   import { format } from "date-fns";
   import { useBusStore } from "../stores/Bus.js";
-  import { useRutaStore } from "../stores/Ruta.js";
-  import { useTicketStore } from "../stores/Ticket.js"
+  import { useTicketStore } from "../stores/Ticket.js";
+  import { useVendedorStore} from "../stores/Vendedor.js"
+  import { useClienteStore } from "../stores/Cliente.js"
   
   const busStore = useBusStore();
-  const rutaStore = useRutaStore()
   const ticketStore = useTicketStore()
+  const vendedorStore = useVendedorStore()
+  const clienteStore = useClienteStore()
   
   let tickets = ref([]);
   let rows = ref([]);
   let fixed = ref(false);
   let text = ref("");
   let ruta = ref("")
-  let options = ref([])
-  let placa = ref("");
-  let numero_bus = ref();
+  let optionsVendedor = ref([])
+  let optionsCliente = ref([])
+
+  let vendedor = ref("");
+  let cliente = ref("");
   let cantidad_asientos = ref("");
   let empresa_asignada = ref("");
   let cambio = ref(0);
@@ -85,56 +89,58 @@
     }
   }
   
-  watch(ruta, (newValue, oldValue) => {
-    console.log(ruta._rawValue.value);
-  });
+  // watch(ruta, (newValue, oldValue) => {
+  //   console.log(ruta._rawValue.value);
+  // });
   
-  async function obtenerRutas() {
-        try {
-            await rutaStore.obtenerInfoRutas();
-            options.value = rutaStore.rutas.map((ruta) => (
-              {
-                label: `${ruta.precio} - ${ruta.origen} - ${ruta.destino}`,
-                value: String(ruta._id)
-            }));
-        } catch (error) {
-            console.log(error);
-        }
+  async function obtenerVendedor(){
+    try {
+      await vendedorStore.obtenerInfoVendedor()
+      optionsVendedor.value = vendedorStore.vendedores.map((vendedor)=>({
+        label: `${vendedor.nombre} - ${vendedor.telefono}`,
+        value: String(vendedor._id)
+      }))
+
+    } catch (error) {
+      console.log(error);
     }
+  }
+  async function obtenerCliente(){
+    try {
+      await clienteStore.obtenerInfoClientes()
+      optionsCliente.value = clienteStore.clientes.map((cliente)=>({
+        label: `${cliente.nombre} - ${cliente.cedula} - ${cliente.telefono}`,
+        value: String(cliente._id)
+      }))
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
   
   onMounted(async () => {
     obtenerInfo();
   });
   
   const columns = [
-    { name: "cliente_id", label: "Cliente Nombre", field: (row)=>row.cliente_id.nombre},
-    { name: "cliente_id",label: "Cedula Cliente", field: (row)=>row.cliente_id.cedula},
-    { name: "cliente_id",label: "Telefono Cliente",field: (row)=>row.cliente_id.telefono},
-    { name: "bus_id",label: "Numero Bus",field: (row)=>row.bus_id.numero_bus},
-    { name: "bus_id",label: "Empresa Asignada",field: (row)=>row.bus_id.empresa_asignada},
-    { name: "bus_id",label: "Placa",field: (row)=>row.bus_id.placa},
-    { name: "vendedor_id",label: "Nombre Vendedor",field: (row)=>row.vendedor_id.nombre},
-    { name: "vendedor_id",label: "Telefono Vendedor",field: (row)=>row.vendedor_id.telefono},
+    { name: "cliente_id", label: "Info Cliente", field: (row)=>`${row.cliente_id.nombre} - ${row.cliente_id.cedula}- ${row.cliente_id.telefono}`},
+    { name: "bus_id",label: "Info Bus",field: (row)=>`${row.bus_id.empresa_asignada} - ${row.bus_id.placa} - N°${row.bus_id.numero_bus} `},
+    { name: "vendedor_id",label: "Info Vendedor",field: (row)=>`${row.vendedor_id.nombre} - ${row.vendedor_id.telefono}`},
+    { name: "bus_id", label: "Ruta Origen - Destino", field: (row)=>`${row.bus_id.ruta_id.origen} - ${row.bus_id.ruta_id.destino}`},
+    { name: "bus_id", label: "Horario Partida - Llegada", field: (row)=>`${row.bus_id.ruta_id.horario_id.hora_partida} - ${row.bus_id.ruta_id.horario_id.hora_llegada}` },
     { name: "no_asiento",label: "N° Asiento",field:"no_asiento", sortable:true},
     { name: "fecha_departida",label: "Fecha de partida",field:"fecha_departida", sortable:true, 
     format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-
     { name: "estado", label: "Estado", field: "estado", sortable: true },
-    { name: "createAT",label: "Fecha de Creación",field: "createAT",sortable: true,
-    format: (val) => format(new Date(val), "yyyy-MM-dd"),},
+    // { name: "createAT",label: "Fecha de Creación",field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd")},
     { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
   ];
   
-  function agregarBus() {
-    obtenerRutas()
-    fixed.value = true;
-    text.value = "Agregar Bus";
-    cambio.value = 0;
-  }
   
-  async function editarAgregarBus() {
-    if (cambio.value === 0) {
-      await busStore.postBus({
+  async function editarTicket() {
+    let id = idTicket.value;
+    if (id) {
+      await busStore.putEditarBus(id, {
         placa: placa.value,
         numero_bus: numero_bus.value,
         cantidad_asientos: cantidad_asientos.value,
@@ -143,21 +149,7 @@
       });
       limpiar();
       obtenerInfo();
-    } else {
-      let id = idBus.value;
-      if (id) {
-        await busStore.putEditarBus(id, {
-          placa: placa.value,
-          numero_bus: numero_bus.value,
-          cantidad_asientos: cantidad_asientos.value,
-          empresa_asignada: empresa_asignada.value,
-          ruta_id: ruta._rawValue.value,
-        });
-  
-        limpiar();
-        obtenerInfo();
-        fixed.value = false;
-      }
+      fixed.value = false;
     }
   }
   
@@ -169,31 +161,31 @@
     ruta.value= ""
   }
   
-  let idBus = ref("");
-  async function EditarBus(id) {
-    obtenerRutas()
-    cambio.value = 1;
-    const busSeleccionado = buses.value.find((bus) => bus._id === id);
-    if (busSeleccionado) {
-      idBus.value = String(busSeleccionado._id);
+  let idTicket = ref("");
+  async function EditarTicket(id) {
+    obtenerVendedor()
+    obtenerCliente()
+    const ticketSelect = tickets.value.find((ticket) => ticket._id === id);
+    if (ticketSelect) {
+      idTicket.value = String(ticketSelect._id);
       fixed.value = true;
-      text.value = "Editar Bus";
-      placa.value = busSeleccionado.placa;
-      numero_bus.value = busSeleccionado.numero_bus;
-      cantidad_asientos.value = busSeleccionado.cantidad_asientos;
-      empresa_asignada.value = busSeleccionado.empresa_asignada;
+      text.value = "Editar Ticket";
+      vendedor.value =`${ticketSelect.vendedor_id.nombre} - ${ticketSelect.vendedor_id.telefono}`;
+      cliente.value = `${ticketSelect.cliente_id.nombre} - ${ticketSelect.cliente_id.cedula} - ${ticketSelect.cliente_id.telefono}`
+      cantidad_asientos.value = ticketSelect.cantidad_asientos;
+      empresa_asignada.value = ticketSelect.empresa_asignada;
     }
   }
   
-  async function InactivarBus(id) {
-    await busStore.putInactivarBus(id);
-    obtenerInfo();
-  }
+  // async function InactivarBus(id) {
+  //   await busStore.putInactivarBus(id);
+  //   obtenerInfo();
+  // }
   
-  async function ActivarBus(id) {
-    await busStore.putActivarBus(id);
-    obtenerInfo();
-  }
+  // async function ActivarBus(id) {
+  //   await busStore.putActivarBus(id);
+  //   obtenerInfo();
+  // }
   </script>
     
   <style scoped>

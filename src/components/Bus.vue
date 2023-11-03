@@ -183,6 +183,7 @@ async function EditarBus(id) {
     numero_bus.value = busSeleccionado.numero_bus;
     cantidad_asientos.value = busSeleccionado.cantidad_asientos;
     empresa_asignada.value = busSeleccionado.empresa_asignada;
+    ruta.value = `${busSeleccionado.ruta_id.origen} - ${busSeleccionado.ruta_id.destino}` 
   }
 }
 

@@ -3,7 +3,7 @@ import axios from 'axios'
 import {ref} from'vue'
 
 
-export const useVendedoresStore = defineStore('vendedor', ()=>{
+export const useVendedorStore = defineStore('vendedor', ()=>{
     const vendedores = ref ([])
     
 
