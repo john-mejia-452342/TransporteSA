@@ -170,6 +170,22 @@ async function obtenerVendedor(){
     vendedor.value = loginStore.vendedor;
 }
 
+let tickets = ref([])
+async function validarAsientos(){
+    await ticketStore.getTickets();
+    tickets.value = ticketStore.ticket
+
+    const ticketVendedorId =  tickets.value.map((ticket)=> ticket.bus_id._id = bus._rawValue.value )
+
+    if (ticketVendedorId){
+        const date = new Date(ticketSelect.fecha_departida);
+        const formattedDate = date.toISOString().split('T')[0]; 
+
+        fecha_departida.value = formattedDate;
+        const ticketFechaPartida = tickets.value.map((ticket)=> ticket.fecha_departida = fecha_departida.value)
+    }
+}
+
 watch(ruta, () => {
     obtenerBuses();
 });

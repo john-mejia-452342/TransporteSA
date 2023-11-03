@@ -163,7 +163,10 @@
       fixed.value = true;
       text.value = "Editar Ruta";
       precio.value = rutaSelected.precio;
-      horario.value = `${rutaSelected.horario_id.hora_partida} - ${rutaSelected.horario_id.hora_llegada}`
+      horario.value = {
+                        label: `${rutaSelected.horario_id.hora_partida} - ${rutaSelected.horario_id.hora_llegada}`,
+                        value: String(rutaSelected.horario_id._id)
+                      }
       origen.value = rutaSelected.origen;
       destino.value = rutaSelected.destino;
     }

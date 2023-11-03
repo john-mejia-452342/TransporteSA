@@ -89,9 +89,9 @@ async function obtenerInfo() {
   }
 }
 
-watch(ruta, (newValue, oldValue) => {
-  console.log(ruta._rawValue.value);
-});
+// watch(ruta, (newValue, oldValue) => {
+//   console.log(ruta._rawValue.value);
+// });
 
 async function obtenerRutas() {
       try {
@@ -183,7 +183,10 @@ async function EditarBus(id) {
     numero_bus.value = busSeleccionado.numero_bus;
     cantidad_asientos.value = busSeleccionado.cantidad_asientos;
     empresa_asignada.value = busSeleccionado.empresa_asignada;
-    ruta.value = `${busSeleccionado.ruta_id.origen} - ${busSeleccionado.ruta_id.destino}` 
+    ruta.value = {
+                    label: `${busSeleccionado.ruta_id.origen} - ${busSeleccionado.ruta_id.destino}` ,
+                    value: String(busSeleccionado.ruta_id._id)
+                  }
   }
 }
 

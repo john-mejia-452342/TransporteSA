@@ -27,15 +27,41 @@ export const useTicketStore = defineStore('ticket', () => {
         try {
           let res = await axios.get("/ticket/ticket");
           ticket.value = res.data.ticket
-          console.log(res.data);
           return res;
         } catch (error) {
           throw error;
         };
       };
 
+      const putEditarTicket = async (id, data)=>{
+        try {
+          let res = await axios.put(`/ticket/editarTicket/${id}`, data)
+          return res
+        } catch (error) {
+          throw error
+        }
+      };
+
+      const putInactivarTicket = async (id)=>{
+        try {
+          let res = await axios.put(`/ticket/inactivarTicket/${id}`);
+          return res
+        } catch (error) {
+          throw error
+        }
+      };
+
+      const putActivarTicket = async (id)=>{
+        try {
+          let res = await axios.put(`/ticket/activarTicket/${id}`)
+          return res
+        } catch (error) {
+          throw error
+        }
+      }
+
     return {
       ticket,
-      postTicket, getTickets
+      postTicket, getTickets, putEditarTicket, putInactivarTicket, putActivarTicket
     };
 });

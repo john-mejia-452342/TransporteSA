@@ -13,14 +13,21 @@
           <q-card-section style="max-height: 50vh" class="scroll">
             <div class="q-pa" style="width: 300px;">
               <div class="q-gutter">
-                <q-select v-model="vendedor" :optionsVendedor="optionsVendedor" label="Vendedor"/> 
+                <q-select v-model="vendedor" :options="optionsVendedor" label="Vendedor"/> 
               </div>
             </div>
             <div class="q-pa" style="width: 300px;">
               <div class="q-gutter">
-                <q-select v-model="cliente" :optionsCliente="optionsCliente" label="Cliente"/> 
+                <q-select v-model="cliente" :options="optionsCliente" label="Cliente"/> 
               </div>
             </div>
+            <div class="q-pa" style="width: 300px;">
+              <div class="q-gutter">
+                <q-select v-model="bus" :options="optionsBus" label="Bus"/> 
+              </div>
+            </div>
+            <q-input type="number" v-model="no_asiento" label="Numero Asiento" style="width: 300px" />
+            <q-input type="date" v-model="fecha_departida" label="Fecha Partida" style="width: 300px" />
           </q-card-section>
           <q-separator />
   
@@ -57,28 +64,32 @@
   import { format } from "date-fns";
   import { useBusStore } from "../stores/Bus.js";
   import { useTicketStore } from "../stores/Ticket.js";
-  import { useVendedorStore} from "../stores/Vendedor.js"
-  import { useClienteStore } from "../stores/Cliente.js"
+  import { useVendedorStore} from "../stores/Vendedor.js";
+  import { useClienteStore } from "../stores/Cliente.js";
+  import { useRutaStore } from "../stores/Ruta.js";
   
   const busStore = useBusStore();
-  const ticketStore = useTicketStore()
-  const vendedorStore = useVendedorStore()
-  const clienteStore = useClienteStore()
-  
+  const ticketStore = useTicketStore();
+  const vendedorStore = useVendedorStore();
+  const clienteStore = useClienteStore();
+  const rutaStore = useRutaStore();
+   
   let tickets = ref([]);
   let rows = ref([]);
   let fixed = ref(false);
   let text = ref("");
-  let ruta = ref("")
-  let optionsVendedor = ref([])
-  let optionsCliente = ref([])
+  let optionsVendedor = ref([]);
+  let optionsCliente = ref([]);
+  let optionsBus = ref([]);
+  let buses = ref([])
 
+  
   let vendedor = ref("");
   let cliente = ref("");
-  let cantidad_asientos = ref("");
-  let empresa_asignada = ref("");
-  let cambio = ref(0);
-  
+  let bus = ref("");
+  let no_asiento = ref(0);
+  let fecha_departida = ref("");
+
   async function obtenerInfo() {
     try {
       await ticketStore.getTickets();
@@ -89,8 +100,8 @@
     }
   }
   
-  // watch(ruta, (newValue, oldValue) => {
-  //   console.log(ruta._rawValue.value);
+  // watch(vendedor, (newValue, oldValue) => {
+  //   console.log(vendedor._rawValue.value);
   // });
   
   async function obtenerVendedor(){
@@ -100,7 +111,6 @@
         label: `${vendedor.nombre} - ${vendedor.telefono}`,
         value: String(vendedor._id)
       }))
-
     } catch (error) {
       console.log(error);
     }
@@ -112,12 +122,28 @@
         label: `${cliente.nombre} - ${cliente.cedula} - ${cliente.telefono}`,
         value: String(cliente._id)
       }))
-
     } catch (error) {
       console.log(error);
     }
   }
-  
+ 
+
+  async function obtenerBuses() {
+    try {
+      await rutaStore.obtenerInfoRutas();
+      const ruta_ids = rutaStore.rutas.map((ruta) => String(ruta._id));
+      await busStore.obtenerInfoBuses();
+      const busesFiltrados = busStore.buses.filter((bus) =>
+        ruta_ids.includes(String(bus.ruta_id._id))
+      );
+      optionsBus.value = busesFiltrados.map((bus) => ({
+        label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
+        value: String(bus._id),
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
   onMounted(async () => {
     obtenerInfo();
   });
@@ -140,12 +166,12 @@
   async function editarTicket() {
     let id = idTicket.value;
     if (id) {
-      await busStore.putEditarBus(id, {
-        placa: placa.value,
-        numero_bus: numero_bus.value,
-        cantidad_asientos: cantidad_asientos.value,
-        empresa_asignada: empresa_asignada.value,
-        ruta_id: ruta._rawValue.value,
+      await ticketStore.putEditarTicket(id, {
+        vendedor_id: vendedor._rawValue.value,
+        cliente_id: cliente._rawValue.value,
+        bus_id: bus._rawValue.value,
+        no_asiento: no_asiento.value,
+        fecha_departida: fecha_departida.value,
       });
       limpiar();
       obtenerInfo();
@@ -154,38 +180,55 @@
   }
   
   function limpiar() {
-    placa.value = "";
-    numero_bus.value = "";
-    cantidad_asientos.value = "";
-    empresa_asignada.value = "";
-    ruta.value= ""
+    vendedor.value = "";
+    cliente.value = "";
+    bus.value = "";
+    no_asiento.value = "";
+    fecha_departida.value= ""
   }
   
   let idTicket = ref("");
   async function EditarTicket(id) {
-    obtenerVendedor()
-    obtenerCliente()
+    await obtenerCliente();
+    await obtenerVendedor();
+    await obtenerBuses()
     const ticketSelect = tickets.value.find((ticket) => ticket._id === id);
     if (ticketSelect) {
       idTicket.value = String(ticketSelect._id);
       fixed.value = true;
       text.value = "Editar Ticket";
-      vendedor.value =`${ticketSelect.vendedor_id.nombre} - ${ticketSelect.vendedor_id.telefono}`;
-      cliente.value = `${ticketSelect.cliente_id.nombre} - ${ticketSelect.cliente_id.cedula} - ${ticketSelect.cliente_id.telefono}`
-      cantidad_asientos.value = ticketSelect.cantidad_asientos;
-      empresa_asignada.value = ticketSelect.empresa_asignada;
+      vendedor.value = {
+                        label: `${ticketSelect.vendedor_id.nombre} - ${ticketSelect.vendedor_id.telefono}`,
+                        value: String(ticketSelect.vendedor_id._id)
+                      }
+      
+      cliente.value = {
+                        label: `${ticketSelect.cliente_id.nombre} - ${ticketSelect.cliente_id.cedula} - ${ticketSelect.cliente_id.telefono}`,
+                        value: String(ticketSelect.cliente_id._id)
+                      }
+
+      bus.value =  {
+                      label:`${ticketSelect.bus_id.empresa_asignada} - ${ticketSelect.bus_id.placa} - N°${ticketSelect.bus_id.numero_bus}`,
+                      value: String(ticketSelect.bus_id._id)
+                    }
+      no_asiento.value = ticketSelect.no_asiento;
+
+      const date = new Date(ticketSelect.fecha_departida);
+      const formattedDate = date.toISOString().split('T')[0]; 
+
+      fecha_departida.value = formattedDate;
     }
   }
   
-  // async function InactivarBus(id) {
-  //   await busStore.putInactivarBus(id);
-  //   obtenerInfo();
-  // }
+  async function InactivarTicket(id) {
+    await ticketStore.putInactivarTicket(id);
+    obtenerInfo();
+  }
   
-  // async function ActivarBus(id) {
-  //   await busStore.putActivarBus(id);
-  //   obtenerInfo();
-  // }
+  async function ActivarTicket(id) {
+    await ticketStore.putActivarTicket(id);
+    obtenerInfo();
+  }
   </script>
     
   <style scoped>

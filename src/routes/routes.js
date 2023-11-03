@@ -26,7 +26,6 @@ const routes = [
         { path: "/ruta", component: Ruta},
         { path: "/venta", component: Venta,},
         { path: "/ticket", component: Ticket}
-        
       ],
     }
 ]
