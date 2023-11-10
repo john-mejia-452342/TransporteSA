@@ -42,11 +42,11 @@
                     </div>
                 </div>
                 <div v-if="showClienteDiv" class="cliente">
-                    <q-btn color="primary" label="Buscar Cliente" @click="buscarCliente()" />
-                    <q-input standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente" style="width: 300px" />
-                    <q-input standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente" style="width: 300px" />
-                    <q-input standout v-model="telefono" label="Telefono" placeholder="Telefono del cliente"  style="width: 300px"/>
-                    <q-btn color="primary" label="Generar Ticket" @click="CrearTicket()" />
+                    <q-btn  class="bnt-bc" color="primary" label="Buscar Cliente" @click="buscarCliente()" />
+                    <q-input class="label" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente" style="width: 300px" />
+                    <q-input class="label" standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente" style="width: 300px" />
+                    <q-input class="label" standout v-model="telefono" label="Telefono" placeholder="Telefono del cliente"  style="width: 300px"/>
+                    <q-btn  class="btn-c" color="primary" label="Generar Ticket" @click="CrearTicket()" />
                 </div>
             </div>
         </div>
@@ -217,23 +217,25 @@ onMounted(async () => {
 }
 .btn-generar{
     width: 100%;
-    margin-top: 50px;
+    margin-top: 70px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     margin-right: 10px;
 }
 .container-info{
     display: flex;
     width: 100%;
+    flex-direction: column;
 }
 .container-bus {
     height: 250px;
-    width: 50%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
+    margin-top: 70px;
   }
   
   .container-asientos {
@@ -244,18 +246,34 @@ onMounted(async () => {
   }
   
   .container-asientos button {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     margin: 5px;
+    font-size: 6mm;
+    border-radius: 5px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border: solid rgb(0, 67, 252)
   }
   .cliente{
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     align-items: center;
+    margin-top: 80px;
   }
   .cliente input{
     margin: 4px;
   }
-
+  .bnt-bc{
+    margin-bottom: 2px;
+  }
+  .btn-c{
+    margin-top: 2px;
+  }
+  .label{
+    background-color: rgba(100, 100, 100, 0.329);
+    border-radius: 5px;
+    border: solid gray 1px; 
+    margin: 1px;
+  }
 </style>
