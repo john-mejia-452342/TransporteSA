@@ -114,8 +114,8 @@ function toggleLeftDrawer() {
 
 #logo {
   border-radius: 30px;
-  width: 250px;
-  height: 250px;
+  width: 180px;
+  height: 180px;
 }
 
 .link{

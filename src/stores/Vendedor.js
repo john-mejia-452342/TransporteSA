@@ -39,7 +39,7 @@ const putInactivarVendedor = async (id)=>{
         let r = await axios.put(`vendedor/inactivarVendedor/${id}`)
         return r
     } catch (error){
-        console.log(error, "Error al cambiar el estado del vendedor ");
+        throw error
     }
 }
 
@@ -48,7 +48,7 @@ const putActivarVendedor = async (id)=>{
         let r = await axios.put(`/vendedor/activarVendedor/${id}`)
         return r
     } catch (error) {
-        console.log(error, "Error al cambiar el estado del bus");
+        throw error
     }
 }
 

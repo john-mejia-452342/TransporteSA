@@ -17,6 +17,7 @@
                 </q-card-section>
 
                 <q-separator />
+                <div class="error">{{errorMessage}}</div>
 
                 <q-card-actions align="right">
                     <q-btn flat label="Cerrar" color="primary" v-close-popup />
@@ -24,7 +25,7 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
-        <div class="container-table">
+        <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
             <h1>Clientes</h1>
             <div class="btn-agregar">
                 <q-btn color="secondary" label="Agregar ➕" @click="agregarCliente()" />
@@ -56,8 +57,12 @@
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useClienteStore } from '../stores/Cliente.js';
+import { useQuasar } from "quasar";
 
-const clienteStore = useClienteStore()
+
+const clienteStore = useClienteStore();
+const $q = useQuasar();
+
 
 let clientes = ref([]);
 let rows = ref([]);
@@ -105,26 +110,72 @@ function agregarCliente() {
 }
 
 async function editarAgregarCliente() {
-    if (cambio.value === 0) {
-        await clienteStore.postCliente({
-            cedula: cedula.value,
-            nombre: nombre.value,
-            telefono: telefono.value,
-        })
-        limpiar();
-        obtenerInfo();
-
-    } else {
+    validar();
+    if (validacion.value === true) {
+        if (cambio.value === 0) {
+            try {
+                showDefault();
+                await clienteStore.postCliente({
+                    cedula: cedula.value,
+                    nombre: nombre.value,
+                    telefono: telefono.value,
+                })
+                if (notification) {
+                notification();
+                }
+                limpiar();
+                $q.notify({
+                    spinner: false,
+                    message: "Cliente Agregado",
+                    timeout: 2000,
+                    type: "positive",
+                });
+                obtenerInfo();
+            } catch (error) {
+                if (notification) {
+                notification();
+                }
+                $q.notify({
+                    spinner: false,
+                    message: `${error.response.data.error.errors[0].msg}`,
+                    timeout: 2000,
+                    type: "negative",
+                });
+             }
+        } else {
         let id = idCliente.value;
-        if (id) {
-            await clienteStore.putEditarCliente(id,{
-                cedula: cedula.value,
-                nombre: nombre.value,
-                telefono: telefono.value,
-            });
-            limpiar(); 
-            obtenerInfo()
-            fixed.value = false;
+            if (id) {
+                try {
+                    await clienteStore.putEditarCliente(id,{
+                        cedula: cedula.value,
+                        nombre: nombre.value,
+                        telefono: telefono.value,
+                    });
+                if (notification) {
+                    notification();
+                }
+                limpiar();
+                $q.notify({
+                    spinner: false,
+                    message: "Cliente Actualizado",
+                    timeout: 2000,
+                    type: "positive",
+                });
+                obtenerInfo();
+                fixed.value = false;
+                } catch (error) {
+                    if (notification) {
+                        notification();
+                    }
+                    $q.notify({
+                    spinner: false,
+                    message: `${error.response.data.error.errors[0].msg}`,
+                    timeout: 2000,
+                    type: "negative",
+                    });
+                }
+               
+            }
         }
     }
 }
@@ -151,17 +202,88 @@ async function editarCliente(id) {
 }
 
 async function inactivarCliente(id) {
-    console.log(id);
+    try{        
+    showDefault();
     await clienteStore.putInactivarCliente(id)
+    if(notification){ 
+      notification();
+    }
+    $q.notify({
+        spinner: false, 
+        message: "Cliente Inactivado", 
+        timeout: 2000,
+        type: 'positive',
+    }); 
     obtenerInfo()
+  }catch (error) {
+    if(notification) {
+      notification()
+    };
+    $q.notify({
+        spinner: false, 
+        message: `${error.response.data.error.errors[0].msg}`, 
+        timeout: 2000,
+        type: 'negative',
+    });
+  }
+
 }
 
 async function activarCliente(id) {
+    try{        
+    showDefault();
     await clienteStore.putActivarCliente(id)
+    if(notification){ 
+      notification();
+    }
+    $q.notify({
+        spinner: false, 
+        message: "Clinete Activado", 
+        timeout: 2000,
+        type: 'positive',
+    }); 
     obtenerInfo()
+  }catch (error) {
+    if(notification) {
+      notification()
+    };
+    $q.notify({
+        spinner: false, 
+        message: `${error.response.data.error.errors[0].msg}`, 
+        timeout: 2000,
+        type: 'negative',
+    });
+  }
 }
 
+let errorMessage = ref("");
 
+const showDefault = () => {
+  notification = $q.notify({
+    spinner: true,
+    message: "Please wait...",
+    timeout: 0,
+  });
+};
+
+let validacion = ref(false);
+let notification = ref(null);
+async function validar() {
+    if (!cedula.value && !nombre.value && !telefono.value) {
+        errorMessage.value = "Por favor rellene los campos";
+    } else if (!cedula.value) {
+        errorMessage.value = "Ingrese la Cedula";
+    } else if (!nombre.value) {
+        errorMessage.value = "Ingrese el Nombre";
+    } else if (!telefono.value) {
+        errorMessage.value = "Ingrese el Telefono";
+    } else if (telefono.value.length !== 10) {
+        errorMessage.value = "El telefono debe tener 10 Digitos";
+    } else {
+        errorMessage.value = "";
+        validacion.value = true;
+    }
+}
 </script>
   
 <style scoped>
@@ -176,9 +298,11 @@ async function activarCliente(id) {
     text-align: center;
     flex-direction: column;
 }
-.container-table h1{
-    font-family: 'Gabarito', sans-serif;
-}
+.container-table h1 {
+    font-family: "Gabarito", sans-serif;
+    padding: 0;
+    margin: 0;
+  }
 .modal-content {
     width: 400px;
 }
@@ -193,5 +317,12 @@ async function activarCliente(id) {
     display: flex;
     justify-content: flex-end
 }
-
+.error{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    color: red;
+    font-size: 18px;
+    text-align: center;    
+  }
 </style>

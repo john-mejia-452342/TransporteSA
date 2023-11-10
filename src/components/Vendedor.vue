@@ -17,14 +17,14 @@
             <q-input type="text" v-model="telefono" label="Telefono" style="width: 300px" />
           </q-card-section>
           <q-separator />
-  
+          <div class="error">{{errorMessage}}</div>
           <q-card-actions align="right">
             <q-btn flat label="Cerrar" color="primary" v-close-popup />
             <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarVendedor()" />
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <div class="container-table">
+      <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
         <h1>Vendedor</h1>
         <div class="btn-agregar">
           <q-btn color="secondary" label="Agregar ➕" @click="agregarVendedor()" />
@@ -32,9 +32,7 @@
         <q-table title="Conductores" :rows="rows" :columns="columns" row-key="name">
           <template v-slot:body-cell-estado="props">
             <q-td :props="props">
-              <label for="" v-if="props.row.estado == 1" style="color: green"
-                >Activo</label
-              >
+              <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
               <label for="" v-else style="color: red">Inactivo</label>
             </q-td>
           </template>
@@ -54,8 +52,12 @@
   import { ref, onMounted } from "vue";
   import { format } from "date-fns";
   import { useVendedorStore } from "../stores/Vendedor.js";
+  import { useQuasar } from 'quasar';
   
-  const VendedoresStore = useVendedorStore()
+
+  const VendedoresStore = useVendedorStore();
+const $q = useQuasar();
+
   
   let vendedores = ref([]);
   let rows = ref([]);
@@ -100,27 +102,75 @@
   }
   
   async function editarAgregarVendedor() {
-    if (cambio.value === 0) {
-      await VendedoresStore.postvendedor({
-        cedula: cedula.value,
-        nombre: nombre.value,
-        telefono: telefono.value
-      });
-      limpiar();
-      obtenerInfo();
-    } else {
-      let id = idVendedor.value;
-      if (id) {
-        await VendedoresStore.puteditarvendedor(id, {
-          cedula: cedula.value,
-          nombre: nombre.value,
-          telefono: telefono.value
-        });
-        limpiar();
-        obtenerInfo();
-        fixed.value = false;
+    validar();
+    if (validacion.value === true) {
+      if (cambio.value === 0) {
+        try {
+          showDefault();
+          await VendedoresStore.postvendedor({
+            cedula: cedula.value,
+            nombre: nombre.value,
+            telefono: telefono.value
+          });
+            if (notification) {
+                notification();
+            }
+            limpiar();
+            $q.notify({
+                spinner: false,
+                message: "Vendedor Agregado",
+                timeout: 2000,
+                type: "positive",
+            });
+            obtenerInfo();
+        } catch (error) {
+            if (notification) {
+              notification();
+            }
+            $q.notify({
+            spinner: false,
+            message: `${error.response.data.error.errors[0].msg}`,
+            timeout: 2000,
+            type: "negative",
+            });
+        }
+      } else {
+        let id = idVendedor.value;
+        if (id) {
+          try {
+            showDefault();
+            await VendedoresStore.puteditarvendedor(id, {
+            cedula: cedula.value,
+            nombre: nombre.value,
+            telefono: telefono.value
+          });
+          if (notification) {
+              notification();
+          }
+          limpiar();
+          $q.notify({
+              spinner: false,
+              message: "Vendedor Actualizado",
+              timeout: 2000,
+              type: "positive",
+          });
+          obtenerInfo();
+          fixed.value = false;
+          } catch (error) {
+              if (notification) {
+                  notification();
+              }
+              $q.notify({
+              spinner: false,
+              message: `${error.response.data.error.errors[0].msg}`,
+              timeout: 2000,
+              type: "negative",
+              });
+          }
+        }
       }
     }
+    
   }
   
   function limpiar() {
@@ -143,15 +193,90 @@
     }
   }
   
-//   async function InactivarVendedor(id) {
-//     await conductorStore.putInactivarConductor(id);
-//     obtenerInfo();
-//   }
+  async function InactivarVendedor(id) {
+    try{        
+    showDefault();
+    await VendedoresStore.putInactivarVendedor(id);
+
+    if(notification){ 
+      notification();
+    }
+    $q.notify({
+        spinner: false, 
+        message: "Vendedor Inactivado", 
+        timeout: 2000,
+        type: 'positive',
+    }); 
+    obtenerInfo()
+    }catch (error) {
+      if(notification) {
+        notification()
+      };
+      $q.notify({
+          spinner: false, 
+          message: `${error.response.data.error.errors[0].msg}`, 
+          timeout: 2000,
+          type: 'negative',
+      });
+    }
+  }
   
-//   async function ActivarVendedor(id) {
-//     await conductorStore.putActivarConductor(id);
-//     obtenerInfo();
-//   }
+  async function ActivarVendedor(id) {
+    try{        
+    showDefault();
+    await VendedoresStore.putActivarVendedor(id);
+    if(notification){ 
+      notification();
+    }
+    $q.notify({
+        spinner: false, 
+        message: "Vendedor Inactivado", 
+        timeout: 2000,
+        type: 'positive',
+    }); 
+    obtenerInfo()
+    }catch (error) {
+      if(notification) {
+        notification()
+      };
+      $q.notify({
+          spinner: false, 
+          message: `${error.response.data.error.errors[0].msg}`, 
+          timeout: 2000,
+          type: 'negative',
+      });
+    }
+  }
+
+  let errorMessage = ref("");
+
+const showDefault = () => {
+  notification = $q.notify({
+    spinner: true,
+    message: "Please wait...",
+    timeout: 0,
+  });
+};
+
+let validacion = ref(false);
+let notification = ref(null);
+async function validar() {
+
+  if (!cedula.value && !nombre.value && !telefono.value) {
+    errorMessage.value = "Por favor rellene los campos";
+  } else if (!cedula.value) {
+    errorMessage.value = "Ingrese la Cedula";
+  } else if (!nombre.value) {
+    errorMessage.value = "Ingrese el Nombre";
+  }else if (!telefono.value) {
+    errorMessage.value = "Ingrese el Telefono";
+  } else if (telefono.value.length !== 10) {
+    errorMessage.value = "El telefono debe tener 10 Digitos";
+  } else {
+    errorMessage.value = "";
+    validacion.value = true;
+  }
+}
   </script>
     
   <style scoped>
@@ -168,7 +293,9 @@
   }
   .container-table h1 {
     font-family: "Gabarito", sans-serif;
-  }
+    padding: 0;
+    margin: 0;
+}
   .modal-content {
     width: 400px;
   }
@@ -182,5 +309,14 @@
     margin-bottom: 5px;
     display: flex;
     justify-content: flex-end;
+  }
+
+  .error{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    color: red;
+    font-size: 18px;
+    text-align: center;    
   }
   </style>

@@ -16,19 +16,19 @@
                 </q-card-section>
 
                 <q-separator />
-
+                <q-div class="error">{{errorMessage}}</q-div>
                 <q-card-actions align="right">
                     <q-btn flat label="Cerrar" color="primary" v-close-popup />
                     <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarHorario()" />
                 </q-card-actions>
             </q-card>
         </q-dialog>
-        <div class="container-table">
+        <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
             <h1>Horario</h1>
             <div class="btn-agregar">
                 <q-btn color="secondary" label="Agregar ➕" @click="agregarHorario()" />
             </div>
-            <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
+            <q-table title="Horarios" :rows="rows" :columns="columns" row-key="name">
                 <template v-slot:body-cell-estado="props">
                     <q-td :props="props">
                         <label for="" v-if="props.row.estado == 1" style="color: green;" >Activo</label>
@@ -56,7 +56,11 @@
 import { ref, onMounted } from 'vue';
 import { format } from 'date-fns';
 import { useHorarioStore } from '../stores/Horario.js';
-const horarioStore = useHorarioStore()
+import { useQuasar } from 'quasar'
+
+const horarioStore = useHorarioStore();
+const $q = useQuasar();
+
 
 let horarios = ref([]);
 let rows = ref([]);
@@ -96,34 +100,84 @@ const columns = [
 ];
 
 function agregarHorario() {
+    limpiar();
     fixed.value = true;
     text.value = "Agregar Horario";
     cambio.value = 0
 }
 
 async function editarAgregarHorario() {
-    if (cambio.value === 0) {
-        await horarioStore.postHorario({
-            hora_partida: hora_partida.value,
-            hora_llegada: hora_llegada.value,
-        })
-        limpiar() 
-        obtenerInfo()
-
-    } else {
-        let id = idHorario.value;
-        if (id) {
-            await horarioStore.putEditarHorario(id,{
+    validar();
+    if (validacion.value===true) {
+        if (cambio.value === 0) {
+            try {
+                showDefault()
+                await horarioStore.postHorario({
                 hora_partida: hora_partida.value,
                 hora_llegada: hora_llegada.value,
-            });
-           
-            limpiar(); 
-            obtenerInfo()
-            fixed.value = false;
-        }
-    }
-}
+                })
+                if(notification) {
+                    notification()
+                }
+                limpiar()
+                $q.notify({
+                    spinner: false, 
+                    message: "Horario Agregado", 
+                    timeout: 2000,
+                    type: 'positive',
+                }); 
+            } catch (error) {
+                if(notification) {
+                    notification()
+                };
+                $q.notify({
+                    spinner: false, 
+                    message: `${error.response.data.error.errors[0].msg}`, 
+                    timeout: 2000,
+                    type: 'negative',
+                });
+            }
+        obtenerInfo()
+        } else {
+            let id = idHorario.value;
+            if (id) {
+                try {
+                    showDefault()
+                    await horarioStore.putEditarHorario(id,{
+                    hora_partida: hora_partida.value,
+                    hora_llegada: hora_llegada.value,
+                    });
+                    if(notification) {
+                        notification()
+                    }
+                    limpiar()
+                    $q.notify({
+                        spinner: false, 
+                        message: "Horario Actualizado", 
+                        timeout: 2000,
+                        type: 'positive',
+                    }); 
+                     
+                    obtenerInfo()
+                    fixed.value = false;
+                } catch (error) {
+                    if(notification) {
+                    notification()
+                    };
+                    $q.notify({
+                        spinner: false, 
+                        message: `${error.response.data.error.errors[0].msg}`, 
+                        timeout: 2000,
+                        type: 'negative',
+                    });
+                }
+                
+            };
+        };
+        validacion.value = false  
+    };
+ 
+};
 
 
 function limpiar() {
@@ -146,14 +200,90 @@ async function editarHorario(id) {
 }
 
 async function InactivarHorario(id) {
-    await horarioStore.putInactivarHorario(id)
-    obtenerInfo()
+    try{        
+        showDefault()
+        await horarioStore.putInactivarHorario(id)
+        if(notification) 
+            notification()
+        
+        $q.notify({
+            spinner: false, 
+            message: "Horario Inactivado", 
+            timeout: 2000,
+            type: 'positive',
+        }); 
+        obtenerInfo()
+    }catch (error) {
+        if(notification) {
+            notification()
+        };
+        $q.notify({
+            spinner: false, 
+            message: `${error.response.data.error.errors[0].msg}`, 
+            timeout: 2000,
+            type: 'negative',
+        });
+    }
+    
 }
 
 async function ActivarHorario(id) {
-    await horarioStore.putActivarHorario(id)
-    obtenerInfo()
+    try {
+        showDefault()
+        await horarioStore.putActivarHorario(id)
+        if(notification) 
+            notification()
+        
+        $q.notify({
+            spinner: false, 
+            message: "Horario Activado", 
+            timeout: 2000,
+            type: 'positive',
+        }); 
+        obtenerInfo();
+ 
+    } catch (error) {
+        if(notification) {
+            notification()
+        };
+        $q.notify({
+            spinner: false, 
+            message: `${error.response.data.error.errors[0].msg}`, 
+            timeout: 2000,
+            type: 'negative',
+        });
+    }
 }
+
+let errorMessage = ref("");
+
+const showDefault = () => {
+  notification = $q.notify({
+    spinner: true,
+    message: 'Please wait...',
+    timeout: 0 
+  });
+};
+
+let validacion = ref(false);
+let notification = ref(null);
+async function validar() {
+
+    const timeFormat = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
+    if (!hora_partida.value && !hora_llegada.value) {
+        errorMessage.value = "Ingrese la hora de Partida y Llegada";
+    } else if (!hora_partida.value) {
+        errorMessage.value = "Ingrese la hora de Partida";
+    } else if (!hora_llegada.value) {
+        errorMessage.value = "Ingrese la hora de Llegada";
+    } else if (!timeFormat.test(hora_partida.value) || !timeFormat.test(hora_llegada.value)) {
+        errorMessage.value = "Ingrese las horas en el formato correcto, por ejemplo, 12:00:00 o 09:00:00";
+    } else {
+        errorMessage.value = ""
+        validacion.value = true;
+    }   
+
+};
 
 
 </script>
@@ -163,6 +293,7 @@ async function ActivarHorario(id) {
 .container{
     display: flex;
     justify-content: center;
+    min-height: 90vh;
 }
 .container-table{
     display: flex;
@@ -170,9 +301,11 @@ async function ActivarHorario(id) {
     text-align: center;
     flex-direction: column;
 }
-.container-table h1{
-    font-family: 'Gabarito', sans-serif;
-}
+.container-table h1 {
+    font-family: "Gabarito", sans-serif;
+    padding: 0;
+    margin: 0;
+  }
 .modal-content {
     width: 400px;
 }
@@ -186,6 +319,14 @@ async function ActivarHorario(id) {
     margin-bottom: 5px;
     display: flex;
     justify-content: flex-end
+}
+.error{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    color: red;
+    font-size: 18px;
+    text-align: center;    
 }
 
 </style>

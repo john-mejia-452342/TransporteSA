@@ -13,25 +13,23 @@
         <q-card-section style="max-height: 50vh" class="scroll">
           <q-input type="text" v-model="cedula" label="Cedula" style="width: 300px"/>
           <q-input type="text" v-model="nombre" label="Nombre" style="width: 300px" />
-          
-            <div class="q-pa" style="width: 300px;">
-                <div class="q-gutter">
-                  <q-select v-model="bus" :options="options" label="Bus"/> 
-                </div>
-            </div>
-
+          <div class="q-pa" style="width: 300px;">
+              <div class="q-gutter">
+                <q-select v-model="bus" :options="options" label="Bus"/> 
+              </div>
+          </div>
           <q-input type="text" v-model="experiencia" label="Experiencia" style="width: 300px" />
           <q-input type="text" v-model="telefono" label="Telefono" style="width: 300px" />
         </q-card-section>
         <q-separator />
-
+        <div class="error">{{errorMessage}}</div>
         <q-card-actions align="right">
           <q-btn flat label="Cerrar" color="primary" v-close-popup />
           <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarConductor()" />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div class="container-table">
+    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Conductores</h1>
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarConductor()" />
@@ -61,10 +59,14 @@
 import { ref, onMounted } from "vue";
 import { format } from "date-fns";
 import { useBusStore } from "../stores/Bus.js";
-import { useConductorStore } from "../stores/Conductor.js"
+import { useConductorStore } from "../stores/Conductor.js";
+import { useQuasar } from 'quasar'
+
 
 const busStore = useBusStore();
-const conductorStore = useConductorStore()
+const conductorStore = useConductorStore();
+const $q = useQuasar();
+
 
 let conductores = ref([]);
 let rows = ref([]);
@@ -124,36 +126,83 @@ const columns = [
 ];
 
 function agregarConductor() {
-    obtenerBuses()
+    obtenerBuses();
     fixed.value = true;
     text.value = "Agregar Conductor";
     cambio.value = 0;
 }
 
 async function editarAgregarConductor() {
-  if (cambio.value === 0) {
-    await conductorStore.postConductor({
-      cedula: cedula.value,
-      nombre: nombre.value,
-      id_bus: bus._rawValue.value,
-      experiencia: experiencia.value,
-      telefono: telefono.value
-    });
-    limpiar();
-    obtenerInfo();
-  } else {
-    let id = idConductor.value;
-    if (id) {
-      await conductorStore.putEditarConductor(id, {
+  validar();
+  if (validacion.value === true) {
+    if (cambio.value === 0) {
+      try {
+        showDefault();
+        await conductorStore.postConductor({
         cedula: cedula.value,
         nombre: nombre.value,
         id_bus: bus._rawValue.value,
         experiencia: experiencia.value,
         telefono: telefono.value
       });
+      if (notification) {
+        notification();
+      }
       limpiar();
+      $q.notify({
+          spinner: false,
+          message: "Conductor Agregado",
+          timeout: 2000,
+          type: "positive",
+      });
       obtenerInfo();
-      fixed.value = false;
+    } catch (error) {
+      if (notification) {
+      notification();
+      }
+      $q.notify({
+          spinner: false,
+          message: `${error.response.data.error.errors[0].msg}`,
+          timeout: 2000,
+          type: "negative",
+      });
+    }
+  } else {
+    let id = idConductor.value;
+    if (id) {
+      try {
+        showDefault();
+        await conductorStore.putEditarConductor(id, {
+          cedula: cedula.value,
+          nombre: nombre.value,
+          id_bus: bus._rawValue.value,
+          experiencia: experiencia.value,
+          telefono: telefono.value
+        });
+        if (notification) {
+            notification();
+        }
+          limpiar();
+          $q.notify({
+              spinner: false,
+              message: "Conductor Actualizado",
+              timeout: 2000,
+              type: "positive",
+          });
+          obtenerInfo();
+          fixed.value = false;
+          } catch (error) {
+              if (notification) {
+                  notification();
+              }
+              $q.notify({
+              spinner: false,
+              message: `${error.response.data.error.errors[0].msg}`,
+              timeout: 2000,
+              type: "negative",
+              });
+          }
+        } 
     }
   }
 }
@@ -184,13 +233,92 @@ async function EditarConductor(id) {
 }
 
 async function InactivarConductor(id) {
-  await conductorStore.putInactivarConductor(id);
-  obtenerInfo();
+  try{        
+    showDefault();
+    await conductorStore.putInactivarConductor(id);
+    if(notification){ 
+      notification();
+    }
+    $q.notify({
+        spinner: false, 
+        message: "Conductor Inactivado", 
+        timeout: 2000,
+        type: 'positive',
+    }); 
+    obtenerInfo()
+  }catch (error) {
+    if(notification) {
+      notification()
+    };
+    $q.notify({
+        spinner: false, 
+        message: `${error.response.data.error.errors[0].msg}`, 
+        timeout: 2000,
+        type: 'negative',
+    });
+  }
 }
 
 async function ActivarConductor(id) {
-  await conductorStore.putActivarConductor(id);
-  obtenerInfo();
+  try{        
+    showDefault();
+    await conductorStore.putActivarConductor(id);
+    if(notification){ 
+      notification();
+    }
+    $q.notify({
+        spinner: false, 
+        message: "Conductor Activado", 
+        timeout: 2000,
+        type: 'positive',
+    }); 
+    obtenerInfo()
+  }catch (error) {
+    if(notification) {
+      notification()
+    };
+    $q.notify({
+        spinner: false, 
+        message: `${error.response.data.error.errors[0].msg}`, 
+        timeout: 2000,
+        type: 'negative',
+    });
+  }
+}
+
+
+let errorMessage = ref("");
+
+const showDefault = () => {
+  notification = $q.notify({
+    spinner: true,
+    message: "Please wait...",
+    timeout: 0,
+  });
+};
+
+let validacion = ref(false);
+let notification = ref(null);
+async function validar() {
+
+  if (!cedula.value && !nombre.value && !bus.value && !experiencia.value && !telefono.value) {
+    errorMessage.value = "Por favor rellene los campos";
+  } else if (!cedula.value) {
+    errorMessage.value = "Ingrese la Cedula";
+  } else if (!nombre.value) {
+    errorMessage.value = "Ingrese el Nombre";
+  } else if (!bus.value) {
+    errorMessage.value = "Seleccione un Bus";
+  }else if(!experiencia.value){
+    errorMessage.value = "Digite la experiencia, por ejemplo (4 años)"
+  }else if (!telefono.value) {
+    errorMessage.value = "Ingrese el Telefono";
+  } else if (telefono.value.length !== 10) {
+    errorMessage.value = "El telefono debe tener 10 Digitos";
+  } else {
+    errorMessage.value = "";
+    validacion.value = true;
+  }
 }
 </script>
   
@@ -208,6 +336,8 @@ async function ActivarConductor(id) {
 }
 .container-table h1 {
   font-family: "Gabarito", sans-serif;
+  padding: 0;
+  margin: 0;
 }
 .modal-content {
   width: 400px;
@@ -222,5 +352,14 @@ async function ActivarConductor(id) {
   margin-bottom: 5px;
   display: flex;
   justify-content: flex-end;
+}
+
+.error{
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  color: red;
+  font-size: 18px;
+  text-align: center;    
 }
 </style>

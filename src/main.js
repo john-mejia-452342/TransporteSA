@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import {router} from "./routes/routes.js"
-import { Quasar } from 'quasar'
+import { Quasar, Notify } from 'quasar'
 import axios from 'axios'
 import { createPinia} from 'pinia'
 
@@ -16,7 +16,9 @@ const app = createApp(App)
 app.use(router)
 app.use(pinia)
 app.use(Quasar, {
-    plugins:{}
+    plugins:{
+        Notify
+    },
 })
 
 axios.defaults.baseURL="https://transporte-czaa.onrender.com/api/"

@@ -37,7 +37,7 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <div class="container-table">
+      <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
         <h1>Tickets</h1>
         <q-table title="Tickets" :rows="rows" :columns="columns" row-key="name">
           <template v-slot:body-cell-estado="props">
@@ -158,7 +158,7 @@
     { name: "fecha_departida",label: "Fecha de partida",field:"fecha_departida", sortable:true, 
     format: (val) => format(new Date(val), "yyyy-MM-dd"),},
     { name: "estado", label: "Estado", field: "estado", sortable: true },
-    // { name: "createAT",label: "Fecha de Creación",field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd")},
+    { name: "createAT",label: "Fecha de Creación",field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd")},
     { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
   ];
   
@@ -245,6 +245,8 @@
   }
   .container-table h1 {
     font-family: "Gabarito", sans-serif;
+    padding: 0;
+    margin: 0;
   }
   .modal-content {
     width: 400px;

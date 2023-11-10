@@ -6,17 +6,23 @@
                 <h1 id="Titulo">Login</h1>
             </div>
             <div class="card-body">
+                <!-- <div class="q-pa-md">
+                    <div class="row q-gutter-sm">
+                      <q-btn color="purple" @click="showDefault" label="Default spinner" />
+                    </div>
+                  </div> -->
                 <form @submit.prevent="validar">
                     <div class="input-container">
-                        <input placeholder="Usuario" class="input-field" type="text" v-model="username" name="username" required>
+                        <input placeholder="Usuario" class="input-field" type="text" v-model="username" name="username">
                         <label for="input-field" class="input-label">Usuario</label>
                         <span class="input-highlight"></span>
                     </div>   
                     <div class="input-container">
-                        <input placeholder="Password" class="input-field"  v-model="password" name="password" type="password" required>
+                        <input placeholder="Password" class="input-field"  v-model="password" name="password" type="password">
                         <label for="input-field" class="input-label">Password</label>
                         <span class="input-highlight"></span>
-                    </div>                   
+                    </div>   
+                    <div class="error">{{errorMessage}}</div>
                     <div class="form-group">
                         <button type="submit" class="login-button">Ingresar</button>
                     </div>
@@ -29,27 +35,67 @@
 <script setup>
 import { ref } from "vue";
 import { useLoginStore } from "../stores/Login.js"
-
+import { useQuasar } from 'quasar'
 const loginStore = useLoginStore()
 
 const username = ref('');
 const password = ref('');
+const $q = useQuasar();
+let errorMessage = ref("");
 
+
+const showDefault = () => {
+  notification = $q.notify({
+    spinner: true,
+    message: 'Please wait...',
+    timeout: 0 
+  });
+};
+
+let validacion = ref(false);
+let notification = ref(null);
 async function validar() {
-    if (!username.value || !password.value) {
-        alert('Por favor complete todos los campos');
-        return;
-    }
-    try {
-        loginStore.Login({
+    if (!username.value && !password.value) {
+        errorMessage.value = "Ingrese el usuario y la contraseña"
+    }else if(!username.value){
+        errorMessage.value = "Ingrese el usuario"
+    }else if(!password.value){
+        errorMessage.value = "Ingrese la contraseña"
+    }else{
+        errorMessage.value =""
+        validacion.value = true;
+    };
+    if (validacion.value==true) {
+        try {
+        showDefault()
+        await loginStore.Login({
             cuenta: username.value,
             clave: password.value
         });
-
+        if(notification) {
+            notification()
+        }
+        $q.notify({
+            spinner: false, 
+            message: "Ingresado al programa", 
+            timeout: 2000,
+            type: 'positive',
+        });
     } catch (error) {
-        alert('Error en el servidor');
+        if(notification) {
+            notification()
+        };
+        $q.notify({
+            spinner: false, 
+            message: `${error.response.data.msg}`, 
+            timeout: 2000,
+            type: 'negative',
+        });
+    };
     }
-}
+    
+    validacion.value = false  
+};
 </script>
 
 
@@ -88,19 +134,15 @@ async function validar() {
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
 
 }
-
-
 .card-header {
     text-align: center;
 
 }
-
 .card-header h1 {
     font-size: 2em;
     color: #333;
     text-shadow: 1px 1px #ddd;
 }
-
 .card-body {
     display: flex;
     align-content: stretch;
@@ -159,6 +201,7 @@ input[type="submit"]:hover {
 }
 
 .login-button {
+    position: absolute;
     background-color: #007bff;
     border: none;
     border-radius: 5px;
@@ -166,10 +209,11 @@ input[type="submit"]:hover {
     cursor: pointer;
     font-size: 1.2em;
     padding: 10px;
-    width: 100%;
+    width: 58%;
     margin-top: 30px;
     transition: background-color 0.3s ease;
     transition: 0.25s;
+    top: 90%;
 }
 
 .login-button:hover {
@@ -229,6 +273,13 @@ input[type="submit"]:hover {
   .input-field:focus + .input-label + .input-highlight {
     width: 100%;
   }
+  .error{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    color: red;
+    font-size: 18px;
+    }
   
 </style>
   

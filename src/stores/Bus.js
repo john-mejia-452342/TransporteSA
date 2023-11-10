@@ -19,6 +19,7 @@ export const useBusStore = defineStore('bus', () => {
             let res = await axios.post("bus/bus/agregar", data);
             return res
         } catch (error) {
+            console.log(error);
             throw error
         }
     }
