@@ -49,6 +49,7 @@
                     <q-btn  class="btn-c" color="primary" label="Generar Ticket" @click="CrearTicket()" />
                 </div>
             </div>
+
         </div>
     </div>
 </template>
@@ -241,6 +242,7 @@ onMounted(async () => {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    
   }
   
   .container-asientos button {
