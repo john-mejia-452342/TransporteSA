@@ -18,14 +18,14 @@ const obtenerInfoVendedor = async () =>{
 
 const postvendedor = async (data) =>{
     try{
-        let res = await axios.post('/vendedor/vendedor/agregar', data);
+        let res = await axios.post('/vendedor/agregar', data);
         return res
     } catch(error){
         throw error
     }
 }
 
-const puteditarvendedor =async (id, data) =>{
+const putVendedor =async (id, data) =>{
     try{
         let res = await axios.put(`vendedor/vendedor/${id}`, data);
         return res
@@ -56,7 +56,7 @@ const putActivarVendedor = async (id)=>{
 
 return {
     vendedores,
-    putInactivarVendedor, obtenerInfoVendedor, postvendedor, puteditarvendedor, putActivarVendedor
+    putInactivarVendedor, obtenerInfoVendedor, postvendedor, putVendedor, putActivarVendedor
 };
 
 

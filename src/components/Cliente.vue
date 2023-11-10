@@ -6,18 +6,18 @@
                 <q-card-section class="row items-center q-pb-none" style="color: black;">
                     <div class="text-h6">{{ text }}</div>
                     <q-space />
-                    <q-btn icon="close" flat round dense v-close-popup/>
+                    <q-btn icon="close" flat round dense v-close-popup />
                 </q-card-section>
                 <q-separator />
 
                 <q-card-section style="max-height: 50vh" class="scroll">
-                    <q-input type="number" v-model="cedula" label="Cedula" style="width: 300px;"/>
-                    <q-input v-model="nombre" label="Nombre" style="width: 300px;"/>
+                    <q-input type="number" v-model="cedula" label="Cedula" style="width: 300px;" />
+                    <q-input v-model="nombre" label="Nombre" style="width: 300px;" />
                     <q-input type="number" v-model="telefono" label="Telefono" style="width: 300px;" />
                 </q-card-section>
 
                 <q-separator />
-                <div class="error">{{errorMessage}}</div>
+                <div class="error">{{ errorMessage }}</div>
 
                 <q-card-actions align="right">
                     <q-btn flat label="Cerrar" color="primary" v-close-popup />
@@ -33,7 +33,7 @@
             <q-table title="Clientes" :rows="rows" :columns="columns" row-key="name">
                 <template v-slot:body-cell-estado="props">
                     <q-td :props="props">
-                        <label for="" v-if="props.row.estado == 1" style="color: green;" >Activo</label>
+                        <label for="" v-if="props.row.estado == 1" style="color: green;">Activo</label>
                         <label for="" v-else style="color: red;">Inactivo</label>
 
                     </q-td>
@@ -73,7 +73,7 @@ let nombre = ref();
 let telefono = ref();
 let cambio = ref(0)
 
-async function obtenerInfo(){
+async function obtenerInfo() {
     try {
         await clienteStore.obtenerInfoClientes();
         clientes.value = clienteStore.clientes;
@@ -91,16 +91,9 @@ const columns = [
     { name: 'cedula', label: 'Cedula', field: 'cedula', sortable: true },
     { name: 'nombre', label: 'Nombre', field: 'nombre', sortable: true },
     { name: 'telefono', label: 'Telefono', field: 'telefono' },
-    { name: 'estado', label: 'Estado', field: 'estado', sortable: true},
-    {
-        name: 'createAT', label: 'Fecha de Creación', field: 'createAT', sortable: true,
-        format: (val) => format(new Date(val), 'yyyy-MM-dd')
-    },
-    {
-        name: 'opciones', label: 'Opciones',
-        field: row => null,
-        "sortable": false,
-    },
+    { name: 'estado', label: 'Estado', field: 'estado', sortable: true },
+    { name: 'createAT', label: 'Fecha de Creación', field: 'createAT', sortable: true, format: (val) => format(new Date(val), 'yyyy-MM-dd')},
+    { name: 'opciones', label: 'Opciones', field: row => null, "sortable": false },
 ];
 
 function agregarCliente() {
@@ -121,7 +114,7 @@ async function editarAgregarCliente() {
                     telefono: telefono.value,
                 })
                 if (notification) {
-                notification();
+                    notification();
                 }
                 limpiar();
                 $q.notify({
@@ -133,7 +126,7 @@ async function editarAgregarCliente() {
                 obtenerInfo();
             } catch (error) {
                 if (notification) {
-                notification();
+                    notification();
                 }
                 $q.notify({
                     spinner: false,
@@ -141,42 +134,43 @@ async function editarAgregarCliente() {
                     timeout: 2000,
                     type: "negative",
                 });
-             }
+            }
         } else {
-        let id = idCliente.value;
+            let id = idCliente.value;
             if (id) {
                 try {
-                    await clienteStore.putEditarCliente(id,{
+                    await clienteStore.putEditarCliente(id, {
                         cedula: cedula.value,
                         nombre: nombre.value,
                         telefono: telefono.value,
                     });
-                if (notification) {
-                    notification();
-                }
-                limpiar();
-                $q.notify({
-                    spinner: false,
-                    message: "Cliente Actualizado",
-                    timeout: 2000,
-                    type: "positive",
-                });
-                obtenerInfo();
-                fixed.value = false;
+                    if (notification) {
+                        notification();
+                    }
+                    limpiar();
+                    $q.notify({
+                        spinner: false,
+                        message: "Cliente Actualizado",
+                        timeout: 2000,
+                        type: "positive",
+                    });
+                    obtenerInfo();
+                    fixed.value = false;
                 } catch (error) {
                     if (notification) {
                         notification();
                     }
                     $q.notify({
-                    spinner: false,
-                    message: `${error.response.data.error.errors[0].msg}`,
-                    timeout: 2000,
-                    type: "negative",
+                        spinner: false,
+                        message: `${error.response.data.error.errors[0].msg}`,
+                        timeout: 2000,
+                        type: "negative",
                     });
                 }
-               
+
             }
         }
+    validacion.value = false;
     }
 }
 
@@ -187,7 +181,7 @@ function limpiar() {
     telefono.value = ""
 }
 
-let idCliente= ref('')
+let idCliente = ref('')
 async function editarCliente(id) {
     cambio.value = 1;
     const clienteSeleccionado = clientes.value.find((cliente) => cliente._id === id);
@@ -202,68 +196,68 @@ async function editarCliente(id) {
 }
 
 async function inactivarCliente(id) {
-    try{        
-    showDefault();
-    await clienteStore.putInactivarCliente(id)
-    if(notification){ 
-      notification();
+    try {
+        showDefault();
+        await clienteStore.putInactivarCliente(id)
+        if (notification) {
+            notification();
+        }
+        $q.notify({
+            spinner: false,
+            message: "Cliente Inactivado",
+            timeout: 2000,
+            type: 'positive',
+        });
+        obtenerInfo()
+    } catch (error) {
+        if (notification) {
+            notification()
+        };
+        $q.notify({
+            spinner: false,
+            message: `${error.response.data.error.errors[0].msg}`,
+            timeout: 2000,
+            type: 'negative',
+        });
     }
-    $q.notify({
-        spinner: false, 
-        message: "Cliente Inactivado", 
-        timeout: 2000,
-        type: 'positive',
-    }); 
-    obtenerInfo()
-  }catch (error) {
-    if(notification) {
-      notification()
-    };
-    $q.notify({
-        spinner: false, 
-        message: `${error.response.data.error.errors[0].msg}`, 
-        timeout: 2000,
-        type: 'negative',
-    });
-  }
 
 }
 
 async function activarCliente(id) {
-    try{        
-    showDefault();
-    await clienteStore.putActivarCliente(id)
-    if(notification){ 
-      notification();
+    try {
+        showDefault();
+        await clienteStore.putActivarCliente(id)
+        if (notification) {
+            notification();
+        }
+        $q.notify({
+            spinner: false,
+            message: "Clinete Activado",
+            timeout: 2000,
+            type: 'positive',
+        });
+        obtenerInfo()
+    } catch (error) {
+        if (notification) {
+            notification()
+        };
+        $q.notify({
+            spinner: false,
+            message: `${error.response.data.error.errors[0].msg}`,
+            timeout: 2000,
+            type: 'negative',
+        });
     }
-    $q.notify({
-        spinner: false, 
-        message: "Clinete Activado", 
-        timeout: 2000,
-        type: 'positive',
-    }); 
-    obtenerInfo()
-  }catch (error) {
-    if(notification) {
-      notification()
-    };
-    $q.notify({
-        spinner: false, 
-        message: `${error.response.data.error.errors[0].msg}`, 
-        timeout: 2000,
-        type: 'negative',
-    });
-  }
 }
 
 let errorMessage = ref("");
 
 const showDefault = () => {
-  notification = $q.notify({
-    spinner: true,
-    message: "Please wait...",
-    timeout: 0,
-  });
+    notification = $q.notify({
+        spinner: true,
+        message: "Please wait...",
+        timeout: 0,
+    });
 };
 
 let validacion = ref(false);
@@ -288,21 +282,25 @@ async function validar() {
   
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Gabarito&display=swap');
-.container{
+
+.container {
     display: flex;
     justify-content: center;
 }
-.container-table{
+
+.container-table {
     display: flex;
     justify-content: center;
     text-align: center;
     flex-direction: column;
 }
+
 .container-table h1 {
     font-family: "Gabarito", sans-serif;
     padding: 0;
     margin: 0;
-  }
+}
+
 .modal-content {
     width: 400px;
 }
@@ -317,12 +315,12 @@ async function validar() {
     display: flex;
     justify-content: flex-end
 }
-.error{
+
+.error {
     display: flex;
     width: 100%;
     justify-content: center;
     color: red;
     font-size: 18px;
-    text-align: center;    
-  }
-</style>
+    text-align: center;
+}</style>

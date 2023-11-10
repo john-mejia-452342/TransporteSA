@@ -13,6 +13,8 @@
           <q-card-section style="max-height: 50vh" class="scroll">
             <q-input type="text" v-model="cedula" label="Cedula" style="width: 300px"/>
             <q-input type="text" v-model="nombre" label="Nombre" style="width: 300px" />
+            <q-input type="text" v-model="cuenta" label="Cuenta" style="width: 300px" />
+            <q-input type="text" v-model="clave" label="Clave" style="width: 300px" />
             <!-- <q-input type="text" v-model="id_bus" label="Bus" style="width: 300px" /> -->
             <q-input type="text" v-model="telefono" label="Telefono" style="width: 300px" />
           </q-card-section>
@@ -64,7 +66,9 @@ const $q = useQuasar();
   let fixed = ref(false);
   let text = ref("");
   let cedula = ref("");
-  let nombre = ref();
+  let nombre = ref("");
+  let cuenta = ref("");
+  let clave = ref();
   let telefono = ref("");
   let cambio = ref(0);
   
@@ -89,6 +93,8 @@ const $q = useQuasar();
   const columns = [
     { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
     { name: "nombre", label: "Nombre", field: "nombre", sortable: true},
+    { name: "cuenta", label: "Cuenta", field: "cuenta"},
+    { name: "clave", label: "Clave", field: "clave"},
     { name: "telefono", label: "Telefono", field: "telefono"},
     { name: "estado", label: "Estado", field: "estado", sortable: true },
     { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
@@ -110,6 +116,8 @@ const $q = useQuasar();
           await VendedoresStore.postvendedor({
             cedula: cedula.value,
             nombre: nombre.value,
+            cuenta:cuenta.value,
+            clave:clave.value,
             telefono: telefono.value
           });
             if (notification) {
@@ -139,9 +147,11 @@ const $q = useQuasar();
         if (id) {
           try {
             showDefault();
-            await VendedoresStore.puteditarvendedor(id, {
+            await VendedoresStore.putVendedor(id, {
             cedula: cedula.value,
             nombre: nombre.value,
+            cuenta: cuenta.value,
+            clave: clave.value,
             telefono: telefono.value
           });
           if (notification) {
@@ -176,6 +186,8 @@ const $q = useQuasar();
   function limpiar() {
     cedula.value = "";
     nombre.value = "";
+    cuenta.value = "";
+    clave.value = "";
     telefono.value = ""
   }
   
@@ -189,6 +201,8 @@ const $q = useQuasar();
       text.value = "Editar vendedor";
       cedula.value = vendedorSeleccionado.cedula;
       nombre.value = vendedorSeleccionado.nombre;
+      cuenta.value = vendedorSeleccionado.cuenta;
+      clave.value = vendedorSeleccionado.clave;
       telefono.value = vendedorSeleccionado.telefono;
     }
   }
@@ -262,12 +276,16 @@ let validacion = ref(false);
 let notification = ref(null);
 async function validar() {
 
-  if (!cedula.value && !nombre.value && !telefono.value) {
+  if (!cedula.value && !nombre.value && !cuenta.value && !clave.value && !telefono.value ) {
     errorMessage.value = "Por favor rellene los campos";
   } else if (!cedula.value) {
     errorMessage.value = "Ingrese la Cedula";
   } else if (!nombre.value) {
     errorMessage.value = "Ingrese el Nombre";
+  }else if (!cuenta.value) {
+    errorMessage.value = "Ingrese su cuenta";
+  }else if (!clave.value) {
+    errorMessage.value = "Ingrese su clave";
   }else if (!telefono.value) {
     errorMessage.value = "Ingrese el Telefono";
   } else if (telefono.value.length !== 10) {
