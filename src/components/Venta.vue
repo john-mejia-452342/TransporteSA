@@ -5,7 +5,8 @@
                 <q-btn color="primary" label="Generar Ticket" @click="mostrarModal" />
             </div>
             <!-- Modal -->
-        <div v-if="showmodal" class="modal">
+            <div class="container-wrapper">
+        <div v-if="showmodal" class="column modal">
             <div class="text-h6">{{ text }}</div>
             <q-select v-model="ruta" :options="optionsRutas" label="Rutas" />
             <q-select v-model="bus" :options="optionsBuses" label="Buses" />
@@ -13,14 +14,15 @@
             <q-btn flat label="Cerrar" color="primary" @click="cerrarModal" />
             <q-btn flat label="Guardar 💾" color="primary" @click="generarTicketInfo()" />
         </div>
-            <div class="container-info">
+    </div>
+            <div class="column container-info">
                 <div v-if="asientos.length" class="container-bus">
                     <div v-for="i in asientos" :key="i" class="container-asientos">
                         <button type="button" :value="i" @click="no_asiento = i"
                             :style="{ backgroundColor: no_asiento === i ? 'red' : 'initial' }">{{ i }} 💺</button>
                     </div>
                 </div>
-                <div v-if="showClienteDiv" class="cliente">
+                <div v-if="showClienteDiv" class="column cliente">
                     <q-btn class="bnt-bc" color="primary" label="Buscar Cliente" @click="buscarCliente()" />
                     <q-input class="label" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente"
                         style="width: 300px" />
@@ -210,7 +212,31 @@ onMounted(async () => {
     margin: 0;
     padding: 0;
     width: 100%;
+    display: flex;
+    justify-content: center;
+   
 }
+.container-wrapper {
+    display: flex;
+    max-width: 1200px;
+  }
+  .column {
+    flex: 1;
+    margin: 10px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  @media (max-width: 768px) {
+ 
+    .container-wrapper {
+      flex-direction: column;
+    }
+    .column {
+      width: 100%;
+    }
+  }
 
 .container {
     width: 100%;
