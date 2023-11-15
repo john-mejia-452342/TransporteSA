@@ -37,9 +37,7 @@
       <q-table title="Conductores" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green"
-              >Activo</label
-            >
+            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
@@ -226,7 +224,10 @@ async function EditarConductor(id) {
     text.value = "Editar Conductor";
     cedula.value = conductorSeleccionado.cedula;
     nombre.value = conductorSeleccionado.nombre;
-    bus.value = `${conductorSeleccionado.id_bus.placa} - ${conductorSeleccionado.id_bus.empresa_asignada} - ${conductorSeleccionado.id_bus.numero_bus}`
+    bus.value = {
+      label: `${conductorSeleccionado.id_bus.placa} - ${conductorSeleccionado.id_bus.empresa_asignada} - ${conductorSeleccionado.id_bus.numero_bus}`,
+      value: String(conductorSeleccionado.id_bus._id)
+    }
     experiencia.value = conductorSeleccionado.experiencia;
     telefono.value = conductorSeleccionado.telefono;
   }

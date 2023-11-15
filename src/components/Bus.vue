@@ -172,6 +172,7 @@ async function editarAgregarBus() {
       let id = idBus.value;
       if (id) {
         try {
+          showDefault();
           await busStore.putEditarBus(id, {
             placa: placa.value,
             numero_bus: numero_bus.value,

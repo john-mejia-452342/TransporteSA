@@ -15,7 +15,6 @@
             <q-input type="text" v-model="nombre" label="Nombre" style="width: 300px" />
             <q-input type="text" v-model="cuenta" label="Cuenta" style="width: 300px" />
             <q-input type="text" v-model="clave" label="Clave" style="width: 300px" />
-            <!-- <q-input type="text" v-model="id_bus" label="Bus" style="width: 300px" /> -->
             <q-input type="text" v-model="telefono" label="Telefono" style="width: 300px" />
           </q-card-section>
           <q-separator />
@@ -31,7 +30,7 @@
         <div class="btn-agregar">
           <q-btn color="secondary" label="Agregar ➕" @click="agregarVendedor()" />
         </div>
-        <q-table title="Conductores" :rows="rows" :columns="columns" row-key="name">
+        <q-table title="Vendedores" :rows="rows" :columns="columns" row-key="name">
           <template v-slot:body-cell-estado="props">
             <q-td :props="props">
               <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
@@ -94,7 +93,6 @@ const $q = useQuasar();
     { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
     { name: "nombre", label: "Nombre", field: "nombre", sortable: true},
     { name: "cuenta", label: "Cuenta", field: "cuenta"},
-    { name: "clave", label: "Clave", field: "clave"},
     { name: "telefono", label: "Telefono", field: "telefono"},
     { name: "estado", label: "Estado", field: "estado", sortable: true },
     { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
