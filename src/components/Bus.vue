@@ -17,7 +17,7 @@
           <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" style="width: 300px" />
           <div class="q-pa" style="width: 300px;">
             <div class="q-gutter">
-              <q-select v-model="ruta" :options="options" label="Rutas" />
+              <q-select v-model="conductor" :options="options" label="Conductores" />
             </div>
           </div>
         </q-card-section>
@@ -59,18 +59,18 @@
 import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 import { useBusStore } from "../stores/Bus.js";
-import { useRutaStore } from "../stores/Ruta.js";
+import { useConductorStore } from "../stores/Conductor.js";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
 const busStore = useBusStore();
-const rutaStore = useRutaStore()
+const conductorStore = useConductorStore()
 
 let buses = ref([]);
 let rows = ref([]);
 let fixed = ref(false);
 let text = ref("");
-let ruta = ref("")
+let conductor = ref("")
 let options = ref([])
 let placa = ref("");
 let numero_bus = ref();
@@ -83,6 +83,7 @@ let cambio = ref(0);
 async function obtenerInfo() {
   try {
     await busStore.obtenerInfoBuses();
+    console.log(busStore.buses);
     buses.value = busStore.buses;
     rows.value = busStore.buses;
   } catch (error) {
@@ -94,13 +95,14 @@ async function obtenerInfo() {
 //   console.log(ruta._rawValue.value);
 // });
 
-async function obtenerRutas() {
+async function obtenerConductores() {
   try {
-    await rutaStore.obtenerInfoRutas();
-    options.value = rutaStore.rutas.map((ruta) => (
+    await conductorStore.obtenerInfoConductores();
+    console.log(conductorStore.conductores);
+    options.value = conductorStore.conductores.map((conductor) => (
       {
-        label: `${ruta.precio} - ${ruta.origen} - ${ruta.destino}`,
-        value: String(ruta._id)
+        label: `${conductor.nombre} - ${conductor.cedula} - ${conductor.telefono}`,
+        value: String(conductor._id)
       }));
   } catch (error) {
     console.log(error);
@@ -116,18 +118,16 @@ const columns = [
   { name: "numero_bus", label: "Número de Bus", field: "numero_bus", sortable: true },
   { name: "cantidad_asientos", label: "Cantidad de Asientos", field: "cantidad_asientos", },
   { name: "empresa_asignada", label: "Empresa Asignada", field: "empresa_asignada" },
-  { name: "precio", label: "Ruta Precio", field: (row) => row.ruta_id.precio },
-  { name: "origen", label: "Ruta Origen", field: (row) => row.ruta_id.origen },
-  { name: "destino", label: "Ruta Destino", field: (row) => row.ruta_id.destino },
-  { name: "hora_partida", label: "Ruta Horario Partida", field: (row) => row.ruta_id.horario_id.hora_partida },
-  { name: "hora_llegada", label: "Ruta Horario Llegada", field: (row) => row.ruta_id.horario_id.hora_llegada },
+  { name: "nombre", label: "Nombre Conductor", field: (row) => row.conductor_id.nombre },
+  { name: "cedula", label: "Cedula Conductor", field: (row) => row.conductor_id.cedula },
+  { name: "telefono", label: "Telefono Conductor", field: (row) => row.conductor_id.telefono },
   { name: "estado", label: "Estado", field: "estado", sortable: true },
   { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd")},
   { name: "opciones", label: "Opciones", field: (row) => null, sortable: false },
 ];
 
 function agregarBus() {
-  obtenerRutas()
+  obtenerConductores()
   fixed.value = true;
   text.value = "Agregar Bus";
   cambio.value = 0;
@@ -144,7 +144,7 @@ async function editarAgregarBus() {
           numero_bus: numero_bus.value,
           cantidad_asientos: cantidad_asientos.value,
           empresa_asignada: empresa_asignada.value,
-          ruta_id: ruta._rawValue.value,
+          conductor_id: conductor._rawValue.value,
         });
         if (notification) {
           notification();
@@ -178,7 +178,7 @@ async function editarAgregarBus() {
             numero_bus: numero_bus.value,
             cantidad_asientos: cantidad_asientos.value,
             empresa_asignada: empresa_asignada.value,
-            ruta_id: ruta._rawValue.value,
+            conductor_id: conductor._rawValue.value,
           });
           if (notification) {
             notification();
@@ -215,12 +215,12 @@ function limpiar() {
   numero_bus.value = "";
   cantidad_asientos.value = "";
   empresa_asignada.value = "";
-  ruta.value = ""
+  conductor.value = ""
 }
 
 let idBus = ref("");
 async function EditarBus(id) {
-  obtenerRutas()
+  obtenerConductores()
   cambio.value = 1;
   const busSeleccionado = buses.value.find((bus) => bus._id === id);
   if (busSeleccionado) {
@@ -231,9 +231,9 @@ async function EditarBus(id) {
     numero_bus.value = busSeleccionado.numero_bus;
     cantidad_asientos.value = busSeleccionado.cantidad_asientos;
     empresa_asignada.value = busSeleccionado.empresa_asignada;
-    ruta.value = {
-      label: `${busSeleccionado.ruta_id.origen} - ${busSeleccionado.ruta_id.destino}`,
-      value: String(busSeleccionado.ruta_id._id)
+    conductor.value = {
+      label: `${busSeleccionado.conductor_id} - ${busSeleccionado.conductor_id.telefono} - ${busSeleccionado.conductor_id.cedula}`,
+      value: String(busSeleccionado.conductor_id._id)
     }
   }
 }
@@ -308,7 +308,7 @@ let validacion = ref(false);
 let notification = ref(null);
 async function validar() {
 
-  if (!placa.value && !numero_bus.value && !cantidad_asientos.value && !empresa_asignada.value && !ruta.value) {
+  if (!placa.value && !numero_bus.value && !cantidad_asientos.value && !empresa_asignada.value && !conductor.value) {
     errorMessage.value = "Por favor rellene los campos";
   } else if (!placa.value) {
     errorMessage.value = "Ingrese la Placa";
@@ -318,8 +318,8 @@ async function validar() {
     errorMessage.value = "Ingrese la cantidad de asientos";
   } else if (!empresa_asignada.value) {
     errorMessage.value = "Ingrese el nombre de la empresa"
-  } else if (!ruta.value) {
-    errorMessage.value = "Seleccione una ruta"
+  } else if (!conductor.value) {
+    errorMessage.value = "Seleccione un Conductor"
   } else {
     errorMessage.value = "";
     validacion.value = true;

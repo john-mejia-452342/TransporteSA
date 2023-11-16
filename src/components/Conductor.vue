@@ -13,11 +13,6 @@
         <q-card-section style="max-height: 50vh" class="scroll">
           <q-input type="text" v-model="cedula" label="Cedula" style="width: 300px"/>
           <q-input type="text" v-model="nombre" label="Nombre" style="width: 300px" />
-          <div class="q-pa" style="width: 300px;">
-              <div class="q-gutter">
-                <q-select v-model="bus" :options="options" label="Bus"/> 
-              </div>
-          </div>
           <q-input type="text" v-model="experiencia" label="Experiencia" style="width: 300px" />
           <q-input type="text" v-model="telefono" label="Telefono" style="width: 300px" />
         </q-card-section>
@@ -92,18 +87,6 @@ async function obtenerInfo() {
 }
 
 
-async function obtenerBuses() {
-    try {
-        await busStore.obtenerInfoBuses();
-        options.value = busStore.buses.map((bus) => (
-          {
-            label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
-            value: String(bus._id)
-        }));
-    } catch (error) {
-        console.log(error);
-    }
-}
 
 
 onMounted(async () => {
@@ -113,9 +96,6 @@ onMounted(async () => {
 const columns = [
   { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
   { name: "nombre", label: "Nombre", field: "nombre", sortable: true},
-  { name: "id_bus", label: "Placa", field: (row)=>row.id_bus.placa},
-  { name: "id_bus", label: "Empresa Bus", field: (row)=>row.id_bus.empresa_asignada},
-  { name: "id_bus", label: "Numero Bus", field: (row)=>row.id_bus.numero_bus},
   { name: "experiencia", label: "Experiencia", field: "experiencia"},
   { name: "telefono", label: "Telefono", field: "telefono"},
   { name: "estado", label: "Estado", field: "estado", sortable: true },
@@ -124,7 +104,6 @@ const columns = [
 ];
 
 function agregarConductor() {
-    obtenerBuses();
     fixed.value = true;
     text.value = "Agregar Conductor";
     cambio.value = 0;
@@ -139,7 +118,6 @@ async function editarAgregarConductor() {
         await conductorStore.postConductor({
         cedula: cedula.value,
         nombre: nombre.value,
-        id_bus: bus._rawValue.value,
         experiencia: experiencia.value,
         telefono: telefono.value
       });
@@ -173,7 +151,6 @@ async function editarAgregarConductor() {
         await conductorStore.putEditarConductor(id, {
           cedula: cedula.value,
           nombre: nombre.value,
-          id_bus: bus._rawValue.value,
           experiencia: experiencia.value,
           telefono: telefono.value
         });
@@ -208,14 +185,12 @@ async function editarAgregarConductor() {
 function limpiar() {
   cedula.value = "";
   nombre.value = "";
-  bus.value = "";
   experiencia.value = "";
   telefono.value = ""
 }
 
 let idConductor = ref("");
 async function EditarConductor(id) {
-  obtenerBuses()
   cambio.value = 1;
   const conductorSeleccionado = conductores.value.find((conductor) => conductor._id === id);
   if (conductorSeleccionado) {
@@ -224,10 +199,6 @@ async function EditarConductor(id) {
     text.value = "Editar Conductor";
     cedula.value = conductorSeleccionado.cedula;
     nombre.value = conductorSeleccionado.nombre;
-    bus.value = {
-      label: `${conductorSeleccionado.id_bus.placa} - ${conductorSeleccionado.id_bus.empresa_asignada} - ${conductorSeleccionado.id_bus.numero_bus}`,
-      value: String(conductorSeleccionado.id_bus._id)
-    }
     experiencia.value = conductorSeleccionado.experiencia;
     telefono.value = conductorSeleccionado.telefono;
   }
@@ -302,15 +273,13 @@ let validacion = ref(false);
 let notification = ref(null);
 async function validar() {
 
-  if (!cedula.value && !nombre.value && !bus.value && !experiencia.value && !telefono.value) {
+  if (!cedula.value && !nombre.value && !experiencia.value && !telefono.value) {
     errorMessage.value = "Por favor rellene los campos";
   } else if (!cedula.value) {
     errorMessage.value = "Ingrese la Cedula";
   } else if (!nombre.value) {
     errorMessage.value = "Ingrese el Nombre";
-  } else if (!bus.value) {
-    errorMessage.value = "Seleccione un Bus";
-  }else if(!experiencia.value){
+  } else if(!experiencia.value){
     errorMessage.value = "Digite la experiencia, por ejemplo (4 años)"
   }else if (!telefono.value) {
     errorMessage.value = "Ingrese el Telefono";
