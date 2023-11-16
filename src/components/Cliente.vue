@@ -1,6 +1,15 @@
 <template>
     <div class="container">
         <!-- Modal -->
+       
+        <q-input
+      v-model="searchCedula"
+      label="Buscar por Cedula"
+      style="width: 300px;"
+      @input="filtrarClientes"
+    />
+    <q-btn color="primary" label="Buscar" @click="filtrarClientes" />
+    
         <q-dialog v-model="fixed">
             <q-card class="modal-content">
                 <q-card-section class="row items-center q-pb-none" style="color: black;">
@@ -72,6 +81,17 @@ let cedula = ref();
 let nombre = ref();
 let telefono = ref();
 let cambio = ref(0)
+let searchCedula = ref("");
+
+function filtrarClientes() {
+  if (searchCedula.value.trim() === "") {
+    rows.value = clientes.value; // Mostrar todos los clientes si la búsqueda está vacía
+  } else {
+    rows.value = clientes.value.filter((cliente) =>
+      cliente.cedula.toString().includes(searchCedula.value.toString())
+    );
+  }
+}
 
 async function obtenerInfo() {
     try {
