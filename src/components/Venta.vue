@@ -7,12 +7,15 @@
             <!-- Modal -->
             <div class="container-wrapper">
         <div v-if="showmodal" class="column modal">
-            <div class="text-h6">{{ text }}</div>
             <q-select v-model="ruta" :options="optionsRutas" label="Rutas" />
             <q-select v-model="bus" :options="optionsBuses" label="Buses" />
             <q-input v-model="fecha_departida" filled type="date" hint="Fecha para Partida" style="width: 300px" />
-            <q-btn flat label="Cerrar" color="primary" @click="cerrarModal" />
-            <q-btn flat label="Guardar 💾" color="primary" @click="generarTicketInfo()" />
+
+            <div class="options">
+               <q-btn flat label="Cerrar" color="primary" @click="cerrarModal" />
+                <q-btn flat label="Guardar 💾" color="primary" @click="generarTicketInfo()" /> 
+            </div>
+            
         </div>
     </div>
             <div class="column container-info">
@@ -79,7 +82,6 @@ function mostrarModal() {
     // Configurar la información necesaria antes de mostrar el modal
     obtenerRutas();
     fixed.value = true;
-    text.value = "Generar Ticket";
     showmodal.value = true;
 }
 
@@ -116,11 +118,16 @@ async function obtenerRutas() {
 }
 
 async function obtenerBuses() {
-    const busesFiltrados = buses.value.filter((bus) => bus.ruta_id._id === ruta._rawValue.value);
-    optionsBuses.value = busesFiltrados.map((bus) => ({
-        label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
-        value: String(bus._id),
-    }));
+    try {
+        await busStore.obtenerInfoBuses()
+        optionsBuses.value = busStore.buses.map((bus) => ({
+            label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
+            value: String(bus._id),
+        })); 
+    } catch (error) {
+        console.log(error);
+    }
+    
 }
 
 function generarListaAsientos() {
@@ -317,12 +324,18 @@ onMounted(async () => {
 
 .modal {
     border: solid rgb(0, 0, 0);
-    margin-top: 100px;
-    width: 600px;
-    height: 300PX;
     background-color: white;
-    padding: 20px;
-    flex-direction: row; /* Cambiado a fila (row) */
-    }
+    display: flex;
+    align-content: center;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 362px;
+}
+
+
+.options{
+    display: flex;
+    justify-content: space-around;
+}
 
 </style>
