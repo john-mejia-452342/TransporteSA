@@ -1,6 +1,13 @@
 <template>
   <div class="container">
     <!-- Modal -->
+    <q-input
+      v-model="buscarplaca"
+      label="Buscar por Cedula"
+      style="width: 300px"
+      @input="filtrarbuses"
+    />
+    <q-btn color="primary" label="Buscar" @click="filtrarbuses" />
     <q-dialog v-model="fixed">
       <q-card class="modal-content">
         <q-card-section class="row items-center q-pb-none" style="color: black">
@@ -76,8 +83,17 @@ let placa = ref("");
 let numero_bus = ref();
 let cantidad_asientos = ref("");
 let empresa_asignada = ref("");
-// const cantidad_asientos = ref("");
-// const empresa_asignada = ref("");
+let buscarplaca = ref("");
+
+function filtrarbuses() {
+  if (buscarplaca.value.trim() === "") {
+    rows.value = buses.value; // Mostrar todos los buses si la búsqueda está vacía
+  } else {
+    rows.value = buses.value.filter((buses) =>
+      buses.placa.toString().includes(buscarplaca.value.toString())
+    );
+  }
+}
 let cambio = ref(0);
 
 async function obtenerInfo() {
