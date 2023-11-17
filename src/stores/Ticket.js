@@ -58,10 +58,20 @@ export const useTicketStore = defineStore('ticket', () => {
         } catch (error) {
           throw error
         }
+      };
+
+      const buscarTickets = async (id_ruta, id_bus, fecha)=>{
+        try {
+          let res = await axios.get(`/ticket/encontrartickets?id_ruta=${id_ruta}&id_bus=${id_bus}&fecha=${fecha}`)
+          console.log(res);
+          return res
+        } catch (error) {
+          throw error
+        }
       }
 
     return {
       ticket,
-      postTicket, getTickets, putEditarTicket, putInactivarTicket, putActivarTicket
+      postTicket, getTickets, putEditarTicket, putInactivarTicket, putActivarTicket, buscarTickets
     };
 });

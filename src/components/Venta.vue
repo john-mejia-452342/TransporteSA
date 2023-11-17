@@ -27,13 +27,14 @@
                 </div>
                 <div v-if="showClienteDiv" class="column cliente">
                     <q-btn class="bnt-bc" color="primary" label="Buscar Cliente" @click="buscarCliente()" />
-                    <q-input class="label" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente"
+                    <q-input class="label" type="number" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente"
                         style="width: 300px" />
                     <q-input class="label" standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente"
                         style="width: 300px" />
-                    <q-input class="label" standout v-model="telefono" label="Telefono" placeholder="Telefono del cliente"
+                    <q-input class="label" type="number" standout v-model="telefono" label="Telefono" placeholder="Telefono del cliente"
                         style="width: 300px" />
                     <q-btn class="btn-c" color="primary" label="Generar Ticket" @click="CrearTicket()" />
+                    <div class="notfounf">{{notfound}}</div>
                 </div>
             </div>
         </div>
@@ -64,9 +65,9 @@ let fecha_departida = ref("");
 let no_asiento = ref(0);
 let showClienteDiv = ref(false);
 let showmodal = ref(false);
-let cedula = ref('');
+let cedula = ref(0);
 let nombre = ref('');
-let telefono = ref('');
+let telefono = ref(0);
 let buses = ref([]);
 let rutas = ref([]);
 let clientes = ref([]);
@@ -79,14 +80,12 @@ let optionsBuses = ref([]);
 
 
 function mostrarModal() {
-    // Configurar la información necesaria antes de mostrar el modal
     obtenerRutas();
     fixed.value = true;
     showmodal.value = true;
 }
 
 function cerrarModal() {
-    // Opcional: Restablecer los valores o realizar otras acciones al cerrar el modal
     fixed.value = false;
     showmodal.value = false;
 }
@@ -142,14 +141,18 @@ function generarListaAsientos() {
     }
 }
 
+let notfound = ref("")
 let cliente_id = ref("")
 async function buscarCliente() {
-    const clienteEncontrado = clientes.value.find(cliente => cliente.cedula === cedula.value || cliente.nombre === nombre.value || cliente.telefono === telefono.value);
+    const clienteEncontrado = clientes.value.find(cliente => cliente.cedula == cedula.value || cliente.nombre == nombre.value || cliente.telefono == telefono.value);
     if (clienteEncontrado) {
         cedula.value = clienteEncontrado.cedula;
         nombre.value = clienteEncontrado.nombre;
         telefono.value = clienteEncontrado.telefono;
-        cliente_id.value = clienteEncontrado._id
+        cliente_id.value = clienteEncontrado._id;
+        notfound.value = ""
+    }else{
+        notfound.value = "No se encontro ningun cliente"
     }
 }
 
@@ -157,7 +160,7 @@ async function generarTicket() {
     await obtenerRutas();
     fixed.value = true;
     text.value = "Generar Ticket";
-    showmodal.value = true; // Asegúrate de que showmodal se establezca en true aquí
+    showmodal.value = true; 
 }
 
 async function generarTicketInfo() {
@@ -166,9 +169,6 @@ async function generarTicketInfo() {
 }
 
 async function CrearTicket() {
-    // const token = loginStore.token;
-    // console.log(token);
-
     await ticketStore.postTicket({
         vendedor_id: String(vendedor.value._id),
         cliente_id: cliente_id.value,
@@ -182,22 +182,11 @@ async function obtenerVendedor() {
     vendedor.value = loginStore.vendedor;
 }
 
-let tickets = ref([])
 
 
 async function validarAsientos() {
-    await ticketStore.getTickets();
-    tickets.value = ticketStore.ticket
-
-    const date = new Date(ticketStore.ticket.fecha_departida);
-    const formattedDate = date.toISOString().split('T')[0];
-
-    fecha_departida.value = formattedDate;
-    const ticketFechaPartida = tickets.value.map((ticket) => ticket.fecha_departida = fecha_departida.value)
-
-    if (ticketVendedorId) {
-
-    }
+    await ticketStore.buscarTickets();
+    
 }
 
 watch(ruta, () => {
@@ -336,6 +325,9 @@ onMounted(async () => {
 .options{
     display: flex;
     justify-content: space-around;
+}
+.notfound {
+    color: red;
 }
 
 </style>
