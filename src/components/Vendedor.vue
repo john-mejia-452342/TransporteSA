@@ -1,13 +1,7 @@
 <template>
   <div class="container">
     <!-- Modal -->
-    <q-input
-      v-model="searchCedula"
-      label="Buscar por Cedula"
-      style="width: 300px"
-      @input="filtrarvendedores"
-    />
-    <q-btn color="primary" label="Buscar" @click="filtrarvendedores" />
+
     <q-dialog v-model="fixed">
       <q-card class="modal-content">
         <q-card-section class="row items-center q-pb-none" style="color: black">
@@ -67,6 +61,12 @@
       style="height: 90vh; overflow-y: auto; width: 80%"
     >
       <h1>Vendedor</h1>
+
+      <div class="b-b">
+        <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 400px" @input="filtrarvendedores"/>
+        <q-btn color="primary" label="Buscar" @click="filtrarvendedores" class="btnbuscar"/>
+      </div>
+
       <div class="btn-agregar">
         <q-btn
           color="secondary"
@@ -419,5 +419,27 @@ async function validar() {
   color: red;
   font-size: 18px;
   text-align: center;
+}
+.b-b {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 5px;
+}
+
+.btnbuscar{
+  width:170px;
+  height:53px;
+  position: relative;
+  top: 7px;
+}
+.bbuscar{
+  width: 170px;
+  font-size: 18px;
+  background-color: rgba(5, 177, 245, 0.204);
+  border-radius: 5px;
+  position: relative;
+  top: 6px;
 }
 </style>

@@ -11,70 +11,44 @@
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input
-            v-model="hora_partida"
-            label="Hora de partida"
-            style="width: 300px"
-          />
-          <q-input
-            v-model="hora_llegada"
-            label="Hora de llegada"
-            style="width: 300px"
-          />
+          <q-input v-model="hora_partida" label="Hora de partida" style="width: 300px" />
+          <q-input v-model="hora_llegada" label="Hora de llegada" style="width: 300px" />
         </q-card-section>
 
         <q-separator />
         <q-div class="error">{{ errorMessage }}</q-div>
         <q-card-actions align="right">
           <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn
-            flat
-            label="Guardar 💾"
-            color="primary"
-            @click="editarAgregarHorario()"
-          />
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarHorario()" />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div
-      class="container-table"
-      style="height: 90vh; overflow-y: auto; width: 80%"
-    >
+    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Horario</h1>
+
+      <!-- <div class="b-b">
+        <q-input class="bbuscar" v-model="searchhorario" label="Buscar por Cedula" style="width: 300px" @input="filtrarhora" />
+
+        <q-btn color="primary" label="Buscar" @click="filtrarhora" class="btnbuscar" />
+      </div> -->
+
+
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarHorario()" />
       </div>
       <q-table title="Horarios" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green"
-              >Activo</label
-            >
+            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn
-              color="white"
-              text-color="black"
-              label="🖋️"
-              @click="editarHorario(props.row._id)"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="❌"
-              @click="InactivarHorario(props.row._id)"
-              v-if="props.row.estado == 1"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="✅"
-              @click="ActivarHorario(props.row._id)"
-              v-else
-            />
+            <q-btn color="white" text-color="black" label="🖋️" @click="editarHorario(props.row._id)" />
+            <q-btn color="white" text-color="black" label="❌" @click="InactivarHorario(props.row._id)"
+              v-if="props.row.estado == 1" />
+            <q-btn color="white" text-color="black" label="✅" @click="ActivarHorario(props.row._id)" v-else />
           </q-td>
         </template>
       </q-table>
@@ -98,6 +72,18 @@ let text = ref("");
 let hora_partida = ref();
 let hora_llegada = ref();
 let cambio = ref(0);
+// let searchhorario = ref("");
+
+// function filtrarhora() {
+//   const searchTerm = searchhorario.value.trim().toLowerCase();
+//   if (!searchTerm) {
+//     rows.value = horarios.value;
+//   } else {
+//     rows.value = horarios.value.filter((horarios) =>
+//       horarios.hora_partida.toString().toLowerCase().includes(searchTerm)
+//     );
+//   }
+// }
 
 async function obtenerInfo() {
   try {
@@ -325,22 +311,26 @@ async function validar() {
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Gabarito&display=swap");
+
 .container {
   display: flex;
   justify-content: center;
   min-height: 90vh;
 }
+
 .container-table {
   display: flex;
   justify-content: center;
   text-align: center;
   flex-direction: column;
 }
+
 .container-table h1 {
   font-family: "Gabarito", sans-serif;
   padding: 0;
   margin: 0;
 }
+
 .modal-content {
   width: 400px;
 }
@@ -355,6 +345,7 @@ async function validar() {
   display: flex;
   justify-content: flex-end;
 }
+
 .error {
   display: flex;
   width: 100%;

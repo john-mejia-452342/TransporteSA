@@ -31,6 +31,14 @@
     </q-dialog>
     <div  class="container-table"  style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Rutas</h1>
+
+
+      <div class="b-b">
+        <q-input class="bbuscar" v-model="searchrutas" label="Buscar por Cedula" style="width: 300px" @input="filtraruta" />
+        <q-btn color="primary" label="Buscar" @click="filtraruta" class="btnbuscar" />
+      </div>
+
+
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarRuta()" />
       </div>
@@ -74,6 +82,17 @@ let horario = ref("");
 let origen = ref("");
 let destino = ref("");
 let cambio = ref(0);
+let searchrutas = ref("");
+
+function filtraruta() {
+  if (searchrutas.value.trim() === "") {
+    rows.value = rutas.value;
+  } else {
+    rows.value = rutas.value.filter((rutas) =>
+      rutas.origen.toString().includes(searchrutas.value.toString())
+    );
+  }
+}
 
 async function obtenerInfo() {
   try {
@@ -357,5 +376,27 @@ async function validar() {
   color: red;
   font-size: 18px;
   text-align: center;    
+}
+.b-b {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 5px;
+}
+
+.btnbuscar{
+  width:170px;
+  height:53px;
+  position: relative;
+  top: 7px;
+}
+.bbuscar{
+  width: 170px;
+  font-size: 18px;
+  background-color: rgba(5, 177, 245, 0.204);
+  border-radius: 5px;
+  position: relative;
+  top: 6px;
 }
 </style>

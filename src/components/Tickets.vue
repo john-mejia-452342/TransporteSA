@@ -39,6 +39,12 @@
       </q-dialog>
       <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
         <h1>Tickets</h1>
+
+        <div class="b-b">
+        <q-input class="bbuscar" v-model="searchtieckets" label="Buscar por Cedula" style="width: 300px" @input="filtrarticket" />
+        <q-btn color="primary" label="Buscar" @click="filtrarticket" class="btnbuscar" />
+      </div>
+
         <q-table title="Tickets" :rows="rows" :columns="columns" row-key="name">
           <template v-slot:body-cell-estado="props">
             <q-td :props="props">
@@ -82,13 +88,22 @@
   let optionsCliente = ref([]);
   let optionsBus = ref([]);
   let buses = ref([])
-
-  
   let vendedor = ref("");
   let cliente = ref("");
   let bus = ref("");
   let no_asiento = ref(0);
   let fecha_departida = ref("");
+  let searchtieckets = ref("");
+
+function filtrarticket() {
+  if (searchtieckets.value.trim() === "") {
+    rows.value = tickets.value;
+  } else {
+    rows.value = tickets.value.filter((tickets) =>
+      tickets.cliente.toString().includes(searchtieckets.value.toString())
+    );
+  }
+}
 
   async function obtenerInfo() {
     try {
@@ -262,4 +277,28 @@
     display: flex;
     justify-content: flex-end;
   }
+
+  .b-b {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 5px;
+  margin-bottom: 30px;
+}
+
+.btnbuscar{
+  width:170px;
+  height:53px;
+  position: relative;
+  top: 7px;
+}
+.bbuscar{
+  width: 170px;
+  font-size: 18px;
+  background-color: rgba(5, 177, 245, 0.204);
+  border-radius: 5px;
+  position: relative;
+  top: 6px;
+}
   </style>
