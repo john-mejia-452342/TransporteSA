@@ -19,10 +19,19 @@
         </div>
     </div>
             <div class="column container-info">
-                <div v-if="asientos.length" class="container-bus">
+                  <div v-if="asientos.length" class="container-bus">
                     <div v-for="i in asientos" :key="i" class="container-asientos">
-                        <button type="button" :value="i" @click="no_asiento = i"
-                            :style="{ backgroundColor: no_asiento === i ? 'red' : 'initial' }">{{ i }} 💺</button>
+                    <button
+                        type="button"
+                        :value="i"
+                        @click="no_asiento = i"
+                        :style="{
+                        backgroundColor: no_asiento === i ? 'red' : (puestos.includes(i) ? 'red' : 'initial'),
+                        cursor: puestos.includes(i) ? 'not-allowed' : 'pointer'
+                        }"
+                    >
+                        {{ i }} 💺
+                    </button>
                     </div>
                 </div>
                 <div v-if="showClienteDiv" class="column cliente">
@@ -65,9 +74,9 @@ let fecha_departida = ref("");
 let no_asiento = ref(0);
 let showClienteDiv = ref(false);
 let showmodal = ref(false);
-let cedula = ref(0);
+let cedula = ref();
 let nombre = ref('');
-let telefono = ref(0);
+let telefono = ref();
 let buses = ref([]);
 let rutas = ref([]);
 let clientes = ref([]);
@@ -129,7 +138,8 @@ async function obtenerBuses() {
     
 }
 
-function generarListaAsientos() {
+async function generarListaAsientos() {
+    await validarAsientos();
     const busSeleccionado = buses.value.find((b) => b._id === bus._rawValue.value);
     if (busSeleccionado) {
         const numeroAsientos = busSeleccionado.cantidad_asientos;
@@ -172,6 +182,7 @@ async function CrearTicket() {
     await ticketStore.postTicket({
         vendedor_id: String(vendedor.value._id),
         cliente_id: cliente_id.value,
+        ruta_id: ruta._rawValue.value,
         bus_id: bus._rawValue.value,
         no_asiento: no_asiento.value,
         fecha_departida: fecha_departida.value
@@ -183,10 +194,19 @@ async function obtenerVendedor() {
 }
 
 
-
+let puestos = ref([])
 async function validarAsientos() {
-    await ticketStore.buscarTickets();
-    
+    try {
+        const id_ruta = ruta._rawValue.value; 
+        const id_bus = bus._rawValue.value; 
+        const fecha = fecha_departida.value;
+
+        await ticketStore.buscarTickets(id_ruta, id_bus, fecha);
+        puestos.value = ticketStore.puestos
+
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 watch(ruta, () => {
