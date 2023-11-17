@@ -12,37 +12,13 @@
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input
-            type="text"
-            v-model="placa"
-            label="Placa"
-            style="width: 300px"
-          />
-          <q-input
-            type="number"
-            v-model="numero_bus"
-            label="Número de Bus"
-            style="width: 300px"
-          />
-          <q-input
-            type="text"
-            v-model="cantidad_asientos"
-            label="Cantidad de Asientos"
-            style="width: 300px"
-          />
-          <q-input
-            type="text"
-            v-model="empresa_asignada"
-            label="Empresa Asignada"
-            style="width: 300px"
-          />
+          <q-input type="text" v-model="placa" label="Placa" style="width: 300px" />
+          <q-input type="number" v-model="numero_bus" label="Número de Bus" style="width: 300px" />
+          <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" style="width: 300px" />
+          <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" style="width: 300px" />
           <div class="q-pa" style="width: 300px">
             <div class="q-gutter">
-              <q-select
-                v-model="conductor"
-                :options="options"
-                label="Conductores"
-              />
+              <q-select v-model="conductor" :options="options" label="Conductores" />
             </div>
           </div>
         </q-card-section>
@@ -51,29 +27,19 @@
         <div class="error">{{ errorMessage }}</div>
         <q-card-actions align="right">
           <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn
-            flat
-            label="Guardar 💾"
-            color="primary"
-            @click="editarAgregarBus()"
-          />
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarBus()" />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div
-      class="container-table"
-      style="height: 90vh; overflow-y: auto; width: 80%"
-    >
+    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Buses</h1>
-      <div class="b-b" >
-        <q-input
-          v-model="buscarplaca"
-          label="Buscar por Cedula"
-          style="width: 300px"
-          @input="filtrarbuses"
-        />
-        <q-btn color="primary" label="Buscar" @click="filtrarbuses" />
+
+
+      <div class="b-b">
+        <q-input class="bbuscar" v-model="buscarplaca" label="Buscar por Placa" style="width: 300px" @input="filtrarbuses" />
+        <q-btn color="primary" label="Buscar" @click="filtrarbuses" class="btnbuscar" />
       </div>
+
 
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
@@ -81,34 +47,16 @@
       <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green"
-              >Activo</label
-            >
+            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn
-              color="white"
-              text-color="black"
-              label="🖋️"
-              @click="EditarBus(props.row._id)"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="❌"
-              @click="InactivarBus(props.row._id)"
-              v-if="props.row.estado == 1"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="✅"
-              @click="ActivarBus(props.row._id)"
-              v-else
-            />
+            <q-btn color="white" text-color="black" label="🖋️" @click="EditarBus(props.row._id)" />
+            <q-btn color="white" text-color="black" label="❌" @click="InactivarBus(props.row._id)"
+              v-if="props.row.estado == 1" />
+            <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else />
           </q-td>
         </template>
       </q-table>
@@ -482,6 +430,23 @@ async function validar() {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin-top: 30px;
+  gap: 5px;
+}
+
+.btnbuscar{
+  width:170px;
+  height:53px;
+  position: relative;
+  top: 7px;
+}
+.bbuscar{
+  width: 170px;
+  font-size: 18px;
+  background-color: rgba(5, 177, 245, 0.204);
+  border-radius: 5px;
+  position: relative;
+  top: 6px;
 }
 
 </style>

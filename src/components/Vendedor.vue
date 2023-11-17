@@ -63,8 +63,7 @@
       <h1>Vendedor</h1>
 
       <div class="b-b">
-        <q-input v-model="searchCedula" label="Buscar por Cedula" style="width: 400px" @input="filtrarvendedores"
-        />
+        <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 400px" @input="filtrarvendedores"/>
         <q-btn color="primary" label="Buscar" @click="filtrarvendedores" class="btnbuscar"/>
       </div>
 
@@ -425,12 +424,22 @@ async function validar() {
   display: flex;
   flex-direction: row;
   justify-content: center;
+  margin-top: 30px;
+  gap: 5px;
 }
 
 .btnbuscar{
-  width:200px;
-  height:35px;
-  position:
-  
+  width:170px;
+  height:53px;
+  position: relative;
+  top: 7px;
+}
+.bbuscar{
+  width: 170px;
+  font-size: 18px;
+  background-color: rgba(5, 177, 245, 0.204);
+  border-radius: 5px;
+  position: relative;
+  top: 6px;
 }
 </style>
