@@ -1,13 +1,7 @@
 <template>
   <div class="container">
     <!-- Modal -->
-    <q-input
-      v-model="buscarplaca"
-      label="Buscar por Cedula"
-      style="width: 300px"
-      @input="filtrarbuses"
-    />
-    <q-btn color="primary" label="Buscar" @click="filtrarbuses" />
+
     <q-dialog v-model="fixed">
       <q-card class="modal-content">
         <q-card-section class="row items-center q-pb-none" style="color: black">
@@ -18,13 +12,37 @@
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input type="text" v-model="placa" label="Placa" style="width: 300px" />
-          <q-input type="number" v-model="numero_bus" label="Número de Bus" style="width: 300px" />
-          <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" style="width: 300px" />
-          <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" style="width: 300px" />
-          <div class="q-pa" style="width: 300px;">
+          <q-input
+            type="text"
+            v-model="placa"
+            label="Placa"
+            style="width: 300px"
+          />
+          <q-input
+            type="number"
+            v-model="numero_bus"
+            label="Número de Bus"
+            style="width: 300px"
+          />
+          <q-input
+            type="text"
+            v-model="cantidad_asientos"
+            label="Cantidad de Asientos"
+            style="width: 300px"
+          />
+          <q-input
+            type="text"
+            v-model="empresa_asignada"
+            label="Empresa Asignada"
+            style="width: 300px"
+          />
+          <div class="q-pa" style="width: 300px">
             <div class="q-gutter">
-              <q-select v-model="conductor" :options="options" label="Conductores" />
+              <q-select
+                v-model="conductor"
+                :options="options"
+                label="Conductores"
+              />
             </div>
           </div>
         </q-card-section>
@@ -33,35 +51,71 @@
         <div class="error">{{ errorMessage }}</div>
         <q-card-actions align="right">
           <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarBus()" />
+          <q-btn
+            flat
+            label="Guardar 💾"
+            color="primary"
+            @click="editarAgregarBus()"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
+    <div
+      class="container-table"
+      style="height: 90vh; overflow-y: auto; width: 80%"
+    >
       <h1>Buses</h1>
+      <div class="b-b" >
+        <q-input
+          v-model="buscarplaca"
+          label="Buscar por Cedula"
+          style="width: 300px"
+          @input="filtrarbuses"
+        />
+        <q-btn color="primary" label="Buscar" @click="filtrarbuses" />
+      </div>
+
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
       </div>
       <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
+            <label for="" v-if="props.row.estado == 1" style="color: green"
+              >Activo</label
+            >
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn color="white" text-color="black" label="🖋️" @click="EditarBus(props.row._id)" />
-            <q-btn color="white" text-color="black" label="❌" @click="InactivarBus(props.row._id)"
-              v-if="props.row.estado == 1" />
-            <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="🖋️"
+              @click="EditarBus(props.row._id)"
+            />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="❌"
+              @click="InactivarBus(props.row._id)"
+              v-if="props.row.estado == 1"
+            />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="✅"
+              @click="ActivarBus(props.row._id)"
+              v-else
+            />
           </q-td>
         </template>
       </q-table>
     </div>
   </div>
 </template>
-  
+
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
@@ -71,14 +125,14 @@ import { useQuasar } from "quasar";
 
 const $q = useQuasar();
 const busStore = useBusStore();
-const conductorStore = useConductorStore()
+const conductorStore = useConductorStore();
 
 let buses = ref([]);
 let rows = ref([]);
 let fixed = ref(false);
 let text = ref("");
-let conductor = ref("")
-let options = ref([])
+let conductor = ref("");
+let options = ref([]);
 let placa = ref("");
 let numero_bus = ref();
 let cantidad_asientos = ref("");
@@ -115,11 +169,10 @@ async function obtenerConductores() {
   try {
     await conductorStore.obtenerInfoConductores();
     console.log(conductorStore.conductores);
-    options.value = conductorStore.conductores.map((conductor) => (
-      {
-        label: `${conductor.nombre} - ${conductor.cedula} - ${conductor.telefono}`,
-        value: String(conductor._id)
-      }));
+    options.value = conductorStore.conductores.map((conductor) => ({
+      label: `${conductor.nombre} - ${conductor.cedula} - ${conductor.telefono}`,
+      value: String(conductor._id),
+    }));
   } catch (error) {
     console.log(error);
   }
@@ -131,19 +184,55 @@ onMounted(async () => {
 
 const columns = [
   { name: "placa", label: "Placa", field: "placa", sortable: true },
-  { name: "numero_bus", label: "Número de Bus", field: "numero_bus", sortable: true },
-  { name: "cantidad_asientos", label: "Cantidad de Asientos", field: "cantidad_asientos", },
-  { name: "empresa_asignada", label: "Empresa Asignada", field: "empresa_asignada" },
-  { name: "nombre", label: "Nombre Conductor", field: (row) => row.conductor_id.nombre },
-  { name: "cedula", label: "Cedula Conductor", field: (row) => row.conductor_id.cedula },
-  { name: "telefono", label: "Telefono Conductor", field: (row) => row.conductor_id.telefono },
+  {
+    name: "numero_bus",
+    label: "Número de Bus",
+    field: "numero_bus",
+    sortable: true,
+  },
+  {
+    name: "cantidad_asientos",
+    label: "Cantidad de Asientos",
+    field: "cantidad_asientos",
+  },
+  {
+    name: "empresa_asignada",
+    label: "Empresa Asignada",
+    field: "empresa_asignada",
+  },
+  {
+    name: "nombre",
+    label: "Nombre Conductor",
+    field: (row) => row.conductor_id.nombre,
+  },
+  {
+    name: "cedula",
+    label: "Cedula Conductor",
+    field: (row) => row.conductor_id.cedula,
+  },
+  {
+    name: "telefono",
+    label: "Telefono Conductor",
+    field: (row) => row.conductor_id.telefono,
+  },
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd")},
-  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false },
+  {
+    name: "createAT",
+    label: "Fecha de Creación",
+    field: "createAT",
+    sortable: true,
+    format: (val) => format(new Date(val), "yyyy-MM-dd"),
+  },
+  {
+    name: "opciones",
+    label: "Opciones",
+    field: (row) => null,
+    sortable: false,
+  },
 ];
 
 function agregarBus() {
-  obtenerConductores()
+  obtenerConductores();
   fixed.value = true;
   text.value = "Agregar Bus";
   cambio.value = 0;
@@ -208,7 +297,6 @@ async function editarAgregarBus() {
           });
           obtenerInfo();
           fixed.value = false;
-
         } catch (error) {
           if (notification) {
             notification();
@@ -222,7 +310,7 @@ async function editarAgregarBus() {
         }
       }
     }
-  validacion.value = false;
+    validacion.value = false;
   }
 }
 
@@ -231,12 +319,12 @@ function limpiar() {
   numero_bus.value = "";
   cantidad_asientos.value = "";
   empresa_asignada.value = "";
-  conductor.value = ""
+  conductor.value = "";
 }
 
 let idBus = ref("");
 async function EditarBus(id) {
-  obtenerConductores()
+  obtenerConductores();
   cambio.value = 1;
   const busSeleccionado = buses.value.find((bus) => bus._id === id);
   if (busSeleccionado) {
@@ -249,8 +337,8 @@ async function EditarBus(id) {
     empresa_asignada.value = busSeleccionado.empresa_asignada;
     conductor.value = {
       label: `${busSeleccionado.conductor_id} - ${busSeleccionado.conductor_id.telefono} - ${busSeleccionado.conductor_id.cedula}`,
-      value: String(busSeleccionado.conductor_id._id)
-    }
+      value: String(busSeleccionado.conductor_id._id),
+    };
   }
 }
 
@@ -265,18 +353,18 @@ async function InactivarBus(id) {
       spinner: false,
       message: "Bus Inactivado",
       timeout: 2000,
-      type: 'positive',
+      type: "positive",
     });
-    obtenerInfo()
+    obtenerInfo();
   } catch (error) {
     if (notification) {
-      notification()
-    };
+      notification();
+    }
     $q.notify({
       spinner: false,
       message: `${error.response.data.error.errors[0].msg}`,
       timeout: 2000,
-      type: 'negative',
+      type: "negative",
     });
   }
 }
@@ -292,22 +380,20 @@ async function ActivarBus(id) {
       spinner: false,
       message: "Bus Activado",
       timeout: 2000,
-      type: 'positive',
+      type: "positive",
     });
-    obtenerInfo()
+    obtenerInfo();
   } catch (error) {
     if (notification) {
-      notification()
-    };
+      notification();
+    }
     $q.notify({
       spinner: false,
       message: `${error.response.data.error.errors[0].msg}`,
       timeout: 2000,
-      type: 'negative',
+      type: "negative",
     });
   }
-
-
 }
 
 let errorMessage = ref("");
@@ -323,8 +409,13 @@ const showDefault = () => {
 let validacion = ref(false);
 let notification = ref(null);
 async function validar() {
-
-  if (!placa.value && !numero_bus.value && !cantidad_asientos.value && !empresa_asignada.value && !conductor.value) {
+  if (
+    !placa.value &&
+    !numero_bus.value &&
+    !cantidad_asientos.value &&
+    !empresa_asignada.value &&
+    !conductor.value
+  ) {
     errorMessage.value = "Por favor rellene los campos";
   } else if (!placa.value) {
     errorMessage.value = "Ingrese la Placa";
@@ -333,16 +424,16 @@ async function validar() {
   } else if (!cantidad_asientos.value) {
     errorMessage.value = "Ingrese la cantidad de asientos";
   } else if (!empresa_asignada.value) {
-    errorMessage.value = "Ingrese el nombre de la empresa"
+    errorMessage.value = "Ingrese el nombre de la empresa";
   } else if (!conductor.value) {
-    errorMessage.value = "Seleccione un Conductor"
+    errorMessage.value = "Seleccione un Conductor";
   } else {
     errorMessage.value = "";
     validacion.value = true;
   }
 }
 </script>
-  
+
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Gabarito&display=swap");
 
@@ -386,4 +477,11 @@ async function validar() {
   color: red;
   font-size: 18px;
   text-align: center;
-}</style>
+}
+.b-b {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+</style>
