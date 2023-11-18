@@ -2,32 +2,31 @@
   <div class="container">
     <!-- Modal -->
 
-    <q-dialog v-model="fixed">
+    <q-dialog v-model="fixed" class="modal-container">
       <q-card class="modal-content">
-        <q-card-section class="row items-center q-pb-none" style="color: black">
+        <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+          <q-btn icon="close" flat round dense v-close-popup class="close-button" />
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input type="text" v-model="placa" label="Placa" style="width: 300px" />
-          <q-input type="number" v-model="numero_bus" label="Número de Bus" style="width: 300px" />
-          <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" style="width: 300px" />
-          <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" style="width: 300px" />
+        <q-card-section style="max-height: 50vh" class="modal-body">
+          <q-input type="text" v-model="placa" label="Placa" class="modal-input" />
+          <q-input type="number" v-model="numero_bus" label="Número de Bus" class="modal-input" />
+          <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" class="modal-input" />
+          <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" class="modal-input" />
           <div class="q-pa" style="width: 300px">
             <div class="q-gutter">
-              <q-select v-model="conductor" :options="options" label="Conductores" />
+              <q-select v-model="conductor" :options="options" label="Conductores"  />
             </div>
           </div>
         </q-card-section>
 
         <q-separator />
         <div class="error">{{ errorMessage }}</div>
-        <q-card-actions align="right">
-          <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarBus()" />
+        <q-card-actions align="right" class="modal-footer">
+          <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button"/>
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarBus()" class="action-button" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -36,7 +35,8 @@
 
 
       <div class="b-b">
-        <q-input class="bbuscar" v-model="buscarplaca" label="Buscar por Placa" style="width: 300px" @input="filtrarbuses" />
+        <q-input class="bbuscar" v-model="buscarplaca" label="Buscar por Placa" style="width: 300px"
+          @input="filtrarbuses" />
         <q-btn color="primary" label="Buscar" @click="filtrarbuses" class="btnbuscar" />
       </div>
 
@@ -389,6 +389,11 @@ async function validar() {
   display: flex;
   justify-content: center;
 }
+.modal-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
 .container-table {
   display: flex;
@@ -405,6 +410,7 @@ async function validar() {
 
 .modal-content {
   width: 400px;
+  max-width: 90%;
 }
 
 .botones button {
@@ -418,14 +424,15 @@ async function validar() {
   justify-content: flex-end;
 }
 
-.error {
+ .error {
   display: flex;
   width: 100%;
   justify-content: center;
   color: red;
   font-size: 18px;
   text-align: center;
-}
+} 
+
 .b-b {
   display: flex;
   flex-direction: row;
@@ -434,13 +441,14 @@ async function validar() {
   gap: 5px;
 }
 
-.btnbuscar{
-  width:170px;
-  height:53px;
+.btnbuscar {
+  width: 170px;
+  height: 53px;
   position: relative;
   top: 7px;
 }
-.bbuscar{
+
+.bbuscar {
   width: 170px;
   font-size: 18px;
   background-color: rgba(5, 177, 245, 0.204);
@@ -448,5 +456,35 @@ async function validar() {
   position: relative;
   top: 6px;
 }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #3498db; 
+    color: #fff; 
+  }
 
+  .close-button {
+    color: #fff; 
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .modal-footer {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .action-button {
+    margin-left: 10px;
+  }
 </style>

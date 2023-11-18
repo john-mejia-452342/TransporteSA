@@ -1,30 +1,27 @@
 <template>
   <div class="container">
     <!-- Modal -->
-
-
-
-    <q-dialog v-model="fixed">
+    <q-dialog v-model="fixed" class="modal-container">
       <q-card class="modal-content">
-        <q-card-section class="row items-center q-pb-none" style="color: black">
+        <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+          <q-btn icon="close" flat round dense v-close-popup class="close-button"/>
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input type="number" v-model="cedula" label="Cedula" style="width: 300px" />
-          <q-input v-model="nombre" label="Nombre" style="width: 300px" />
-          <q-input type="number" v-model="telefono" label="Telefono" style="width: 300px" />
+        <q-card-section style="max-height: 50vh" class="modal-body">
+          <q-input type="number" v-model="cedula" label="Cedula" class="modal-input" />
+          <q-input v-model="nombre" label="Nombre" class="modal-input" />
+          <q-input type="number" v-model="telefono" label="Telefono" class="modal-input" />
         </q-card-section>
 
         <q-separator />
         <div class="error">{{ errorMessage }}</div>
 
-        <q-card-actions align="right">
-          <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarCliente()" />
+        <q-card-actions align="right" class="modal-footer">
+          <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button" />
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarCliente()" class="action-button"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -313,7 +310,11 @@ async function validar() {
   display: flex;
   justify-content: center;
 }
-
+.modal-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 .container-table {
   display: flex;
   justify-content: center;
@@ -372,5 +373,35 @@ async function validar() {
   position: relative;
   top: 6px;
 }
-  
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #3498db; 
+    color: #fff; 
+  }
+
+  .close-button {
+    color: #fff; 
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .modal-footer {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .action-button {
+    margin-left: 10px;
+  } 
 </style>

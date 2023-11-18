@@ -1,25 +1,25 @@
 <template>
   <div class="container">
     <!-- Modal -->
-    <q-dialog v-model="fixed">
+    <q-dialog v-model="fixed" class="modal-container">
       <q-card class="modal-content">
-        <q-card-section class="row items-center q-pb-none" style="color: black">
+        <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+          <q-btn icon="close" flat round dense v-close-popup class="close-button" />
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input v-model="hora_partida" label="Hora de partida" style="width: 300px" />
-          <q-input v-model="hora_llegada" label="Hora de llegada" style="width: 300px" />
+        <q-card-section style="max-height: 50vh" class="modal-body">
+          <q-input v-model="hora_partida" label="Hora de partida" class="modal-input"  />
+          <q-input v-model="hora_llegada" label="Hora de llegada" class="modal-input"  />
         </q-card-section>
 
         <q-separator />
         <q-div class="error">{{ errorMessage }}</q-div>
-        <q-card-actions align="right">
-          <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarHorario()" />
+        <q-card-actions align="right" class="modal-footer">
+          <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button"/>
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarHorario()" class="action-button"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -317,7 +317,11 @@ async function validar() {
   justify-content: center;
   min-height: 90vh;
 }
-
+.modal-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 .container-table {
   display: flex;
   justify-content: center;
@@ -354,4 +358,35 @@ async function validar() {
   font-size: 18px;
   text-align: center;
 }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #3498db; 
+    color: #fff; 
+  }
+
+  .close-button {
+    color: #fff; 
+  }
+
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-input {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .modal-footer {
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .action-button {
+    margin-left: 10px;
+  }
 </style>
