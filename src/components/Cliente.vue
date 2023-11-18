@@ -2,8 +2,6 @@
   <div class="container">
     <!-- Modal -->
 
-
-
     <q-dialog v-model="fixed">
       <q-card class="modal-content">
         <q-card-section class="row items-center q-pb-none" style="color: black">
@@ -14,9 +12,19 @@
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="scroll">
-          <q-input type="number" v-model="cedula" label="Cedula" style="width: 300px" />
+          <q-input
+            type="number"
+            v-model="cedula"
+            label="Cedula"
+            style="width: 300px"
+          />
           <q-input v-model="nombre" label="Nombre" style="width: 300px" />
-          <q-input type="number" v-model="telefono" label="Telefono" style="width: 300px" />
+          <q-input
+            type="number"
+            v-model="telefono"
+            label="Telefono"
+            style="width: 300px"
+          />
         </q-card-section>
 
         <q-separator />
@@ -24,18 +32,36 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarCliente()" />
+          <q-btn
+            flat
+            label="Guardar 💾"
+            color="primary"
+            @click="editarAgregarCliente()"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
+    <div
+      class="container-table"
+      style="height: 90vh; overflow-y: auto; width: 80%"
+    >
       <h1>Clientes</h1>
-      
-      <div class="b-b">
-      <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 300px" @input="filtrarClientes" />
-      <q-btn  class="btnbuscar" color="primary" label="Buscar" @click="filtrarClientes" />
-      </div>
 
+      <div class="b-b">
+        <q-input
+          class="bbuscar"
+          v-model="searchCedula"
+          label="Buscar por Cedula"
+          style="width: 300px"
+          @input="filtrarClientes"
+        />
+        <q-btn
+          class="btnbuscar"
+          color="primary"
+          label="Buscar"
+          @click="filtrarClientes"
+        />
+      </div>
 
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarCliente()" />
@@ -43,16 +69,34 @@
       <q-table title="Clientes" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
+            <label for="" v-if="props.row.estado == 1" style="color: green"
+              >Activo</label
+            >
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn color="white" text-color="black" label="🖋️" @click="editarCliente(props.row._id)" />
-            <q-btn color="white" text-color="black" label="❌" @click="inactivarCliente(props.row._id)"
-              v-if="props.row.estado == 1" />
-            <q-btn color="white" text-color="black" label="✅" @click="activarCliente(props.row._id)" v-else />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="🖋️"
+              @click="editarCliente(props.row._id)"
+            />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="❌"
+              @click="inactivarCliente(props.row._id)"
+              v-if="props.row.estado == 1"
+            />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="✅"
+              @click="activarCliente(props.row._id)"
+              v-else
+            />
           </q-td>
         </template>
       </q-table>
@@ -75,7 +119,7 @@ let fixed = ref(false);
 let text = ref("");
 let cedula = ref();
 let nombre = ref();
-let telefono = ref();
+let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
 
@@ -166,6 +210,7 @@ async function editarAgregarCliente() {
       let id = idCliente.value;
       if (id) {
         try {
+          showDefault();
           await clienteStore.putEditarCliente(id, {
             cedula: cedula.value,
             nombre: nombre.value,
@@ -289,20 +334,20 @@ const showDefault = () => {
 let validacion = ref(false);
 let notification = ref(null);
 async function validar() {
-  if (!cedula.value && !nombre.value && !telefono.value) {
-    errorMessage.value = "Por favor rellene los campos";
-  } else if (!cedula.value) {
-    errorMessage.value = "Ingrese la Cedula";
-  } else if (!nombre.value) {
-    errorMessage.value = "Ingrese el Nombre";
-  } else if (!telefono.value) {
-    errorMessage.value = "Ingrese el Telefono";
-  } else if (telefono.value.length !== 10) {
-    errorMessage.value = "El telefono debe tener 10 Digitos";
-  } else {
-    errorMessage.value = "";
-    validacion.value = true;
-  }
+    if (!cedula.value && !nombre.value && !telefono.value) {
+        errorMessage.value = "Por favor rellene los campos";
+    } else if (!cedula.value) {
+        errorMessage.value = "Ingrese la Cedula";
+    } else if (!nombre.value) {
+        errorMessage.value = "Ingrese el Nombre";
+    } else if (!telefono.value) {
+        errorMessage.value = "Ingrese el Telefono";
+    } else if (String(telefono.value).length !== 10) {
+        errorMessage.value = "El telefono debe tener 10 Dígitos";
+    } else {
+        errorMessage.value = "";
+        validacion.value = true;
+    }
 }
 </script>
 
@@ -358,13 +403,13 @@ async function validar() {
   gap: 5px;
 }
 
-.btnbuscar{
-  width:170px;
-  height:53px;
+.btnbuscar {
+  width: 170px;
+  height: 53px;
   position: relative;
   top: 7px;
 }
-.bbuscar{
+.bbuscar {
   width: 170px;
   font-size: 18px;
   background-color: rgba(5, 177, 245, 0.204);
@@ -372,5 +417,4 @@ async function validar() {
   position: relative;
   top: 6px;
 }
-  
 </style>

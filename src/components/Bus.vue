@@ -353,9 +353,10 @@ const showDefault = () => {
     timeout: 0,
   });
 };
+let notification = ref(null);
 
 let validacion = ref(false);
-let notification = ref(null);
+
 async function validar() {
   if (
     !placa.value &&
