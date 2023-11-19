@@ -1,70 +1,5 @@
 <template>
   <div class="container">
-    <!-- Modal -->
-    <q-dialog v-model="fixed">
-      <q-card class="modal-content">
-        <q-card-section class="row items-center q-pb-none" style="color: black">
-          <div class="text-h6">{{ text }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-        <q-separator />
-
-        <q-card-section style="max-height: 50vh" class="scroll">
-          <div class="q-pa" style="width: 300px">
-            <div class="q-gutter">
-              <q-select
-                v-model="vendedor"
-                :options="optionsVendedor"
-                label="Vendedor"
-              />
-            </div>
-          </div>
-          <div class="q-pa" style="width: 300px">
-            <div class="q-gutter">
-              <q-select
-                v-model="cliente"
-                :options="optionsCliente"
-                label="Cliente"
-              />
-            </div>
-          </div>
-          <div class="q-pa" style="width: 300px">
-            <div class="q-gutter">
-              <q-select v-model="ruta" :options="optionsRutas" label="Ruta" />
-            </div>
-          </div>
-          <div class="q-pa" style="width: 300px">
-            <div class="q-gutter">
-              <q-select v-model="bus" :options="optionsBus" label="Bus" />
-            </div>
-          </div>
-          <q-input
-            type="number"
-            v-model="no_asiento"
-            label="Numero Asiento"
-            style="width: 300px"
-          />
-          <q-input
-            type="date"
-            v-model="fecha_departida"
-            label="Fecha Partida"
-            style="width: 300px"
-          />
-        </q-card-section>
-        <q-separator />
-        <div class="error">{{errorMessage}}</div>
-        <q-card-actions align="right">
-          <q-btn flat label="Cerrar" color="primary" v-close-popup />
-          <q-btn
-            flat
-            label="Guardar 💾"
-            color="primary"
-            @click="editarTicket()"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
     <div
       class="container-table"
       style="height: 90vh; overflow-y: auto; width: 80%"
@@ -303,40 +238,39 @@ async function editarTicket() {
     validar();
     if (validacion.value == true) {
       try {
-      showDefault();
-      await ticketStore.putEditarTicket(id, {
-        vendedor_id: vendedor._rawValue.value,
-        cliente_id: cliente._rawValue.value,
-        ruta_id: ruta._rawValue.value,
-        bus_id: bus._rawValue.value,
-        no_asiento: no_asiento.value,
-        fecha_departida: fecha_departida.value,
-      });
-      if (notification) {
-        notification();
+        showDefault();
+        await ticketStore.putEditarTicket(id, {
+          vendedor_id: vendedor._rawValue.value,
+          cliente_id: cliente._rawValue.value,
+          ruta_id: ruta._rawValue.value,
+          bus_id: bus._rawValue.value,
+          no_asiento: no_asiento.value,
+          fecha_departida: fecha_departida.value,
+        });
+        if (notification) {
+          notification();
+        }
+        limpiar();
+        $q.notify({
+          spinner: false,
+          message: "Ticket Actualizado",
+          timeout: 2000,
+          type: "positive",
+        });
+        obtenerInfo();
+        fixed.value = false;
+      } catch (error) {
+        if (notification) {
+          notification();
+        }
+        $q.notify({
+          spinner: false,
+          message: `${error.response.data.error.errors[0].msg}`,
+          timeout: 2000,
+          type: "negative",
+        });
       }
-      limpiar();
-      $q.notify({
-        spinner: false,
-        message: "Ticket Actualizado",
-        timeout: 2000,
-        type: "positive",
-      });
-      obtenerInfo();
-      fixed.value = false;
-    } catch (error) {
-      if (notification) {
-        notification();
-      }
-      $q.notify({
-        spinner: false,
-        message: `${error.response.data.error.errors[0].msg}`,
-        timeout: 2000,
-        type: "negative",
-      });
     }
-    }
-    
   }
 }
 
@@ -455,18 +389,25 @@ let notification = ref(null);
 let validacion = ref(false);
 
 async function validar() {
-  if (!vendedor.value && !cliente.value &&!ruta.value && !bus.value && !no_asiento.value && !fecha_departida.value) {
+  if (
+    !vendedor.value &&
+    !cliente.value &&
+    !ruta.value &&
+    !bus.value &&
+    !no_asiento.value &&
+    !fecha_departida.value
+  ) {
     errorMessage.value = "Por favor rellene los campos";
-  }else if(!vendedor.value){
-    errorMessage.value = "Seleccione el Vendedor"
-  }else if(!cliente.value){
-    errorMessage.value = "Seleccione el Cliente"
-  }else if (!ruta.value) {
+  } else if (!vendedor.value) {
+    errorMessage.value = "Seleccione el Vendedor";
+  } else if (!cliente.value) {
+    errorMessage.value = "Seleccione el Cliente";
+  } else if (!ruta.value) {
     errorMessage.value = "Seleccione la ruta";
   } else if (!bus.value) {
     errorMessage.value = "Seleccione el bus";
-  } else if(!no_asiento.value){
-    errorMessage.value = "Seleccione el asiento"
+  } else if (!no_asiento.value) {
+    errorMessage.value = "Seleccione el asiento";
   } else if (!fecha_departida.value) {
     errorMessage.value = "Seleccione la fecha de partida";
   } else {
@@ -476,12 +417,18 @@ async function validar() {
 }
 </script>
     
-  <style scoped>
+<style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Gabarito&display=swap");
 .container {
   display: flex;
   justify-content: center;
 }
+.modal-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .container-table {
   display: flex;
   justify-content: center;
@@ -539,5 +486,37 @@ async function validar() {
   color: red;
   font-size: 18px;
   text-align: center;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+}
+
+.close-button {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.modal-footer {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.action-button {
+  margin-left: 10px;
 }
 </style>
