@@ -6,40 +6,93 @@
       <q-card class="modal-content">
         <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
-          <q-btn icon="close" flat round dense v-close-popup class="close-button" />
+          <q-btn
+            icon="close"
+            flat
+            round
+            dense
+            v-close-popup
+            class="close-button"
+          />
         </q-card-section>
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="modal-body">
-          <q-input type="text" v-model="placa" label="Placa" class="modal-input" />
-          <q-input type="number" v-model="numero_bus" label="Número de Bus" class="modal-input" />
-          <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" class="modal-input" />
-          <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" class="modal-input" />
+          <q-input
+            type="text"
+            v-model="placa"
+            label="Placa"
+            class="modal-input"
+          />
+          <q-input
+            type="number"
+            v-model="numero_bus"
+            label="Número de Bus"
+            class="modal-input"
+          />
+          <q-input
+            type="text"
+            v-model="cantidad_asientos"
+            label="Cantidad de Asientos"
+            class="modal-input"
+          />
+          <q-input
+            type="text"
+            v-model="empresa_asignada"
+            label="Empresa Asignada"
+            class="modal-input"
+          />
           <div class="q-pa" style="width: 300px">
             <div class="q-gutter">
-              <q-select v-model="conductor" :options="options" label="Conductores"  />
+              <q-select
+                v-model="conductor"
+                :options="options"
+                label="Conductores"
+              />
             </div>
           </div>
         </q-card-section>
 
         <q-separator />
-        <div class="error">{{ errorMessage }}</div>
         <q-card-actions align="right" class="modal-footer">
-          <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button"/>
-          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarBus()" class="action-button" />
+          <q-btn
+            flat
+            label="Cerrar"
+            color="primary"
+            v-close-popup
+            class="action-button"
+          />
+          <q-btn
+            flat
+            label="Guardar 💾"
+            color="primary"
+            @click="editarAgregarBus()"
+            class="action-button"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
+    <div
+      class="container-table"
+      style="height: 90vh; overflow-y: auto; width: 80%"
+    >
       <h1>Buses</h1>
 
-
       <div class="b-b">
-        <q-input class="bbuscar" v-model="buscarplaca" label="Buscar por Placa" style="width: 300px"
-          @input="filtrarbuses" />
-        <q-btn color="primary" label="Buscar" @click="filtrarbuses" class="btnbuscar" />
+        <q-input
+          class="bbuscar"
+          v-model="buscarplaca"
+          label="Buscar por Placa"
+          style="width: 300px"
+          @input="filtrarbuses"
+        />
+        <q-btn
+          color="primary"
+          label="Buscar"
+          @click="filtrarbuses"
+          class="btnbuscar"
+        />
       </div>
-
 
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
@@ -47,16 +100,34 @@
       <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
+            <label for="" v-if="props.row.estado == 1" style="color: green"
+              >Activo</label
+            >
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn color="white" text-color="black" label="🖋️" @click="EditarBus(props.row._id)" />
-            <q-btn color="white" text-color="black" label="❌" @click="InactivarBus(props.row._id)"
-              v-if="props.row.estado == 1" />
-            <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="🖋️"
+              @click="EditarBus(props.row._id)"
+            />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="❌"
+              @click="InactivarBus(props.row._id)"
+              v-if="props.row.estado == 1"
+            />
+            <q-btn
+              color="white"
+              text-color="black"
+              label="✅"
+              @click="ActivarBus(props.row._id)"
+              v-else
+            />
           </q-td>
         </template>
       </q-table>
@@ -89,7 +160,7 @@ let buscarplaca = ref("");
 
 function filtrarbuses() {
   if (buscarplaca.value.trim() === "") {
-    rows.value = buses.value; // Mostrar todos los buses si la búsqueda está vacía
+    rows.value = buses.value; 
   } else {
     rows.value = buses.value.filter((buses) =>
       buses.placa.toString().includes(buscarplaca.value.toString())
@@ -101,7 +172,6 @@ let cambio = ref(0);
 async function obtenerInfo() {
   try {
     await busStore.obtenerInfoBuses();
-    console.log(busStore.buses);
     buses.value = busStore.buses;
     rows.value = busStore.buses;
   } catch (error) {
@@ -203,23 +273,15 @@ async function editarAgregarBus() {
           notification();
         }
         limpiar();
-        $q.notify({
-          spinner: false,
-          message: "Bus Agregado",
-          timeout: 2000,
-          type: "positive",
-        });
+        greatMessage.value = "Bus agregado"
+        showGreat();
         obtenerInfo();
       } catch (error) {
         if (notification) {
           notification();
         }
-        $q.notify({
-          spinner: false,
-          message: `${error.response.data.error.errors[0].msg}`,
-          timeout: 2000,
-          type: "negative",
-        });
+        badMessage.value = error.response.data.error.errors[0].msg
+        showBad();
       }
     } else {
       let id = idBus.value;
@@ -237,24 +299,16 @@ async function editarAgregarBus() {
             notification();
           }
           limpiar();
-          $q.notify({
-            spinner: false,
-            message: "Bus Actualizado",
-            timeout: 2000,
-            type: "positive",
-          });
+          greatMessage.value = "Bus Actualizado";
+          showGreat();
           obtenerInfo();
           fixed.value = false;
         } catch (error) {
           if (notification) {
             notification();
           }
-          $q.notify({
-            spinner: false,
-            message: `${error.response.data.error.errors[0].msg}`,
-            timeout: 2000,
-            type: "negative",
-          });
+          badMessage.value = error.response.data.error.errors[0].msg
+          showBad();
         }
       }
     }
@@ -297,23 +351,15 @@ async function InactivarBus(id) {
     if (notification) {
       notification();
     }
-    $q.notify({
-      spinner: false,
-      message: "Bus Inactivado",
-      timeout: 2000,
-      type: "positive",
-    });
+    greatMessage.value = "Bus Inactivado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
     if (notification) {
       notification();
     }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
+    badMessage.value = error.response.data.error.errors[0].msg
+    showBad();
   }
 }
 
@@ -324,27 +370,36 @@ async function ActivarBus(id) {
     if (notification) {
       notification();
     }
-    $q.notify({
-      spinner: false,
-      message: "Bus Activado",
-      timeout: 2000,
-      type: "positive",
-    });
+    greatMessage.value = "Bus Activado"
     obtenerInfo();
   } catch (error) {
     if (notification) {
       notification();
     }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
+    badMessage.value = error.response.data.error.errors[0].msg
+    showBad();
   }
 }
 
-let errorMessage = ref("");
+let greatMessage = ref("");
+let badMessage = ref("")
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
+
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
 
 const showDefault = () => {
   notification = $q.notify({
@@ -365,19 +420,25 @@ async function validar() {
     !empresa_asignada.value &&
     !conductor.value
   ) {
-    errorMessage.value = "Por favor rellene los campos";
+    badMessage.value = "Por favor rellene los campos";
+    showBad();
   } else if (!placa.value) {
-    errorMessage.value = "Ingrese la Placa";
+    badMessage.value = "Ingrese la Placa";
+    showBad();
   } else if (!numero_bus.value) {
-    errorMessage.value = "Ingrese el numero del bus";
+    badMessage.value = "Ingrese el numero del bus";
+    showBad();
   } else if (!cantidad_asientos.value) {
-    errorMessage.value = "Ingrese la cantidad de asientos";
+    badMessage.value = "Ingrese la cantidad de asientos";
+    showBad();
   } else if (!empresa_asignada.value) {
-    errorMessage.value = "Ingrese el nombre de la empresa";
+    badMessage.value = "Ingrese el nombre de la empresa";
+    showBad();
   } else if (!conductor.value) {
-    errorMessage.value = "Seleccione un Conductor";
+    badMessage.value = "Seleccione un Conductor";
+    showBad();
   } else {
-    errorMessage.value = "";
+    badMessage.value = "";
     validacion.value = true;
   }
 }
@@ -391,10 +452,10 @@ async function validar() {
   justify-content: center;
 }
 .modal-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .container-table {
   display: flex;
@@ -425,15 +486,6 @@ async function validar() {
   justify-content: flex-end;
 }
 
- .error {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  color: red;
-  font-size: 18px;
-  text-align: center;
-} 
-
 .b-b {
   display: flex;
   flex-direction: row;
@@ -458,34 +510,34 @@ async function validar() {
   top: 6px;
 }
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #3498db; 
-    color: #fff; 
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+}
 
-  .close-button {
-    color: #fff; 
-  }
+.close-button {
+  color: #fff;
+}
 
-  .modal-body {
-    padding: 20px;
-  }
+.modal-body {
+  padding: 20px;
+}
 
-  .modal-input {
-    width: 100%;
-    margin-bottom: 10px;
-  }
+.modal-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
 
-  .modal-footer {
-    padding: 10px;
-    display: flex;
-    justify-content: flex-end;
-  }
+.modal-footer {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
 
-  .action-button {
-    margin-left: 10px;
-  }
+.action-button {
+  margin-left: 10px;
+}
 </style>
