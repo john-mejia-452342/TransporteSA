@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <!-- Modal -->
-
     <q-dialog v-model="fixed" class="modal-container">
       <q-card class="modal-content">
         <q-card-section class="modal-header">
@@ -17,17 +16,15 @@
           <q-input type="text" v-model="telefono" label="Telefono" class="modal-input"/>
         </q-card-section>
         <q-separator />
-        <div class="error">{{ errorMessage }}</div>
         <q-card-actions align="right" class="modal-footer">
           <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button"/>
           <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarConductor()" class="action-button"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <!-- Tabla -->
     <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Conductores</h1>
-
-      
       <div class="b-b">
         <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 300px" @input="filtrarconductores" />
         <q-btn color="primary" label="Buscar" @click="filtrarconductores" class="btnbuscar" />
@@ -57,20 +54,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
-import { useBusStore } from "../stores/Bus.js";
 import { useConductorStore } from "../stores/Conductor.js";
 import { useQuasar } from "quasar";
 
-const busStore = useBusStore();
 const conductorStore = useConductorStore();
 const $q = useQuasar();
 
 let conductores = ref([]);
 let rows = ref([]);
 let fixed = ref(false);
-let options = ref([]);
 let text = ref("");
 let cedula = ref("");
 let nombre = ref();
@@ -80,16 +74,16 @@ let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
 
+// Filtro
 function filtrarconductores() {
   if (searchCedula.value.trim() === "") {
     rows.value = conductores.value;
   } else {
-    rows.value = conductores.value.filter((conductores) =>
-      conductores.cedula.toString().includes(searchCedula.value.toString())
-    );
-  }
-}
+    rows.value = conductores.value.filter((conductores) =>conductores.cedula.toString().includes(searchCedula.value.toString()));
+  };
+};
 
+// Obtener Conductores
 async function obtenerInfo() {
   try {
     await conductorStore.obtenerInfoConductores();
@@ -97,35 +91,33 @@ async function obtenerInfo() {
     rows.value = conductorStore.conductores;
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Primera Accion
 onMounted(async () => {
   obtenerInfo();
 });
 
+// Datos Tabla
 const columns = [
   { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
   { name: "nombre", label: "Nombre", field: "nombre", sortable: true },
   { name: "experiencia", label: "Experiencia", field: "experiencia" },
   { name: "telefono", label: "Telefono", field: "telefono" },
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  {
-    name: "createAT",
-    label: "Fecha de Creación",
-    field: "createAT",
-    sortable: true,
-    format: (val) => format(new Date(val), "yyyy-MM-dd"),
-  },
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
   { name: "opciones", label: "Opciones", sortable: false },
 ];
 
+// Agregar Conductor
 function agregarConductor() {
   fixed.value = true;
   text.value = "Agregar Conductor";
   cambio.value = 0;
-}
+};
 
+// Funcionamiento Agregar y Editar
 async function editarAgregarConductor() {
   validar();
   if (validacion.value === true) {
@@ -138,28 +130,16 @@ async function editarAgregarConductor() {
           experiencia: experiencia.value,
           telefono: telefono.value,
         });
-        if (notification) {
-          notification();
-        }
+        cancelShow();
         limpiar();
-        $q.notify({
-          spinner: false,
-          message: "Conductor Agregado",
-          timeout: 2000,
-          type: "positive",
-        });
+        greatMessage.value = "Conductor Agregado";
+        showGreat();
         obtenerInfo();
       } catch (error) {
-        if (notification) {
-          notification();
-        }
-        $q.notify({
-          spinner: false,
-          message: `${error.response.data.error.errors[0].msg}`,
-          timeout: 2000,
-          type: "negative",
-        });
-      }
+        cancelShow();
+        badMessage.value = error.response.data.error.errors[0].msg;
+        showBad();
+      };
     } else {
       let id = idConductor.value;
       if (id) {
@@ -171,47 +151,36 @@ async function editarAgregarConductor() {
             experiencia: experiencia.value,
             telefono: telefono.value,
           });
-          if (notification) {
-            notification();
-          }
+          cancelShow();
           limpiar();
-          $q.notify({
-            spinner: false,
-            message: "Conductor Actualizado",
-            timeout: 2000,
-            type: "positive",
-          });
+          greatMessage.value = "Conductor Actualizado";
+          showGreat();
           obtenerInfo();
           fixed.value = false;
         } catch (error) {
-          if (notification) {
-            notification();
-          }
-          $q.notify({
-            spinner: false,
-            message: `${error.response.data.error.errors[0].msg}`,
-            timeout: 2000,
-            type: "negative",
-          });
-        }
-      }
-    }
-  }
-}
+          cancelShow();
+          badMessage.value = error.response.data.error.errors[0].msg;
+          showBad();
+        };
+      };
+    };
+  };
+};
 
+// Limpiar Casillas 
 function limpiar() {
   cedula.value = "";
   nombre.value = "";
   experiencia.value = "";
   telefono.value = "";
-}
+};
 
 let idConductor = ref("");
+
+// Editar Conductor 
 async function EditarConductor(id) {
   cambio.value = 1;
-  const conductorSeleccionado = conductores.value.find(
-    (conductor) => conductor._id === id
-  );
+  const conductorSeleccionado = conductores.value.find((conductor) => conductor._id === id);
   if (conductorSeleccionado) {
     idConductor.value = String(conductorSeleccionado._id);
     fixed.value = true;
@@ -220,65 +189,65 @@ async function EditarConductor(id) {
     nombre.value = conductorSeleccionado.nombre;
     experiencia.value = conductorSeleccionado.experiencia;
     telefono.value = conductorSeleccionado.telefono;
-  }
-}
+  };
+};
 
+// Inactivar Conductor
 async function InactivarConductor(id) {
   try {
     showDefault();
     await conductorStore.putInactivarConductor(id);
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: "Conductor Inactivado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Conductor Inactivado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
+// Activar Conductor
 async function ActivarConductor(id) {
   try {
     showDefault();
     await conductorStore.putActivarConductor(id);
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: "Conductor Activado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Conductor Activado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
+let greatMessage = ref("");
+let badMessage = ref("");
 
-let errorMessage = ref("");
+// Notificacion Buena
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
 
+// Notificacion Mala 
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
+
+
+// Notificacion de Carga
 const showDefault = () => {
   notification = $q.notify({
     spinner: true,
@@ -287,26 +256,47 @@ const showDefault = () => {
   });
 };
 
+// Cancelar Notificacion
+const cancelShow = ()=>{
+  if (notification) {
+    notification();
+  };
+};
+
 let validacion = ref(false);
 let notification = ref(null);
-async function validar() {
+
+// Validacion de campos
+function validar() {
   if (!cedula.value && !nombre.value && !experiencia.value && !telefono.value) {
-    errorMessage.value = "Por favor rellene los campos";
+    badMessage.value = "Por favor rellene los campos";
+    showBad();
   } else if (!cedula.value) {
-    errorMessage.value = "Ingrese la Cedula";
+    badMessage.value = "Ingrese la Cedula";
+    showBad();
   } else if (!nombre.value) {
-    errorMessage.value = "Ingrese el Nombre";
+    badMessage.value = "Ingrese el Nombre";
+    showBad();
   } else if (!experiencia.value) {
-    errorMessage.value = "Digite la experiencia, por ejemplo (4 años)";
+    badMessage.value = "Digite la experiencia, por ejemplo (4 años)";
+    showBad();
   } else if (!telefono.value) {
-    errorMessage.value = "Ingrese el Telefono";
+    badMessage.value = "Ingrese el Telefono";
+    showBad();
   } else if (telefono.value.length !== 10) {
-    errorMessage.value = "El telefono debe tener 10 Digitos";
+    badMessage.value = "El telefono debe tener 10 Digitos";
+    showBad();
   } else {
-    errorMessage.value = "";
     validacion.value = true;
-  }
-}
+  };
+};
+
+// Limpiar el modal cuando se cierre mal
+watch(fixed, () => {
+  if (fixed.value == false) {
+    limpiar();
+  };
+});
 </script>
 
 <style scoped>
@@ -349,14 +339,6 @@ async function validar() {
   justify-content: flex-end;
 }
 
-.error {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  color: red;
-  font-size: 18px;
-  text-align: center;
-}
 .b-b {
   display: flex;
   flex-direction: row;

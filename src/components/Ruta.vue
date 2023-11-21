@@ -12,16 +12,15 @@
 
         <q-card-section style="max-height: 50vh" class="modal-body">
           <q-input  type="number"  v-model="precio"  label="Precio" class="modal-input" />
-          <div class="q-pa" style="width: 300px">
+          <div class="q-pa modal-input">
             <div class="q-gutter">
               <q-select v-model="horario" :options="options" label="Horario" />
             </div>
           </div>
-          <q-input  type="text"  v-model="origen"  label="Origen" class="modal-input"/>
-          <q-input  type="text"  v-model="destino"  label="Destino"  class="modal-input"/>
+          <q-input type="text" v-model="origen" label="Origen" class="modal-input"/>
+          <q-input type="text" v-model="destino" label="Destino" class="modal-input"/>
         </q-card-section>
         <q-separator />
-        <div class="error">{{errorMessage}}</div>
 
         <q-card-actions align="right" class="modal-footer">
           <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button" />
@@ -29,15 +28,14 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <!-- Tabla -->
     <div  class="container-table"  style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Rutas</h1>
-
 
       <div class="b-b">
         <q-input class="bbuscar" v-model="searchrutas" label="Buscar por Cedula" style="width: 300px" @input="filtraruta" />
         <q-btn color="primary" label="Buscar" @click="filtraruta" class="btnbuscar" />
       </div>
-
 
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarRuta()" />
@@ -62,7 +60,7 @@
 </template>
     
   <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 import { useHorarioStore } from "../stores/Horario.js";
 import { useRutaStore } from "../stores/Ruta.js";
@@ -84,16 +82,16 @@ let destino = ref("");
 let cambio = ref(0);
 let searchrutas = ref("");
 
+// Filtar Rutas Por Origen
 function filtraruta() {
   if (searchrutas.value.trim() === "") {
     rows.value = rutas.value;
   } else {
-    rows.value = rutas.value.filter((rutas) =>
-      rutas.origen.toString().includes(searchrutas.value.toString())
-    );
-  }
-}
+    rows.value = rutas.value.filter((rutas) =>rutas.origen.toString().includes(searchrutas.value.toString()));
+  };
+};
 
+// Obtener Rutas
 async function obtenerInfo() {
   try {
     await rutaStore.obtenerInfoRutas();
@@ -101,9 +99,10 @@ async function obtenerInfo() {
     rows.value = rutaStore.rutas;
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Obtener las Opciones de los Horarios
 async function obtenerHorarios() {
   try {
     await horarioStore.obtenerInfoHorarios();
@@ -113,45 +112,35 @@ async function obtenerHorarios() {
     }));
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Primera Accion
 onMounted(async () => {
-  obtenerInfo();
+   await obtenerInfo();
 });
 
+// Datos tabla 
 const columns = [
   { name: "precio", label: "Precio", field: "precio", sortable: true },
-  {
-    name: "hora_partida",
-    label: "Hora Partida",
-    field: (row) => row.horario_id.hora_partida,
-  },
-  {
-    name: "hora_llegada",
-    label: "Hora LLegada",
-    field: (row) => row.horario_id.hora_llegada,
-  },
+  { name: "hora_partida", label: "Hora Partida", field: (row) => row.horario_id.hora_partida,},
+  { name: "hora_llegada", label: "Hora LLegada", field: (row) => row.horario_id.hora_llegada,},
   { name: "origen", label: "Origen", field: "origen" },
   { name: "destino", label: "Destino", field: "destino" },
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  {
-    name: "createAT",
-    label: "Fecha de Creación",
-    field: "createAT",
-    sortable: true,
-    format: (val) => format(new Date(val), "yyyy-MM-dd"),
-  },
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
   { name: "opciones", label: "Opciones", sortable: false },
 ];
 
+// Agregar Ruta
 function agregarRuta() {
   obtenerHorarios();
   fixed.value = true;
   text.value = "Agregar Ruta";
   cambio.value = 0;
-}
+};
 
+// Fucionamiento Agregar y Editar Rutas
 async function editarAgregarRuta() {
   validar();
   if (validacion.value === true) {
@@ -164,28 +153,16 @@ async function editarAgregarRuta() {
           origen: origen.value,
           destino: destino.value,
         });
-        if (notification) {
-          notification();
-        }
+  
         limpiar();
-        $q.notify({
-          spinner: false,
-          message: "Ruta Agregada",
-          timeout: 2000,
-          type: "positive",
-        });
+        greatMessage.value = "Ruta Agregada";
+        showGreat();
         obtenerInfo();
       } catch (error) {
-        if (notification) {
-          notification();
-        }
-        $q.notify({
-          spinner: false,
-          message: `${error.response.data.error.errors[0].msg}`,
-          timeout: 2000,
-          type: "negative",
-        });
-      }
+        cancelShow();
+        badMessage.value = error.response.data.error.errors[0].msg;
+        showBad();
+      };
     } else {
       let id = idRuta.value;
       if (id) {
@@ -197,44 +174,33 @@ async function editarAgregarRuta() {
             origen: origen.value,
             destino: destino.value,
           });
-          if (notification) {
-            notification();
-          }
+          cancelShow();
           limpiar();
-          $q.notify({
-            spinner: false,
-            message: "Ruta Actualizada",
-            timeout: 2000,
-            type: "positive",
-          });
+          greatMessage.value = "Ruta Actualizada";
+          showGreat();
           obtenerInfo();
           fixed.value = false;
         } catch (error) {
-          if (notification) {
-            notification();
-          }
-          $q.notify({
-            spinner: false,
-            message: `${error.response.data.error.errors[0].msg}`,
-            timeout: 2000,
-            type: "negative",
-          });
-        }
-        
-      }
-    }
+          cancelShow();
+          badMessage.value = error.response.data.error.errors[0].msg;
+          showBad();
+        };
+      };
+    };
     validacion.value = false
-  }
-}
+  };
+};
 
+// Limpiar Casillas
 function limpiar() {
   precio.value = "";
   horario.value = "";
   origen.value = "";
   destino.value = "";
-}
+};
 
 let idRuta = ref("");
+// Editar Rutas
 async function EditarRuta(id) {
   obtenerHorarios();
   cambio.value = 1;
@@ -253,62 +219,63 @@ async function EditarRuta(id) {
   }
 }
 
+// Inactivar Rutas
 async function InactivarRuta(id) {
   try{        
     showDefault();
     await rutaStore.putInactivarRuta(id);
-    if(notification){ 
-      notification();
-    }
-    $q.notify({
-        spinner: false, 
-        message: "Ruta Inactivada", 
-        timeout: 2000,
-        type: 'positive',
-    }); 
+    cancelShow();
+    greatMessage.value = "Ruta Inactivada";
+    showGreat(); 
     obtenerInfo()
   }catch (error) {
-    if(notification) {
-      notification()
-    };
-    $q.notify({
-        spinner: false, 
-        message: `${error.response.data.error.errors[0].msg}`, 
-        timeout: 2000,
-        type: 'negative',
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
+// Activar Rutas
 async function ActivarRuta(id) {
   try{        
-        showDefault()
-        await rutaStore.putActivarRuta(id);
-        if(notification) 
-            notification()
-        
-        $q.notify({
-            spinner: false, 
-            message: "Ruta Activada", 
-            timeout: 2000,
-            type: 'positive',
-        }); 
-        obtenerInfo()
-    }catch (error) {
-        if(notification) {
-            notification()
-        };
-        $q.notify({
-            spinner: false, 
-            message: `${error.response.data.error.errors[0].msg}`, 
-            timeout: 2000,
-            type: 'negative',
-        });
-  }
-}
+    showDefault()
+    await rutaStore.putActivarRuta(id);
+    cancelShow();
+    greatMessage.value = "Ruta Activada";
+    showGreat();
+    obtenerInfo()
+  }catch (error) {
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
-let errorMessage = ref("");
+let greatMessage = ref("");
+let badMessage = ref("");
 
+// Notificacion Buena
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
+
+// Notificacion Mala 
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
+
+
+// Notificacion de Carga
 const showDefault = () => {
   notification = $q.notify({
     spinner: true,
@@ -317,24 +284,44 @@ const showDefault = () => {
   });
 };
 
+// Cancelar Notificacion
+const cancelShow = ()=>{
+  if (notification) {
+    notification();
+  };
+};
+
 let validacion = ref(false);
 let notification = ref(null);
-async function validar() {
+
+// Validar los Campos
+function validar() {
   if (!precio.value && !horario.value && !origen.value && !destino.value) {
-    errorMessage.value = "Por favor rellene los campos";
+    badMessage.value = "Por favor rellene los campos";
+    showBad();
   } else if (!precio.value) {
-    errorMessage.value = "Ingrese el Precio";
+    badMessage.value = "Ingrese el Precio";
+    showBad();
   } else if (!horario.value) {
-    errorMessage.value = "Eliga un Horario";
+    badMessage.value = "Eliga un Horario";
+    showBad();
   } else if (!origen.value) {
-    errorMessage.value = "Digite el Origen";
+    badMessage.value = "Digite el Origen";
+    showBad();
   }else if(!destino.value){
-    errorMessage.value = "Digite el Destino"
+    badMessage.value = "Digite el Destino";
+    showBad();
   } else {
-    errorMessage.value = "";
     validacion.value = true;
-  }
-}
+  };
+};
+
+// Limpiar el modal cuando se cierre mal
+watch(fixed, () => {
+  if (fixed.value == false) {
+    limpiar();
+  };
+});
 </script>
     
   <style scoped>

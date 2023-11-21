@@ -1,115 +1,52 @@
 <template>
   <div class="container">
     <!-- Modal -->
-
     <q-dialog v-model="fixed" class="modal-container">
       <q-card class="modal-content">
         <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup class="close-button" />
+          <q-btn icon="close" flat round dense v-close-popup class="close-button" @click="limpiar()" />
         </q-card-section>
         <q-separator />
 
         <q-card-section style="max-height: 50vh" class="modal-body">
-          <q-input
-            type="text"
-            v-model="cedula"
-            label="Cedula"
-            class="modal-input"
-          />
-          <q-input
-            type="text"
-            v-model="nombre"
-            label="Nombre"
-            class="modal-input"
-          />
-          <q-input
-            type="text"
-            v-model="cuenta"
-            label="Cuenta"
-            class="modal-input"
-          />
-          <q-input
-            type="text"
-            v-model="clave"
-            label="Clave"
-            class="modal-input"
-          />
-          <q-input
-            type="text"
-            v-model="telefono"
-            label="Telefono"
-            class="modal-input"
-          />
+          <q-input type="text" v-model="cedula" label="Cedula" class="modal-input"/>
+          <q-input type="text" v-model="nombre" label="Nombre" class="modal-input"/>
+          <q-input type="text" v-model="cuenta" label="Cuenta" class="modal-input"/>
+          <!-- <q-input type="text" v-model="clave" label="Clave" class="modal-input"/> -->
+          <q-input type="text" v-model="telefono" label="Telefono" class="modal-input"/>
         </q-card-section>
         <q-separator />
-        <div class="error">{{ errorMessage }}</div>
         <q-card-actions align="right" class="modal-footer">
-          <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button" />
-          <q-btn
-            flat
-            label="Guardar 💾"
-            color="primary"
-            @click="editarAgregarVendedor()" class="action-button"
-          />
+          <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button" @click="limpiar()"/>
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarVendedor()" class="action-button"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div
-      class="container-table"
-      style="height: 90vh; overflow-y: auto; width: 80%"
-    >
+    <!-- Tabla -->
+    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Vendedor</h1>
-
       <div class="b-b">
         <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 400px" @input="filtrarvendedores"/>
         <q-btn color="primary" label="Buscar" @click="filtrarvendedores" class="btnbuscar"/>
       </div>
 
       <div class="btn-agregar">
-        <q-btn
-          color="secondary"
-          label="Agregar ➕"
-          @click="agregarVendedor()"
-        />
+        <q-btn color="secondary" label="Agregar ➕" @click="agregarVendedor()"/>
       </div>
-      <q-table
-        title="Vendedores"
-        :rows="rows"
-        :columns="columns"
-        row-key="name"
-      >
+      <q-table title="Vendedores" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green"
-              >Activo</label
-            >
+            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn
-              color="white"
-              text-color="black"
-              label="🖋️"
-              @click="editarVendedor(props.row._id)"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="❌"
-              @click="InactivarVendedor(props.row._id)"
-              v-if="props.row.estado == 1"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="✅"
-              @click="ActivarVendedor(props.row._id)"
-              v-else
-            />
+            <q-btn color="white" text-color="black" label="🖋️" @click="editarVendedor(props.row._id)"/>
+            <q-btn color="white" text-color="black" label="❌" @click="InactivarVendedor(props.row._id)" v-if="props.row.estado == 1"/>
+            <q-btn color="white" text-color="black" label="✅" @click="ActivarVendedor(props.row._id)" v-else/>
           </q-td>
         </template>
       </q-table>
@@ -118,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 import { useVendedorStore } from "../stores/Vendedor.js";
 import { useQuasar } from "quasar";
@@ -138,16 +75,16 @@ let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
 
+// Filtro Vendedores por Cedula
 function filtrarvendedores() {
   if (searchCedula.value.trim() === "") {
-    rows.value = vendedores.value; // Mostrar todos los vendedores si la búsqueda está vacía
+    rows.value = vendedores.value; 
   } else {
-    rows.value = vendedores.value.filter((vendedores) =>
-      vendedores.cedula.toString().includes(searchCedula.value.toString())
-    );
-  }
-}
+    rows.value = vendedores.value.filter((vendedores) =>vendedores.cedula.toString().includes(searchCedula.value.toString()));
+  };
+};
 
+// Obtener Vendedores
 async function obtenerInfo() {
   try {
     await VendedoresStore.obtenerInfoVendedor();
@@ -155,35 +92,33 @@ async function obtenerInfo() {
     rows.value = VendedoresStore.vendedores;
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Primera Accion 
 onMounted(async () => {
   obtenerInfo();
 });
 
+// Datos de la tabla
 const columns = [
   { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
   { name: "nombre", label: "Nombre", field: "nombre", sortable: true },
   { name: "cuenta", label: "Cuenta", field: "cuenta" },
   { name: "telefono", label: "Telefono", field: "telefono" },
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  {
-    name: "createAT",
-    label: "Fecha de Creación",
-    field: "createAT",
-    sortable: true,
-    format: (val) => format(new Date(val), "yyyy-MM-dd"),
-  },
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
   { name: "opciones", label: "Opciones", sortable: false },
 ];
 
+// Agregar Vendedor
 function agregarVendedor() {
   fixed.value = true;
   text.value = "Agregar Vendedor";
   cambio.value = 0;
-}
+};
 
+// Funcionamiento Agregar y Editar Vendedor
 async function editarAgregarVendedor() {
   validar();
   if (validacion.value === true) {
@@ -197,28 +132,16 @@ async function editarAgregarVendedor() {
           clave: clave.value,
           telefono: telefono.value,
         });
-        if (notification) {
-          notification();
-        }
+        cancelShow();
         limpiar();
-        $q.notify({
-          spinner: false,
-          message: "Vendedor Agregado",
-          timeout: 2000,
-          type: "positive",
-        });
+        greatMessage.value = "Vendedor Agregado";
+        showGreat();
         obtenerInfo();
       } catch (error) {
-        if (notification) {
-          notification();
-        }
-        $q.notify({
-          spinner: false,
-          message: `${error.response.data.error.errors[0].msg}`,
-          timeout: 2000,
-          type: "negative",
-        });
-      }
+        cancelShow();
+        badMessage.value = error.response.data.error.errors[0].msg;
+        showBad();
+      };
     } else {
       let id = idVendedor.value;
       if (id) {
@@ -231,48 +154,36 @@ async function editarAgregarVendedor() {
             clave: clave.value,
             telefono: telefono.value,
           });
-          if (notification) {
-            notification();
-          }
+          cancelShow();
           limpiar();
-          $q.notify({
-            spinner: false,
-            message: "Vendedor Actualizado",
-            timeout: 2000,
-            type: "positive",
-          });
+          greatMessage.value = "Vendedor Actualizado";
+          showGreat();
           obtenerInfo();
           fixed.value = false;
         } catch (error) {
-          if (notification) {
-            notification();
-          }
-          $q.notify({
-            spinner: false,
-            message: `${error.response.data.error.errors[0].msg}`,
-            timeout: 2000,
-            type: "negative",
-          });
-        }
-      }
-    }
-  }
-}
+          cancelShow();
+          badMessage.value = error.response.data.error.errors[0].msg;
+          showBad();
+        };
+      };
+    };
+  };
+};
 
+// Limpiar Casillas
 function limpiar() {
   cedula.value = "";
   nombre.value = "";
   cuenta.value = "";
   clave.value = "";
   telefono.value = "";
-}
+};
 
 let idVendedor = ref("");
+// Editar Vendedor
 async function editarVendedor(id) {
   cambio.value = 1;
-  const vendedorSeleccionado = vendedores.value.find(
-    (vendedor) => vendedor._id === id
-  );
+  const vendedorSeleccionado = vendedores.value.find((vendedor) => vendedor._id === id);
   if (vendedorSeleccionado) {
     idVendedor.value = String(vendedorSeleccionado._id);
     fixed.value = true;
@@ -282,66 +193,65 @@ async function editarVendedor(id) {
     cuenta.value = vendedorSeleccionado.cuenta;
     clave.value = vendedorSeleccionado.clave;
     telefono.value = vendedorSeleccionado.telefono;
-  }
-}
+  };
+};
 
+// Inactivar Vendedor
 async function InactivarVendedor(id) {
   try {
     showDefault();
     await VendedoresStore.putInactivarVendedor(id);
-
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: "Vendedor Inactivado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Vendedor Inactivado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
+// Activar Vendedor
 async function ActivarVendedor(id) {
   try {
     showDefault();
     await VendedoresStore.putActivarVendedor(id);
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: "Vendedor Inactivado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Vendedor Activado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
-let errorMessage = ref("");
+let greatMessage = ref("");
+let badMessage = ref("");
 
+// Notificacion Buena
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
+
+// Notificacion Mala 
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
+
+// Notificacion de Carga
 const showDefault = () => {
   notification = $q.notify({
     spinner: true,
@@ -350,34 +260,50 @@ const showDefault = () => {
   });
 };
 
+// Cancelar Notificacion
+const cancelShow = ()=>{
+  if (notification) {
+    notification();
+  };
+};
+
 let validacion = ref(false);
 let notification = ref(null);
+
+// Validar los campos
 async function validar() {
-  if (
-    !cedula.value &&
-    !nombre.value &&
-    !cuenta.value &&
-    !clave.value &&
-    !telefono.value
-  ) {
-    errorMessage.value = "Por favor rellene los campos";
+  if ( !cedula.value && !nombre.value && !cuenta.value && !clave.value && !telefono.value) {
+    badMessage.value = "Por favor rellene los campos";
   } else if (!cedula.value) {
-    errorMessage.value = "Ingrese la Cedula";
+    badMessage.value = "Ingrese la Cedula";
+    showBad();
   } else if (!nombre.value) {
-    errorMessage.value = "Ingrese el Nombre";
+    badMessage.value = "Ingrese el Nombre";
+    showBad();
   } else if (!cuenta.value) {
-    errorMessage.value = "Ingrese su cuenta";
-  } else if (!clave.value) {
-    errorMessage.value = "Ingrese su clave";
-  } else if (!telefono.value) {
-    errorMessage.value = "Ingrese el Telefono";
-  } else if (telefono.value.length !== 10) {
-    errorMessage.value = "El telefono debe tener 10 Digitos";
+    badMessage.value = "Ingrese su cuenta";
+    showBad();
+  } else if (!clave.value) {  
+    badMessage.value = "Ingrese su clave";
+    showBad();
+  } else if (!telefono.value) {  
+    badMessage.value = "Ingrese el Telefono";
+    showBad();
+  } else if (telefono.value.length !== 10) {  
+    badMessage.value = "El telefono debe tener 10 Digitos";
+    showBad();
   } else {
-    errorMessage.value = "";
     validacion.value = true;
   }
 }
+
+// Limpiar el modal cuando se cierre mal
+watch(fixed, () => {
+  if (fixed.value == false) {
+    limpiar();
+  };
+});
+
 </script>
 
 <style scoped>

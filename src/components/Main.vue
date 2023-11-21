@@ -48,7 +48,10 @@ let content = ref([
 .container{
     display: flex;
     flex-wrap: wrap;
+    height: 75vh;
+    width: 100%;
     justify-content: center;
+    gap: 40px;
 }
 
 .contenedor2 {
@@ -58,6 +61,8 @@ let content = ref([
     align-items: center;
     flex-wrap: wrap;
     flex-direction: column;
+    height: 50%; 
+    margin:5px 15px ;
 }
 
 .contenedor2 a {
@@ -78,12 +83,15 @@ let content = ref([
 }
 
 .card {
-    width: 190px;
-    height: 260px;
+    width: 257px; 
+    height: 290px; 
     margin: 0 auto;
     background-color: #F8FBFE;
     border-radius: 8px;
     z-index: 1;
+    -webkit-box-shadow: 5px 5px 10px -8px rgba(0,0,0,0.77);
+    -moz-box-shadow: 5px 5px 10px -8px rgba(0,0,0,0.77);
+    box-shadow: 5px 5px 10px -8px rgba(0,0,0,0.77);
 }
    
 .tools {

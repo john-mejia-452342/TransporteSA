@@ -11,7 +11,9 @@
           </q-avatar>
           TransporteSA
         </q-toolbar-title>
+        <router-link to="/"><q-btn dense flat round><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></q-btn></router-link>
       </q-toolbar>
+      
     </q-header>
     <q-drawer id="menulateral" v-model="leftDrawerOpen" side="left" overlay elevated>
       <img id="logo" src="https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg" alt=""/>
@@ -26,7 +28,7 @@
       <router-link class="link" to="/ticket"><q-btn id="btnmenu"><i class="fa-solid fa-ticket"></i> Tickets</q-btn></router-link>
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container style="padding-top:50px;">
       <router-view />
     </q-page-container>
 
@@ -80,4 +82,5 @@ function toggleLeftDrawer() {
 .link{
   text-decoration: none;
 }
+
 </style>

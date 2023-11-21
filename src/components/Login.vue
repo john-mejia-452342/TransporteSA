@@ -2,43 +2,21 @@
   <div class="container">
     <div class="login-card">
       <div class="card-header">
-        <img
-          id="fotol"
-          src="https://png.pngtree.com/png-vector/20220912/ourmid/pngtree-high-detailed-bus-vector-png-image_6172563.png"
-          alt=""
-        />
+        <img id="fotol" src="https://png.pngtree.com/png-vector/20220912/ourmid/pngtree-high-detailed-bus-vector-png-image_6172563.png" alt=""/>
         <h1 id="Titulo">Login</h1>
       </div>
       <div class="card-body">
-        <!-- <div class="q-pa-md">
-                    <div class="row q-gutter-sm">
-                      <q-btn color="purple" @click="showDefault" label="Default spinner" />
-                    </div>
-                  </div> -->
         <form @submit.prevent="validar">
           <div class="input-container">
-            <input
-              placeholder="Usuario"
-              class="input-field"
-              type="text"
-              v-model="username"
-              name="username"
-            />
+            <input placeholder="Usuario" class="input-field" type="text" v-model="username" name="username"/>
             <label for="input-field" class="input-label">Usuario</label>
             <span class="input-highlight"></span>
           </div>
           <div class="input-container">
-            <input
-              placeholder="Password"
-              class="input-field"
-              v-model="password"
-              name="password"
-              type="password"
-            />
+            <input placeholder="Password" class="input-field" v-model="password" name="password" type="password"/>
             <label for="input-field" class="input-label">Password</label>
             <span class="input-highlight"></span>
           </div>
-          <div class="error">{{ errorMessage }}</div>
           <div class="form-group">
             <button type="submit" class="login-button">Ingresar</button>
           </div>
@@ -57,8 +35,27 @@ const loginStore = useLoginStore();
 const username = ref("");
 const password = ref("");
 const $q = useQuasar();
-let errorMessage = ref("");
 
+let greatMessage = ref("");
+let badMessage = ref("");
+
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
+
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
 const showDefault = () => {
   notification = $q.notify({
     spinner: true,
@@ -71,15 +68,17 @@ let validacion = ref(false);
 let notification = ref(null);
 async function validar() {
   if (!username.value && !password.value) {
-    errorMessage.value = "Ingrese el usuario y la contraseña";
+    badMessage.value = "Ingrese el usuario y la contraseña";
+    showBad();
   } else if (!username.value) {
-    errorMessage.value = "Ingrese el usuario";
+    badMessage.value = "Ingrese el usuario";
+    showBad();
   } else if (!password.value) {
-    errorMessage.value = "Ingrese la contraseña";
+    badMessage.value = "Ingrese la contraseña";
+    showBad();
   } else {
-    errorMessage.value = "";
     validacion.value = true;
-  }
+  };
   if (validacion.value == true) {
     try {
       showDefault();
@@ -90,27 +89,18 @@ async function validar() {
       if (notification) {
         notification();
       }
-      $q.notify({
-        spinner: false,
-        message: "Ingresado al programa",
-        timeout: 2000,
-        type: "positive",
-      });
+      greatMessage.value =  "Ingresado al programa";
+      showGreat();
     } catch (error) {
       if (notification) {
         notification();
       }
-      $q.notify({
-        spinner: false,
-        message: `${error.response.data.msg}`,
-        timeout: 2000,
-        type: "negative",
-      });
-    }
-  }
-
+      badMessage.value = error.response.data.msg;
+      showBad();
+    };
+  };
   validacion.value = false;
-}
+};
 </script>
 
 <style scoped>

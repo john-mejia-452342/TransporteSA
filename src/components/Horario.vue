@@ -16,18 +16,18 @@
         </q-card-section>
 
         <q-separator />
-        <q-div class="error">{{ errorMessage }}</q-div>
         <q-card-actions align="right" class="modal-footer">
           <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button"/>
           <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarHorario()" class="action-button"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <!-- Tabla -->
     <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
       <h1>Horario</h1>
 
       <!-- <div class="b-b">
-        <q-input class="bbuscar" v-model="searchhorario" label="Buscar por Cedula" style="width: 300px" @input="filtrarhora" />
+        <q-input class="bbuscar" v-model="searchhorario" label="Buscar por hora" style="width: 300px" @input="filtrarhora" />
 
         <q-btn color="primary" label="Buscar" @click="filtrarhora" class="btnbuscar" />
       </div> -->
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 import { useHorarioStore } from "../stores/Horario.js";
 import { useQuasar } from "quasar";
@@ -85,6 +85,7 @@ let cambio = ref(0);
 //   }
 // }
 
+// Obtener Horarios
 async function obtenerInfo() {
   try {
     await horarioStore.obtenerInfoHorarios();
@@ -92,49 +93,32 @@ async function obtenerInfo() {
     rows.value = horarioStore.horarios;
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Primera Accion
 onMounted(async () => {
   obtenerInfo();
 });
 
+// Datos tabla
 const columns = [
-  {
-    name: "hora_partida",
-    label: "Hora Partida",
-    field: "hora_partida",
-    sortable: true,
-  },
-  {
-    name: "hora_llegada",
-    label: "Hora Llegada",
-    field: "hora_llegada",
-    sortable: true,
-  },
+  { name: "hora_partida", label: "Hora Partida", field: "hora_partida", sortable: true,},
+  { name: "hora_llegada", label: "Hora Llegada", field: "hora_llegada", sortable: true,},
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  {
-    name: "createAT",
-    label: "Fecha de Creación",
-    field: "createAT",
-    sortable: true,
-    format: (val) => format(new Date(val), "yyyy-MM-dd"),
-  },
-  {
-    name: "opciones",
-    label: "Opciones",
-    field: (row) => null,
-    sortable: false,
-  },
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
+  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
 ];
 
+// Agregar Horario
 function agregarHorario() {
   limpiar();
   fixed.value = true;
   text.value = "Agregar Horario";
   cambio.value = 0;
-}
+};
 
+// Funcionamiento Agregar y Editar Horario
 async function editarAgregarHorario() {
   validar();
   if (validacion.value === true) {
@@ -145,27 +129,15 @@ async function editarAgregarHorario() {
           hora_partida: hora_partida.value,
           hora_llegada: hora_llegada.value,
         });
-        if (notification) {
-          notification();
-        }
+  
         limpiar();
-        $q.notify({
-          spinner: false,
-          message: "Horario Agregado",
-          timeout: 2000,
-          type: "positive",
-        });
+        greatMessage.value = "Horario Agregado";
+        showGreat();
       } catch (error) {
-        if (notification) {
-          notification();
-        }
-        $q.notify({
-          spinner: false,
-          message: `${error.response.data.error.errors[0].msg}`,
-          timeout: 2000,
-          type: "negative",
-        });
-      }
+        cancelShow();
+        badMessage.value = error.response.data.error.errors[0].msg;
+        showBad();
+      };
       obtenerInfo();
     } else {
       let id = idHorario.value;
@@ -176,42 +148,32 @@ async function editarAgregarHorario() {
             hora_partida: hora_partida.value,
             hora_llegada: hora_llegada.value,
           });
-          if (notification) {
-            notification();
-          }
+          cancelShow();
           limpiar();
-          $q.notify({
-            spinner: false,
-            message: "Horario Actualizado",
-            timeout: 2000,
-            type: "positive",
-          });
-
+          greatMessage.value = "Horario Actualizado";
+          showGreat();
           obtenerInfo();
           fixed.value = false;
         } catch (error) {
-          if (notification) {
-            notification();
-          }
-          $q.notify({
-            spinner: false,
-            message: `${error.response.data.error.errors[0].msg}`,
-            timeout: 2000,
-            type: "negative",
-          });
-        }
-      }
-    }
+          cancelShow();
+          badMessage.value = error.response.data.error.errors[0].msg;
+          showBad();
+        };
+      };
+    };
     validacion.value = false;
-  }
-}
+  };
+};
 
+// Limpiar Casillas
 function limpiar() {
   hora_partida.value = "";
   hora_llegada.value = "";
-}
+};
 
 let idHorario = ref("");
+
+// Editar Horario
 async function editarHorario(id) {
   cambio.value = 1;
   const horarioSelected = horarios.value.find((horario) => horario._id === id);
@@ -221,63 +183,66 @@ async function editarHorario(id) {
     text.value = "Editar Horario";
     hora_partida.value = horarioSelected.hora_partida;
     hora_llegada.value = horarioSelected.hora_llegada;
-  }
-}
+  };
+};
 
+// Inactivar Horario
 async function InactivarHorario(id) {
   try {
     showDefault();
     await horarioStore.putInactivarHorario(id);
-    if (notification) notification();
-
-    $q.notify({
-      spinner: false,
-      message: "Horario Inactivado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Horario Inactivado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
+// Activar Horarios
 async function ActivarHorario(id) {
   try {
     showDefault();
     await horarioStore.putActivarHorario(id);
-    if (notification) notification();
-
-    $q.notify({
-      spinner: false,
-      message: "Horario Activado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Horario Activado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
-let errorMessage = ref("");
+let greatMessage = ref("");
+let badMessage = ref("");
 
+// Notificacion Buena
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
+
+// Notificacion Mala 
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
+
+
+// Notificacion de Carga
 const showDefault = () => {
   notification = $q.notify({
     spinner: true,
@@ -286,27 +251,42 @@ const showDefault = () => {
   });
 };
 
+// Cancelar Notificacion
+const cancelShow = ()=>{
+  if (notification) {
+    notification();
+  };
+};
+
 let validacion = ref(false);
 let notification = ref(null);
-async function validar() {
+
+// Validacion de Campos
+function validar() {
   const timeFormat = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
   if (!hora_partida.value && !hora_llegada.value) {
-    errorMessage.value = "Ingrese la hora de Partida y Llegada";
+    badMessage.value = "Ingrese la hora de Partida y Llegada";
+    showBad();
   } else if (!hora_partida.value) {
-    errorMessage.value = "Ingrese la hora de Partida";
+    badMessage.value = "Ingrese la hora de Partida";
+    showBad();
   } else if (!hora_llegada.value) {
-    errorMessage.value = "Ingrese la hora de Llegada";
-  } else if (
-    !timeFormat.test(hora_partida.value) ||
-    !timeFormat.test(hora_llegada.value)
-  ) {
-    errorMessage.value =
-      "Ingrese las horas en el formato correcto, por ejemplo, 12:00:00 o 09:00:00";
+    badMessage.value = "Ingrese la hora de Llegada";
+    showBad();
+  } else if ( !timeFormat.test(hora_partida.value) || !timeFormat.test(hora_llegada.value)) {
+    badMessage.value ="Ingrese las horas en el formato correcto, por ejemplo, 12:00:00 o 09:00:00";
+    showBad();
   } else {
-    errorMessage.value = "";
     validacion.value = true;
-  }
-}
+  };
+};
+
+// Limpiar el modal cuando se cierre mal
+watch(fixed, () => {
+  if (fixed.value == false) {
+    limpiar();
+  };
+});
 </script>
 
 <style scoped>
@@ -350,14 +330,6 @@ async function validar() {
   justify-content: flex-end;
 }
 
-.error {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  color: red;
-  font-size: 18px;
-  text-align: center;
-}
 .modal-header {
     display: flex;
     justify-content: space-between;

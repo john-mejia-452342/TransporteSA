@@ -14,9 +14,7 @@
           <q-input v-model="nombre" label="Nombre" class="modal-input" />
           <q-input type="number" v-model="telefono" label="Telefono" class="modal-input" />
         </q-card-section>
-
         <q-separator />
-        <div class="error">{{ errorMessage }}</div>
 
         <q-card-actions align="right" class="modal-footer">
           <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button" />
@@ -24,26 +22,13 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div
-      class="container-table"
-      style="height: 90vh; overflow-y: auto; width: 80%"
-    >
+    <!-- Tabla -->
+    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%" >
       <h1>Clientes</h1>
 
       <div class="b-b">
-        <q-input
-          class="bbuscar"
-          v-model="searchCedula"
-          label="Buscar por Cedula"
-          style="width: 300px"
-          @input="filtrarClientes"
-        />
-        <q-btn
-          class="btnbuscar"
-          color="primary"
-          label="Buscar"
-          @click="filtrarClientes"
-        />
+        <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 300px" @input="filtrarClientes"/>
+        <q-btn class="btnbuscar" color="primary" label="Buscar" @click="filtrarClientes"/>
       </div>
 
       <div class="btn-agregar">
@@ -52,34 +37,15 @@
       <q-table title="Clientes" :rows="rows" :columns="columns" row-key="name">
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green"
-              >Activo</label
-            >
+            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
             <label for="" v-else style="color: red">Inactivo</label>
           </q-td>
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn
-              color="white"
-              text-color="black"
-              label="🖋️"
-              @click="editarCliente(props.row._id)"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="❌"
-              @click="inactivarCliente(props.row._id)"
-              v-if="props.row.estado == 1"
-            />
-            <q-btn
-              color="white"
-              text-color="black"
-              label="✅"
-              @click="activarCliente(props.row._id)"
-              v-else
-            />
+            <q-btn color="white" text-color="black" label="🖋️" @click="editarCliente(props.row._id)"/>
+            <q-btn color="white" text-color="black" label="❌" @click="inactivarCliente(props.row._id)" v-if="props.row.estado == 1"/>
+            <q-btn color="white" text-color="black" label="✅" @click="activarCliente(props.row._id)" v-else />
           </q-td>
         </template>
       </q-table>
@@ -88,7 +54,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 import { useClienteStore } from "../stores/Cliente.js";
 import { useQuasar } from "quasar";
@@ -106,16 +72,16 @@ let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
 
+// Filtrar Clientes
 function filtrarClientes() {
   if (searchCedula.value.trim() === "") {
-    rows.value = clientes.value; // Mostrar todos los clientes si la búsqueda está vacía
+    rows.value = clientes.value; 
   } else {
-    rows.value = clientes.value.filter((cliente) =>
-      cliente.cedula.toString().includes(searchCedula.value.toString())
-    );
-  }
-}
+    rows.value = clientes.value.filter((cliente) =>cliente.cedula.toString().includes(searchCedula.value.toString()));
+  };
+};
 
+// Obtener Clientes 
 async function obtenerInfo() {
   try {
     await clienteStore.obtenerInfoClientes();
@@ -123,39 +89,32 @@ async function obtenerInfo() {
     rows.value = clienteStore.clientes;
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Primera Accion 
 onMounted(async () => {
   obtenerInfo();
 });
 
+// Datos Tabla
 const columns = [
   { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
   { name: "nombre", label: "Nombre", field: "nombre", sortable: true },
   { name: "telefono", label: "Telefono", field: "telefono" },
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  {
-    name: "createAT",
-    label: "Fecha de Creación",
-    field: "createAT",
-    sortable: true,
-    format: (val) => format(new Date(val), "yyyy-MM-dd"),
-  },
-  {
-    name: "opciones",
-    label: "Opciones",
-    field: (row) => null,
-    sortable: false,
-  },
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
+  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
 ];
 
+// Agregar Cliente
 function agregarCliente() {
   fixed.value = true;
   text.value = "Agregar Cliente";
   cambio.value = 0;
-}
+};
 
+// Funcionamiento Agregar y Editar Clientes
 async function editarAgregarCliente() {
   validar();
   if (validacion.value === true) {
@@ -167,28 +126,16 @@ async function editarAgregarCliente() {
           nombre: nombre.value,
           telefono: telefono.value,
         });
-        if (notification) {
-          notification();
-        }
+        cancelShow();
         limpiar();
-        $q.notify({
-          spinner: false,
-          message: "Cliente Agregado",
-          timeout: 2000,
-          type: "positive",
-        });
+        greatMessage.value = "Cliente Agregado";
+        showGreat();
         obtenerInfo();
       } catch (error) {
-        if (notification) {
-          notification();
-        }
-        $q.notify({
-          spinner: false,
-          message: `${error.response.data.error.errors[0].msg}`,
-          timeout: 2000,
-          type: "negative",
-        });
-      }
+        cancelShow();
+        badMessage.value = error.response.data.error.errors[0].msg;
+        showBad();
+      };
     } else {
       let id = idCliente.value;
       if (id) {
@@ -199,47 +146,36 @@ async function editarAgregarCliente() {
             nombre: nombre.value,
             telefono: telefono.value,
           });
-          if (notification) {
-            notification();
-          }
+          cancelShow();
           limpiar();
-          $q.notify({
-            spinner: false,
-            message: "Cliente Actualizado",
-            timeout: 2000,
-            type: "positive",
-          });
+          greatMessage.value = "Cliente Actualizado";
+          showGreat();
           obtenerInfo();
           fixed.value = false;
         } catch (error) {
-          if (notification) {
-            notification();
-          }
-          $q.notify({
-            spinner: false,
-            message: `${error.response.data.error.errors[0].msg}`,
-            timeout: 2000,
-            type: "negative",
-          });
-        }
-      }
-    }
+          cancelShow();
+          badMessage.value = error.response.data.error.errors[0].msg;
+          showBad();
+        };
+      };
+    };
     validacion.value = false;
-  }
-}
+  };
+};
 
+// Limpiar Casillas
 function limpiar() {
   cedula.value = "";
   nombre.value = "";
   telefono.value = "";
-}
+};
 
 let idCliente = ref("");
+
+// Editar Clientes
 async function editarCliente(id) {
   cambio.value = 1;
-  const clienteSeleccionado = clientes.value.find(
-    (cliente) => cliente._id === id
-  );
+  const clienteSeleccionado = clientes.value.find((cliente) => cliente._id === id);
   if (clienteSeleccionado) {
     idCliente.value = String(clienteSeleccionado._id);
     fixed.value = true;
@@ -247,65 +183,64 @@ async function editarCliente(id) {
     cedula.value = clienteSeleccionado.cedula;
     nombre.value = clienteSeleccionado.nombre;
     telefono.value = clienteSeleccionado.telefono;
-  }
-}
+  };
+};
 
+// Inactivar Clientes
 async function inactivarCliente(id) {
   try {
     showDefault();
     await clienteStore.putInactivarCliente(id);
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: "Cliente Inactivado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Cliente Inactivado";
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
+// Activar Clientes
 async function activarCliente(id) {
   try {
     showDefault();
     await clienteStore.putActivarCliente(id);
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: "Clinete Activado",
-      timeout: 2000,
-      type: "positive",
-    });
+    cancelShow();
+    greatMessage.value = "Cliente Activado";
+    showGreat();
     obtenerInfo();
   } catch (error) {
-    if (notification) {
-      notification();
-    }
-    $q.notify({
-      spinner: false,
-      message: `${error.response.data.error.errors[0].msg}`,
-      timeout: 2000,
-      type: "negative",
-    });
-  }
-}
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
 
-let errorMessage = ref("");
+let greatMessage = ref("");
+let badMessage = ref("");
 
+// Notificacion Buena
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
+
+// Notificacion Mala 
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
+
+// Notificacion de Carga
 const showDefault = () => {
   notification = $q.notify({
     spinner: true,
@@ -313,25 +248,44 @@ const showDefault = () => {
     timeout: 0,
   });
 };
+// Cancelar Notificacion
+const cancelShow = ()=>{
+  if (notification) {
+    notification();
+  };
+};
 
 let validacion = ref(false);
 let notification = ref(null);
-async function validar() {
+
+// Validar Campos
+function validar() {
   if (!cedula.value && !nombre.value && !telefono.value) {
-    errorMessage.value = "Por favor rellene los campos";
+    badMessage.value = "Por favor rellene los campos";
+    showBad();
   } else if (!cedula.value) {
-    errorMessage.value = "Ingrese la Cedula";
+    badMessage.value = "Ingrese la Cedula";
+    showBad();
   } else if (!nombre.value) {
-    errorMessage.value = "Ingrese el Nombre";
+    badMessage.value = "Ingrese el Nombre";
+    showBad();
   } else if (!telefono.value) {
-    errorMessage.value = "Ingrese el Telefono";
+    badMessage.value = "Ingrese el Telefono";
+    showBad();
   } else if (String(telefono.value).length !== 10) {
-    errorMessage.value = "El telefono debe tener 10 Dígitos";
+    badMessage.value = "El telefono debe tener 10 Dígitos";
+    showBad();
   } else {
-    errorMessage.value = "";
     validacion.value = true;
-  }
-}
+  };
+};
+
+// Limpiar el modal cuando se cierre mal
+watch(fixed, () => {
+  if (fixed.value == false) {
+    limpiar();
+  };
+});
 </script>
 
 <style scoped>
@@ -374,14 +328,6 @@ async function validar() {
   justify-content: flex-end;
 }
 
-.error {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  color: red;
-  font-size: 18px;
-  text-align: center;
-}
 .b-b {
   display: flex;
   flex-direction: row;

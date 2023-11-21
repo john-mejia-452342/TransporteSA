@@ -11,7 +11,6 @@
             <q-select v-model="ruta" :options="optionsRutas" label="Rutas" />
             <q-select v-model="bus" :options="optionsBuses" label="Buses" />
             <q-input v-model="fecha_departida" filled type="date" hint="Fecha para Partida" style="width: 300px"/>
-            <div class="error">{{ errorMessage }}</div>
             <div class="options">
                 <q-btn flat label="Cerrar" color="primary" @click="cerrarModal" />
                 <q-btn flat label="Guardar 💾" color="primary" @click="generarTicketInfo()"/>
@@ -33,7 +32,6 @@
                 <q-input class="label" type="number" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente" style="width: 300px"/>
                 <q-input class="label" standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente" style="width: 300px"/>
                 <q-input class="label" type="number" standout v-model="telefono" label="Telefono" placeholder="Telefono del cliente" style="width: 300px"/>
-                <div class="notfounf">{{ notfound }}</div>
                 <q-btn class="btn-c" color="primary" label="Generar Ticket" @click="CrearTicket()"/>
                 
             </div>
@@ -62,7 +60,7 @@ const ticketStore = useTicketStore();
 const loginStore = useLoginStore();
 
 let fixed = ref(false);
-let text = ref("");
+
 let ruta = ref("");
 let bus = ref("");
 let fecha_departida = ref("");
@@ -81,17 +79,20 @@ let vendedor = ref([]);
 let optionsRutas = ref([]);
 let optionsBuses = ref([]);
 
+// Mostrar Form Rutas Buses y Fecha de partidad
 function mostrarModal() {
   obtenerRutas();
   fixed.value = true;
   showmodal.value = true;
-}
+};
 
+// Cerrar Modal
 function cerrarModal() {
   fixed.value = false;
   showmodal.value = false;
-}
+};
 
+// Obtener Buses, Rutas y clientes 
 async function obtenerInfo() {
   await busStore.obtenerInfoBuses();
   buses.value = busStore.buses;
@@ -101,8 +102,9 @@ async function obtenerInfo() {
 
   await clienteStrore.obtenerInfoClientes();
   clientes.value = clienteStrore.clientes;
-}
+};
 
+// Obtener Opciones de Rutas 
 async function obtenerRutas() {
   try {
     await rutaStore.obtenerInfoRutas();
@@ -112,9 +114,10 @@ async function obtenerRutas() {
     }));
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Obtener Opciones de buses
 async function obtenerBuses() {
   try {
     await busStore.obtenerInfoBuses();
@@ -124,121 +127,92 @@ async function obtenerBuses() {
     }));
   } catch (error) {
     console.log(error);
-  }
-}
+  };
+};
 
+// Generar listado de Asientos disponibles
 async function generarListaAsientos() {
   await validarAsientos();
   if (validacion.value) {
-    const busSeleccionado = buses.value.find(
-      (b) => b._id === bus._rawValue.value
-    );
+    const busSeleccionado = buses.value.find((b) => b._id === bus._rawValue.value);
     if (busSeleccionado) {
       const numeroAsientos = busSeleccionado.cantidad_asientos;
       const listaAsientos = [];
       for (let i = 1; i <= numeroAsientos; i++) {
         listaAsientos.push(Number(i));
-      }
+      };
       asientos.value = listaAsientos;
-    }
-  }
-}
+    };
+  };
+};
 
-let notfound = ref("");
+
 let cliente_id = ref("");
 let validacionCliente = ref(null)
+
+// Buscar Clientes 
 async function buscarCliente() {
-  const clienteEncontrado = clientes.value.find(
-    (cliente) =>
-      cliente.cedula == cedula.value ||
-      cliente.nombre == nombre.value ||
-      cliente.telefono == telefono.value
-  );
+  const clienteEncontrado = clientes.value.find((cliente) => cliente.cedula == cedula.value || cliente.nombre == nombre.value || cliente.telefono == telefono.value);
   if (clienteEncontrado) {
     cedula.value = clienteEncontrado.cedula;
     nombre.value = clienteEncontrado.nombre;
     telefono.value = clienteEncontrado.telefono;
     cliente_id.value = clienteEncontrado._id;
-    notfound.value = "";
-    validacionCliente.value = true
+    greatMessage.value = "Cliente Encontrado";
+    showGreat();
+    validacionCliente.value = true;
   } else {
-    notfound.value = "No se encontro ningun cliente";
-    validacionCliente.value = false
+    badMessage.value = "No se encontro ningun cliente";
+    showBad();
+    validacionCliente.value = false;
   }
 }
 
-// async function generarTicket() {
-//   await obtenerRutas();
-//   fixed.value = true;
-//   text.value = "Generar Ticket";
-//   showmodal.value = true;
-// }
-
+// Generar lista Asientos 
 async function generarTicketInfo() {
   fixed.value = false;
   generarListaAsientos();
-}
+};
 
+// Crear Ticket
 async function CrearTicket() {
-    if (validacionCliente.value == true) {
-        try {
-        
-        showDefault();
-        await ticketStore.postTicket({
+  if (validacionCliente.value == true) {
+    try {
+      showDefault();
+      await ticketStore.postTicket({
         vendedor_id: String(vendedor.value._id),
         cliente_id: cliente_id.value,
         ruta_id: ruta._rawValue.value,
         bus_id: bus._rawValue.value,
         no_asiento: no_asiento.value,
         fecha_departida: fecha_departida.value,
-        });
-        if (notification) {
-            notification();
-        }
-
-        $q.notify({
-            spinner: false,
-            message: "Ticket Agregado",
-            timeout: 2000,
-            type: "positive",
-        });
-        fixed.value = false;
-        showmodal.value = false;
-        asientos.value = [];
-        showClienteDiv = false;
-        
-        } catch (error) {
-        if (notification) {
-            notification();
-        }
-        $q.notify({
-            spinner: false,
-            message: `${error.response.data.error.errors[0].msg}`,
-            timeout: 2000,
-            type: "negative",
-        });
-        }
-    }else{
-    if (notification) {
-        notification();
-      }
-      $q.notify({
-        spinner: false,
-        message: `Agrega un cliente`,
-        timeout: 2000,
-        type: "negative",
       });
-    }
-        
-        
-  
-}
+      cancelShow();
+      greatMessage.value = "Ticket Agregado";
+      showGreat();
+      fixed.value = false;
+      showmodal.value = false;
+      asientos.value = [];
+      showClienteDiv = false;
+    } catch (error) {
+      cancelShow();
+      badMessage.value = error.response.data.error.errors[0].msg;
+      showBad();
+    };
+  }else{
+    cancelShow();
+    badMessage.value = "Agrega un Cliente"
+    showBad();
+  };
+};
 
+// Obtener Vendedor
 async function obtenerVendedor() {
   vendedor.value = loginStore.vendedor;
-}
+};
 
 let puestos = ref([]);
+// Buscar Asientos Disponibles
 async function validarAsientos() {
   validar();
   if (validacion.value == true) {
@@ -249,29 +223,16 @@ async function validarAsientos() {
       showDefault();
       await ticketStore.buscarTickets(id_ruta, id_bus, fecha);
       puestos.value = ticketStore.puestos;
-      if (notification) {
-        notification();
-      }
-
-      $q.notify({
-        spinner: false,
-        message: "Listado Puestos",
-        timeout: 2000,
-        type: "positive",
-      });
+      cancelShow();
+      greatMessage.value = "Listado Puestos";
+      showGreat();
     } catch (error) {
-      if (notification) {
-        notification();
-      }
-      $q.notify({
-        spinner: false,
-        message: `${error.response.data.error.errors[0].msg}`,
-        timeout: 2000,
-        type: "negative",
-      });
-    }
-  }
-}
+      cancelShow();
+      badMessage.value = error.response.data.error.errors[0].msg;
+      showBad();
+    };
+  };
+};
 
 watch(ruta, () => {
   obtenerBuses();
@@ -286,8 +247,30 @@ onMounted(async () => {
   obtenerVendedor();
 });
 
-let errorMessage = ref("");
+let greatMessage = ref("");
+let badMessage = ref("");
 
+// Notificacion Buena
+const showGreat = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: greatMessage,
+    timeout: 2000,
+    type: "positive",
+  });
+};
+
+// Notificacion Mala 
+const showBad = () => {
+  notification = $q.notify({
+    spinner: false,
+    message: badMessage,
+    timeout: 2000,
+    type: "negative",
+  });
+};
+
+// Notificacion de Carga
 const showDefault = () => {
   notification = $q.notify({
     spinner: true,
@@ -295,24 +278,35 @@ const showDefault = () => {
     timeout: 0,
   });
 };
+
+// Cancelar Notificacion
+const cancelShow = ()=>{
+  if (notification) {
+    notification();
+  };
+};
+
 let notification = ref(null);
 
 let validacion = ref(false);
 
 async function validar() {
   if (!ruta.value && !bus.value && !fecha_departida.value) {
-    errorMessage.value = "Por favor rellene los campos";
+    badMessage.value = "Por favor rellene los campos";
+    showBad();
   } else if (!ruta.value) {
-    errorMessage.value = "Seleccione la ruta";
+    badMessage.value = "Seleccione la ruta";
+    showBad();
   } else if (!bus.value) {
-    errorMessage.value = "Seleccione el bus";
+    badMessage.value = "Seleccione el bus";
+    showBad();
   } else if (!fecha_departida.value) {
-    errorMessage.value = "Seleccione la fecha de partida";
+    badMessage.value = "Seleccione la fecha de partida";
+    showBad();
   } else {
-    errorMessage.value = "";
     validacion.value = true;
-  }
-}
+  };
+};
 </script>
   
 <style scoped>
@@ -352,10 +346,11 @@ async function validar() {
 
 .btn-generar {
   width: 100%;
-  margin-top: 70px;
+  margin-top: 25px;
   display: flex;
   justify-content: center;
   margin-right: 10px;
+  height: 50px;
 }
 
 .container-info {
@@ -431,18 +426,6 @@ async function validar() {
 .options {
   display: flex;
   justify-content: space-around;
-}
-.notfound {
-  color: red;
-}
-
-.error, .notfounf {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  color: red;
-  font-size: 18px;
-  text-align: center;
 }
 
 .btns{
