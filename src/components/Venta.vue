@@ -25,14 +25,14 @@
             </div>
             <div v-if="showClienteDiv" class="column cliente">
                 <div class="btns">
-                    <router-link class="link" to="/cliente"><q-btn class="bnt-bc" color="primary" label="Agregar Cliente"></q-btn></router-link>
-                    <q-btn  class="bnt-bc"  color="primary"  label="Buscar Cliente"  @click="buscarCliente()"/>
+                    <router-link class="link" to="/cliente"><q-btn class="bnt-bc" color="primary" label="Agregar Cliente ➕"></q-btn></router-link>
+                    <q-btn  class="bnt-bc"  color="primary"  label="Buscar Cliente 🔎"  @click="buscarCliente()"/>
                 </div>
             
                 <q-input class="label" type="number" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente" style="width: 300px"/>
                 <q-input class="label" standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente" style="width: 300px"/>
                 <q-input class="label" type="number" standout v-model="telefono" label="Telefono" placeholder="Telefono del cliente" style="width: 300px"/>
-                <q-btn class="btn-c" color="primary" label="Generar Ticket" @click="CrearTicket()"/>
+                <q-btn class="btn-c" color="primary" label="Generar Ticket 💾" @click="CrearTicket()"/>
                 
             </div>
         </div>
