@@ -1,43 +1,49 @@
 <template>
   <div class="container-all">
     <div class="container">
-        <div class="btn-generar">
-            <q-btn color="primary" label="Generar Ticket" @click="mostrarModal" />
-        </div>
+      <div class="btn-generar">
+        <q-btn color="primary" label="Generar Ticket" @click="mostrarModal" />
+      </div>
       <!-- Modal -->
       <div class="container-cuestionario">
         <div class="container-wrapper">
-            <div v-if="showmodal" class="column modal">
+          <div v-if="showmodal" class="column modal">
             <q-select v-model="ruta" :options="optionsRutas" label="Rutas" />
             <q-select v-model="bus" :options="optionsBuses" label="Buses" />
-            <q-input v-model="fecha_departida" filled type="date" hint="Fecha para Partida" style="width: 300px"/>
+            <q-input v-model="fecha_departida" filled type="date" hint="Fecha para Partida" style="width: 300px" />
             <div class="options">
-                <q-btn flat label="Cerrar" color="primary" @click="cerrarModal" />
-                <q-btn flat label="Guardar 💾" color="primary" @click="generarTicketInfo()"/>
+              <q-btn flat label="Cerrar" color="primary" @click="cerrarModal" />
+              <q-btn flat label="Guardar 💾" color="primary" @click="generarTicketInfo()" />
             </div>
-            </div>
+          </div>
         </div>
         <div class="column container-info">
-            <div v-if="asientos.length" class="container-bus">
-                <div v-for="i in asientos" :key="i" class="container-asientos">
-                    <button type="button" :value="i" @click="no_asiento = i" :style="{backgroundColor: no_asiento === i ? 'red' : puestos.includes(i) ? 'red' : 'initial', cursor: puestos.includes(i) ? 'not-allowed' : 'pointer', }">  {{ i }} 💺</button>
-                </div>
+          <div v-if="asientos.length" class="container-bus">
+            <div v-for="i in asientos" :key="i" class="container-asientos">
+              <button type="button" :value="i" @click="no_asiento = i"
+                :style="{ backgroundColor: no_asiento === i ? 'red' : puestos.includes(i) ? 'red' : 'initial', cursor: puestos.includes(i) ? 'not-allowed' : 'pointer', }">
+                {{ i }} 💺</button>
             </div>
-            <div v-if="showClienteDiv" class="column cliente">
-                <div class="btns">
-                    <router-link class="link" to="/cliente"><q-btn class="bnt-bc" color="primary" label="Agregar Cliente ➕"></q-btn></router-link>
-                    <q-btn  class="bnt-bc"  color="primary"  label="Buscar Cliente 🔎"  @click="buscarCliente()"/>
-                </div>
-            
-                <q-input class="label" type="number" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente" style="width: 300px"/>
-                <q-input class="label" standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente" style="width: 300px"/>
-                <q-input class="label" type="number" standout v-model="telefono" label="Telefono" placeholder="Telefono del cliente" style="width: 300px"/>
-                <q-btn class="btn-c" color="primary" label="Generar Ticket 💾" @click="CrearTicket()"/>
-                
+          </div>
+          <div v-if="showClienteDiv" class="column cliente">
+            <div class="btns">
+              <router-link class="link" to="/cliente"><q-btn class="bnt-bc" color="primary"
+                  label="Agregar Cliente ➕"></q-btn></router-link>
+              <q-btn class="bnt-bc" color="primary" label="Buscar Cliente 🔎" @click="buscarCliente()" />
             </div>
+
+            <q-input class="label" type="number" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente"
+              style="width: 300px" />
+            <q-input class="label" standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente"
+              style="width: 300px" />
+            <q-input class="label" type="number" standout v-model="telefono" label="Telefono"
+              placeholder="Telefono del cliente" style="width: 300px" />
+            <q-btn class="btn-c" color="primary" label="Generar Ticket 💾" @click="CrearTicket()" />
+
+          </div>
         </div>
       </div>
-        
+
     </div>
   </div>
 </template>
@@ -199,7 +205,7 @@ async function CrearTicket() {
       badMessage.value = error.response.data.error.errors[0].msg;
       showBad();
     };
-  }else{
+  } else {
     cancelShow();
     badMessage.value = "Agrega un Cliente"
     showBad();
@@ -280,7 +286,7 @@ const showDefault = () => {
 };
 
 // Cancelar Notificacion
-const cancelShow = ()=>{
+const cancelShow = () => {
   if (notification) {
     notification();
   };
@@ -317,10 +323,12 @@ async function validar() {
   display: flex;
   justify-content: center;
 }
+
 .container-wrapper {
   display: flex;
   max-width: 1200px;
 }
+
 .column {
   flex: 1;
   margin: 10px;
@@ -332,6 +340,7 @@ async function validar() {
   .container-wrapper {
     flex-direction: column;
   }
+
   .column {
     width: 100%;
   }
@@ -360,13 +369,15 @@ async function validar() {
 }
 
 .container-bus {
-    height: auto;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    align-content: center;
+  position: relative;
+  left: 100px;
+  height: auto;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-content: center;
 }
 
 .container-asientos {
@@ -421,6 +432,8 @@ async function validar() {
   justify-content: space-between;
   flex-direction: column;
   height: 362px;
+  position: relative;
+  left: 50px;
 }
 
 .options {
@@ -428,16 +441,15 @@ async function validar() {
   justify-content: space-around;
 }
 
-.btns{
-    width: 40%;
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 10px;
+.btns {
+  width: 40%;
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
 }
 
-.container-cuestionario{
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-}
-</style>
+.container-cuestionario {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}</style>
