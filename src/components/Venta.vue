@@ -372,13 +372,22 @@ async function validar() {
   position: relative;
   left: 100px;
   height: auto;
-  width: 90%;
+  width: 86%;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-evenly;
   align-content: center;
 }
+
+@media (max-width: 1647){
+.container-bus{
+  width: 84%;
+}
+
+}
+
+
 
 .container-asientos {
   display: flex;
