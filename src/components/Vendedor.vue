@@ -14,7 +14,7 @@
           <q-input type="text" v-model="cedula" label="Cedula" class="modal-input"/>
           <q-input type="text" v-model="nombre" label="Nombre" class="modal-input"/>
           <q-input type="text" v-model="cuenta" label="Cuenta" class="modal-input"/>
-          <!-- <q-input type="text" v-model="clave" label="Clave" class="modal-input"/> -->
+          <q-input type="text" v-model="clave" label="Clave" class="modal-input" v-if="cambio == 0"/>
           <q-input type="text" v-model="telefono" label="Telefono" class="modal-input"/>
         </q-card-section>
         <q-separator />
