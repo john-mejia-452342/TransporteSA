@@ -9,7 +9,7 @@
           <q-btn icon="close" flat round dense v-close-popup class="close-button"/>
         </q-card-section>
         <q-separator />
-        <q-card-section style="max-height: 50vh" class="modal-body">
+        <q-card-section style="max-height: 60vh" class="modal-body">
           <q-input type="number" v-model="cedula" label="Cedula" class="modal-input" />
           <q-input v-model="nombre" label="Nombre" class="modal-input" />
           <q-input type="number" v-model="telefono" label="Telefono" class="modal-input" />

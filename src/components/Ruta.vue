@@ -10,7 +10,7 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 50vh" class="modal-body">
+        <q-card-section style="max-height: 60vh" class="modal-body">
           <q-input  type="number"  v-model="precio"  label="Precio" class="modal-input" />
           <div class="q-pa modal-input">
             <div class="q-gutter">

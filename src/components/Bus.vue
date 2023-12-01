@@ -9,7 +9,7 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 50vh" class="modal-body">
+        <q-card-section style="max-height: 60vh" class="modal-body">
           <q-input type="text" v-model="placa" label="Placa" class="modal-input"/>
           <q-input type="number" v-model="numero_bus" label="Número de Bus" class="modal-input"/>
           <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" class="modal-input"/>

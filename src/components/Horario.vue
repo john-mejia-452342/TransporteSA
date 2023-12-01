@@ -10,7 +10,7 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 50vh" class="modal-body">
+        <q-card-section style="max-height: 60vh" class="modal-body">
           <q-input v-model="hora_partida" label="Hora de partida" class="modal-input"  />
           <q-input v-model="hora_llegada" label="Hora de llegada" class="modal-input"  />
         </q-card-section>
