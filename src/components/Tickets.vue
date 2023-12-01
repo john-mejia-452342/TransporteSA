@@ -380,6 +380,14 @@ function generarPDF(ticket) {
  
   const doc = new jsPDF();
 
+  // Establecer estilos
+  doc.setFont('Helvetica', 'normal'); // Cambiar la fuente y el estilo
+  doc.setFontSize(14); // Cambiar el tamaño del texto
+  doc.setTextColor(30, 30, 30); // Establecer el color del texto en RGB (negro)
+  doc.setFontStyle('bold'); // Texto en negrita
+
+
+  
   doc.text(`Información del Ticket`, 20, 10);
   doc.text(`Cliente: ${ticket.cliente_id.nombre} - ${ticket.cliente_id.cedula} - ${ticket.cliente_id.telefono}`, 20, 20);
   doc.text(`Vendedor: ${ticket.vendedor_id.nombre} - ${ticket.vendedor_id.telefono}`, 20, 30);
