@@ -65,7 +65,7 @@
         </template>
         <template v-slot:body-cell-opciones="props">
           <q-td :props="props" class="botones">
-            <q-btn color="white" text-color="black" label="🖋️" @click="EditarTicket(props.row._id)"/>
+            <!-- <q-btn color="white" text-color="black" label="🖋️" @click="EditarTicket(props.row._id)"/> -->
             <q-btn color="white" text-color="black" label="📄" @click="generarPDF(props.row)"/>
             <q-btn color="white" text-color="black" label="❌" @click="InactivarTicket(props.row._id)" v-if="props.row.estado == 1"/>
             <q-btn color="white" text-color="black" label="✅" @click="ActivarTicket(props.row._id)" v-else/>
@@ -137,57 +137,57 @@ async function obtenerInfo() {
 };
 
 
-// Obtener Opciones de los Vendedores
-async function obtenerVendedor() {
-  try {
-    await vendedorStore.obtenerInfoVendedor();
-    optionsVendedor.value = vendedorStore.vendedores.map((vendedor) => ({
-      label: `${vendedor.nombre} - ${vendedor.telefono}`,
-      value: String(vendedor._id),
-    }));
-  } catch (error) {
-    console.log(error);
-  };
-};
+// // Obtener Opciones de los Vendedores
+// async function obtenerVendedor() {
+//   try {
+//     await vendedorStore.obtenerInfoVendedor();
+//     optionsVendedor.value = vendedorStore.vendedores.map((vendedor) => ({
+//       label: `${vendedor.nombre} - ${vendedor.telefono}`,
+//       value: String(vendedor._id),
+//     }));
+//   } catch (error) {
+//     console.log(error);
+//   };
+// };
 
 // Obtener Opciones de Clientes
-async function obtenerCliente() {
-  try {
-    await clienteStore.obtenerInfoClientes();
-    optionsCliente.value = clienteStore.clientes.map((cliente) => ({
-      label: `${cliente.nombre} - ${cliente.cedula} - ${cliente.telefono}`,
-      value: String(cliente._id),
-    }));
-  } catch (error) {
-    console.log(error);
-  };
-};
+// async function obtenerCliente() {
+//   try {
+//     await clienteStore.obtenerInfoClientes();
+//     optionsCliente.value = clienteStore.clientes.map((cliente) => ({
+//       label: `${cliente.nombre} - ${cliente.cedula} - ${cliente.telefono}`,
+//       value: String(cliente._id),
+//     }));
+//   } catch (error) {
+//     console.log(error);
+//   };
+// };
 
 // Obtener Opciones Buses
-async function obtenerBuses() {
-  try {
-    await busStore.obtenerInfoBuses();
-    optionsBus.value = busStore.buses.map((bus) => ({
-      label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
-      value: String(bus._id),
-    }));
-  } catch (error) {
-    console.log(error);
-  };
-};
+// async function obtenerBuses() {
+//   try {
+//     await busStore.obtenerInfoBuses();
+//     optionsBus.value = busStore.buses.map((bus) => ({
+//       label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
+//       value: String(bus._id),
+//     }));
+//   } catch (error) {
+//     console.log(error);
+//   };
+// };
 
 // Obtener Opciones Rutas
-async function obtenerRutas() {
-  try {
-    await rutaStore.obtenerInfoRutas();
-    optionsRutas.value = rutaStore.rutas.map((ruta) => ({
-      label: `${ruta.origen} - ${ruta.destino} - ${ruta.horario_id.hora_partida} - ${ruta.horario_id.hora_llegada}`,
-      value: String(ruta._id),
-    }));
-  } catch (error) {
-    console.log(error);
-  };
-};
+// async function obtenerRutas() {
+//   try {
+//     await rutaStore.obtenerInfoRutas();
+//     optionsRutas.value = rutaStore.rutas.map((ruta) => ({
+//       label: `${ruta.origen} - ${ruta.destino} - ${ruta.horario_id.hora_partida} - ${ruta.horario_id.hora_llegada}`,
+//       value: String(ruta._id),
+//     }));
+//   } catch (error) {
+//     console.log(error);
+//   };
+// };
 
 // Primera Accion
 onMounted(async () => {
@@ -214,83 +214,83 @@ const columns = [
 ];
 
 // Editar Ticket Funcionamiento
-async function editarTicket() {
-  let id = idTicket.value;
-  if (id) {
-    validar();
-    if (validacion.value == true) {
-      try {
-        showDefault();
-        await ticketStore.putEditarTicket(id, {
-          vendedor_id: vendedor._rawValue.value,
-          cliente_id: cliente._rawValue.value,
-          ruta_id: ruta._rawValue.value,
-          bus_id: bus._rawValue.value,
-          no_asiento:no_asiento.value,
-          fecha_departida: fecha_departida.value,
-        });
-        cancelShow();
-        limpiar();
-        greatMessage.value = "Ticket Actualizado";
-        showGreat();
-        obtenerInfo();
-        fixed.value = false;
-      } catch (error) {
-        console.log(error);
-        cancelShow();
-        badMessage.value = error.response.data.error.errors[0].msg;
-        showBad();
-      };
-    };
-  };
-};
+// async function editarTicket() {
+//   let id = idTicket.value;
+//   if (id) {
+//     validar();
+//     if (validacion.value == true) {
+//       try {
+//         showDefault();
+//         await ticketStore.putEditarTicket(id, {
+//           vendedor_id: vendedor._rawValue.value,
+//           cliente_id: cliente._rawValue.value,
+//           ruta_id: ruta._rawValue.value,
+//           bus_id: bus._rawValue.value,
+//           no_asiento:no_asiento.value,
+//           fecha_departida: fecha_departida.value,
+//         });
+//         cancelShow();
+//         limpiar();
+//         greatMessage.value = "Ticket Actualizado";
+//         showGreat();
+//         obtenerInfo();
+//         fixed.value = false;
+//       } catch (error) {
+//         console.log(error);
+//         cancelShow();
+//         badMessage.value = error.response.data.error.errors[0].msg;
+//         showBad();
+//       };
+//     };
+//   };
+// };
 
-// Limpiar Casillas
-function limpiar() {
-  vendedor.value = "";
-  cliente.value = "";
-  ruta.value = "";
-  bus.value = "";
-  no_asiento.value = "";
-  fecha_departida.value = "";
-}
+// // Limpiar Casillas
+// function limpiar() {
+//   vendedor.value = "";
+//   cliente.value = "";
+//   ruta.value = "";
+//   bus.value = "";
+//   no_asiento.value = "";
+//   fecha_departida.value = "";
+// }
 
 let idTicket = ref("");
 
-// Editar Ticket 
-async function EditarTicket(id) {
-  await obtenerCliente();
-  await obtenerVendedor();
-  await obtenerRutas();
-  await obtenerBuses();
-  const ticketSelect = tickets.value.find((ticket) => ticket._id === id);
-  if (ticketSelect) {
-    idTicket.value = String(ticketSelect._id);
-    fixed.value = true;
-    text.value = "Editar Ticket";
-    vendedor.value = {
-      label: `${ticketSelect.vendedor_id.nombre} - ${ticketSelect.vendedor_id.telefono}`,
-      value: String(ticketSelect.vendedor_id._id),
-    };
-    cliente.value = {
-      label: `${ticketSelect.cliente_id.nombre} - ${ticketSelect.cliente_id.cedula} - ${ticketSelect.cliente_id.telefono}`,
-      value: String(ticketSelect.cliente_id._id),
-    };
-    ruta.value = {
-      label: `${ticketSelect.ruta_id.origen} - ${ticketSelect.ruta_id.destino} - ${ticketSelect.ruta_id.horario_id.hora_partida} - ${ticketSelect.ruta_id.horario_id.hora_llegada}`,
-      value: String(ticketSelect.ruta_id._id),
-    };
-    bus.value = {
-      label: `${ticketSelect.bus_id.empresa_asignada} - ${ticketSelect.bus_id.placa} - N°${ticketSelect.bus_id.numero_bus}`,
-      value: String(ticketSelect.bus_id._id),
-    };
-    no_asiento.value = ticketSelect.no_asiento;
+// // Editar Ticket 
+// async function EditarTicket(id) {
+//   await obtenerCliente();
+//   await obtenerVendedor();
+//   await obtenerRutas();
+//   await obtenerBuses();
+//   const ticketSelect = tickets.value.find((ticket) => ticket._id === id);
+//   if (ticketSelect) {
+//     idTicket.value = String(ticketSelect._id);
+//     fixed.value = true;
+//     text.value = "Editar Ticket";
+//     vendedor.value = {
+//       label: `${ticketSelect.vendedor_id.nombre} - ${ticketSelect.vendedor_id.telefono}`,
+//       value: String(ticketSelect.vendedor_id._id),
+//     };
+//     cliente.value = {
+//       label: `${ticketSelect.cliente_id.nombre} - ${ticketSelect.cliente_id.cedula} - ${ticketSelect.cliente_id.telefono}`,
+//       value: String(ticketSelect.cliente_id._id),
+//     };
+//     ruta.value = {
+//       label: `${ticketSelect.ruta_id.origen} - ${ticketSelect.ruta_id.destino} - ${ticketSelect.ruta_id.horario_id.hora_partida} - ${ticketSelect.ruta_id.horario_id.hora_llegada}`,
+//       value: String(ticketSelect.ruta_id._id),
+//     };
+//     bus.value = {
+//       label: `${ticketSelect.bus_id.empresa_asignada} - ${ticketSelect.bus_id.placa} - N°${ticketSelect.bus_id.numero_bus}`,
+//       value: String(ticketSelect.bus_id._id),
+//     };
+//     no_asiento.value = ticketSelect.no_asiento;
 
-    const date = new Date(ticketSelect.fecha_departida);
-    const formattedDate = date.toISOString().split("T")[0];
-    fecha_departida.value = formattedDate;
-  };
-};
+//     const date = new Date(ticketSelect.fecha_departida);
+//     const formattedDate = date.toISOString().split("T")[0];
+//     fecha_departida.value = formattedDate;
+//   };
+// };
 
 // Inactivar Ticket 
 async function InactivarTicket(id) {
@@ -367,39 +367,39 @@ let notification = ref(null);
 
 let validacion = ref(false);
 
-function validar() {
-  if ( !vendedor.value && !cliente.value && !ruta.value && !bus.value && !no_asiento.value && !fecha_departida.value) {
-    badMessage.value = "Por favor rellene los campos";
-    showBad();
-  } else if (!vendedor.value) {
-    badMessage.value = "Seleccione el Vendedor";
-    showBad();
-  } else if (!cliente.value) {
-    badMessage.value = "Seleccione el Cliente";
-    showBad();
-  } else if (!ruta.value) {
-    badMessage.value = "Seleccione la ruta";
-    showBad();
-  } else if (!bus.value) {
-    badMessage.value = "Seleccione el bus";
-    showBad();
-  } else if (!no_asiento.value) {
-    badMessage.value = "Seleccione el asiento";
-    showBad();
-  } else if (!fecha_departida.value) {
-    badMessage.value = "Seleccione la fecha de partida";
-    showBad();
-  } else {
-    validacion.value = true;
-  };
-};
+// function validar() {
+//   if ( !vendedor.value && !cliente.value && !ruta.value && !bus.value && !no_asiento.value && !fecha_departida.value) {
+//     badMessage.value = "Por favor rellene los campos";
+//     showBad();
+//   } else if (!vendedor.value) {
+//     badMessage.value = "Seleccione el Vendedor";
+//     showBad();
+//   } else if (!cliente.value) {
+//     badMessage.value = "Seleccione el Cliente";
+//     showBad();
+//   } else if (!ruta.value) {
+//     badMessage.value = "Seleccione la ruta";
+//     showBad();
+//   } else if (!bus.value) {
+//     badMessage.value = "Seleccione el bus";
+//     showBad();
+//   } else if (!no_asiento.value) {
+//     badMessage.value = "Seleccione el asiento";
+//     showBad();
+//   } else if (!fecha_departida.value) {
+//     badMessage.value = "Seleccione la fecha de partida";
+//     showBad();
+//   } else {
+//     validacion.value = true;
+//   };
+// };
 
 // Limpiar el modal cuando se cierre mal
-watch(fixed, () => {
-  if (fixed.value == false) {
-    limpiar();
-  };
-});
+// watch(fixed, () => {
+//   if (fixed.value == false) {
+//     limpiar();
+//   };
+// });
 
 // Hacer PDF 
 // Hacer PDF 
