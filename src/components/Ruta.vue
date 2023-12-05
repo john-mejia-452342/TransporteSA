@@ -33,7 +33,7 @@
       <h1>Rutas</h1>
 
       <div class="b-b">
-        <q-input class="bbuscar" v-model="searchrutas" label="Buscar por Ciudad" style="width: 300px" @input="filtraruta" />
+        <q-input class="bbuscar" v-model="searchrutas" label="Buscar por Origen" style="width: 300px" @input="filtraruta" />
         <q-btn color="primary" label="Buscar" @click="filtraruta" class="btnbuscar" />
       </div>
 
@@ -172,7 +172,7 @@ async function editarAgregarRuta() {
           origen: origen.value,
           destino: destino.value,
         });
-  
+        cancelShow();
         limpiar();
         greatMessage.value = "Ruta Agregada";
         showGreat();
@@ -206,8 +206,9 @@ async function editarAgregarRuta() {
         };
       };
     };
-    validacion.value = false
+    
   };
+  validacion.value = false
 };
 
 // Limpiar Casillas
@@ -320,16 +321,17 @@ function validar() {
   if (!precio.value) {
     badMessage.value = "Ingrese el Precio";
     showBad();
-  }else if(!precioRegex.test(precio.value) || parseInt(precio.value)){
+  }else if(!precioRegex.test(precio.value) || parseInt(precio.value)<0){
     badMessage.value = "El precio debe contener solo dígitos positivos";
+    showBad();
   }else if (!horario.value) {
     badMessage.value = "Eliga un Horario";
     showBad();
-  } else if (!origen.value || origen.value.trim()) {
+  } else if (!origen.value || !origen.value.trim()) {
     badMessage.value = "Digite el Origen";
     origen.value = "";
     showBad();
-  }else if(!destino.value || destino.value.trim()){
+  }else if(!destino.value || !destino.value.trim()){
     badMessage.value = "Digite el Destino";
     destino.value = "";
     showBad();
