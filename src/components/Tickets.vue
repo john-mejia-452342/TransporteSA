@@ -80,19 +80,19 @@
   <script setup>
 import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
-import { useBusStore } from "../stores/Bus.js";
+// import { useBusStore } from "../stores/Bus.js";
 import { useTicketStore } from "../stores/Ticket.js";
-import { useVendedorStore } from "../stores/Vendedor.js";
-import { useClienteStore } from "../stores/Cliente.js";
-import { useRutaStore } from "../stores/Ruta.js";
+// import { useVendedorStore } from "../stores/Vendedor.js";
+// import { useClienteStore } from "../stores/Cliente.js";
+// import { useRutaStore } from "../stores/Ruta.js";
 import { useQuasar } from "quasar";
  import { jsPDF } from "jspdf";
 const $q = useQuasar();
-const busStore = useBusStore();
+// const busStore = useBusStore();
 const ticketStore = useTicketStore();
-const vendedorStore = useVendedorStore();
-const clienteStore = useClienteStore();
-const rutaStore = useRutaStore();
+// const vendedorStore = useVendedorStore();
+// const clienteStore = useClienteStore();
+// const rutaStore = useRutaStore();
 
 let tickets = ref([]);
 let rows = ref([]);
@@ -131,6 +131,7 @@ async function obtenerInfo() {
       const dateB = new Date(b.createAT);
       return dateB - dateA;
     });
+    console.log(rows.value);
   } catch (error) {
     console.log(error);
   };
@@ -197,6 +198,7 @@ onMounted(async () => {
 const columns = [
   { name: "cliente_id", label: "Info Cliente", field: (row) =>   `${row.cliente_id.nombre} - ${row.cliente_id.cedula}- ${row.cliente_id.telefono}`,},
   { name: "bus_id", label: "Info Bus", field: (row) =>   `${row.bus_id.empresa_asignada} - ${row.bus_id.placa} - N°${row.bus_id.numero_bus} `,},
+  { name: "bus_id", label: "Info Conductor", field: (row) =>   `${row.bus_id.conductor_id.nombre} - ${row.bus_id.conductor_id.cedula} - N°${row.bus_id.conductor_id.telefono} `,},
   { name: "vendedor_id", label: "Info Vendedor", field: (row) => `${row.vendedor_id.nombre} - ${row.vendedor_id.telefono}`,},
   { name: "ruta_id", label: "Ruta Origen - Destino", field: (row) => `${row.ruta_id.origen} - ${row.ruta_id.destino}`,},
   { name: "ruta_id", label: "Horario Partida - Llegada", field: (row) =>   `${row.ruta_id.horario_id.hora_partida} - ${row.ruta_id.horario_id.hora_llegada}`,},
@@ -255,7 +257,7 @@ const columns = [
 //   fecha_departida.value = "";
 // }
 
-let idTicket = ref("");
+// let idTicket = ref("");
 
 // // Editar Ticket 
 // async function EditarTicket(id) {
@@ -365,7 +367,7 @@ const cancelShow = ()=>{
 
 let notification = ref(null);
 
-let validacion = ref(false);
+// let validacion = ref(false);
 
 // function validar() {
 //   if ( !vendedor.value && !cliente.value && !ruta.value && !bus.value && !no_asiento.value && !fecha_departida.value) {
@@ -407,8 +409,8 @@ function generarPDF(ticket) {
  
  const doc = new jsPDF();
 
- const logoDataUri = 'https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg'; // Reemplaza esto con tus datos de imagen en base64
- doc.addImage(logoDataUri, 'PNG', 120, 0, 80, 80); // Ajusta las coordenadas y el tamaño según sea necesario
+ const logoDataUri = 'https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg'; 
+ doc.addImage(logoDataUri, 'PNG', 120, 0, 80, 80);
  
  
  // Título
@@ -443,31 +445,44 @@ function generarPDF(ticket) {
  doc.setFont('Helvetica', 'normal');
  doc.setFontSize(14);
  doc.text(`-Nombre: ${ticket.vendedor_id.nombre}`, 20, 89);
- doc.text(`-Cedula: ${ticket.vendedor_id.cedula}`, 20, 97);
+ doc.text(`-Telefono: ${ticket.vendedor_id.telefono}`, 20, 97);
 
- // Títulos
+  // Títulos
  doc.setTextColor(30, 30, 30);
  doc.setFont('Helvetica', 'bold');
  doc.setFontSize(15);
- doc.text(`Informacion del bus:`, 22, 110);
+ doc.text(`Informacion del Conductor:`, 22, 110);
 
  //Normal
  doc.setTextColor(30, 30, 30);
  doc.setFont('Helvetica', 'normal');
  doc.setFontSize(14);
- doc.text(`-Empresa encargada: ${ticket.bus_id.empresa_asignada}`, 20, 118);
- doc.text(`-Placa: ${ticket.bus_id.placa}`, 20, 126);
- doc.text(`-Nu° de bus: ${ticket.bus_id.numero_bus}`, 20, 134);
- doc.text(`-Ruta del bus: ${ticket.ruta_id.origen} - ${ticket.ruta_id.destino}`, 20, 142 );
- doc.text(`-Horario salida: ${ticket.ruta_id.horario_id.hora_partida} // Hora de llegada: ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 150);
- doc.text(`-Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 158);
+ doc.text(`-Nombre: ${ticket.bus_id.conductor_id.nombre}`, 20, 118);
+ doc.text(`-Telefono: ${ticket.bus_id.conductor_id.telefono}`, 20, 126);
+ 
+ // Títulos
+ doc.setTextColor(30, 30, 30);
+ doc.setFont('Helvetica', 'bold');
+ doc.setFontSize(15);
+ doc.text(`Informacion del bus:`, 22, 139);
+
+ //Normal
+ doc.setTextColor(30, 30, 30);
+ doc.setFont('Helvetica', 'normal');
+ doc.setFontSize(14);
+ doc.text(`-Empresa encargada: ${ticket.bus_id.empresa_asignada}`, 20, 147);
+ doc.text(`-Placa: ${ticket.bus_id.placa}`, 20, 155);
+ doc.text(`-Nu° de bus: ${ticket.bus_id.numero_bus}`, 20, 163);
+ doc.text(`-Ruta del bus: ${ticket.ruta_id.origen} - ${ticket.ruta_id.destino}`, 20, 171 );
+ doc.text(`-Horario salida: ${ticket.ruta_id.horario_id.hora_partida} // Hora de llegada: ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 179);
+ doc.text(`-Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 187);
 
 
 
  doc.setFont('Helvetica', 'bold');
  doc.setFontSize(25);
  doc.setTextColor(0, 105, 217);
- doc.text(`¡Gracias por tu confianza!`, 20, 174);
+ doc.text(`¡Gracias por tu confianza!`, 20, 203);
 
  doc.save(`ticket_${ticket._id}.pdf`);
 }
