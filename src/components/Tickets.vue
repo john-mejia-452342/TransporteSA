@@ -1,37 +1,37 @@
 <template>
   <div class="container">
     <!-- Modal -->
-    <q-dialog v-model="fixed">
+    <q-dialog v-model="fixed" class="modal-container">
       <q-card class="modal-content">
-        <q-card-section class="row items-center q-pb-none" style="color: black">
+        <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 100vh" class="scroll">
-          <div class="q-pa" style="width:100%;">
+        <q-card-section style="max-height: 100vh" class="modal-body">
+          <div class="q-pa modal-input" style="width:100%;">
             <div class="q-gutter">
               <q-select v-model="vendedor" :options="optionsVendedor" label="Vendedor"/> 
             </div>
           </div>
-          <div class="q-pa" style="width:100%;">
+          <div class="q-pa modal-input" style="width:100%;">
             <div class="q-gutter">
               <q-select v-model="cliente" :options="optionsCliente" label="Cliente"/> 
             </div>
           </div>
-          <div class="q-pa" style="width:100%;">
+          <div class="q-pa modal-input" style="width:100%;">
             <div class="q-gutter">
               <q-select v-model="bus" :options="optionsBus" label="Bus"/> 
             </div>
           </div>
-          <q-input type="number" v-model="no_asiento" label="Numero Asiento" style="width:100%" />
-          <q-input type="date" v-model="fecha_departida" label="Fecha Partida" style="width:100%" />
+          <q-input class="modal-input" type="number" v-model="no_asiento" label="Numero Asiento" style="width:100%" />
+          <q-input class="modal-input" type="date" v-model="fecha_departida" label="Fecha Partida" style="width:100%" />
         </q-card-section>
         <q-separator />
 
-        <q-card-actions align="right">
+        <q-card-actions align="right" class="modal-footer">
           <q-btn flat label="Cerrar" color="primary" v-close-popup />
           <q-btn flat label="Guardar 💾" color="primary" @click="editarTicket()"/>
         </q-card-actions>
@@ -126,8 +126,11 @@ async function obtenerInfo() {
   try {
     await ticketStore.getTickets();
     tickets.value = ticketStore.ticket;
-    console.log(ticketStore.ticket);
-    rows.value = ticketStore.ticket;
+    rows.value = ticketStore.ticket.slice().sort((a, b) => {
+      const dateA = new Date(a.createAT);
+      const dateB = new Date(b.createAT);
+      return dateB - dateA;
+    });
   } catch (error) {
     console.log(error);
   };
@@ -218,14 +221,12 @@ async function editarTicket() {
     if (validacion.value == true) {
       try {
         showDefault();
-        const asiento = `0${no_asiento.value}`
-        const asientoNumero = Number(asiento);
         await ticketStore.putEditarTicket(id, {
           vendedor_id: vendedor._rawValue.value,
           cliente_id: cliente._rawValue.value,
           ruta_id: ruta._rawValue.value,
           bus_id: bus._rawValue.value,
-          no_asiento:asientoNumero,
+          no_asiento:no_asiento.value,
           fecha_departida: fecha_departida.value,
         });
         cancelShow();
@@ -401,25 +402,74 @@ watch(fixed, () => {
 });
 
 // Hacer PDF 
+// Hacer PDF 
 function generarPDF(ticket) {
  
-  const doc = new jsPDF();
+ const doc = new jsPDF();
 
-  // Establecer estilos
-  doc.setFont('Helvetica', 'normal'); // Cambiar la fuente y el estilo
-  doc.setFontSize(14); // Cambiar el tamaño del texto
-  doc.setTextColor(30, 30, 30); // Establecer el color del texto en RGB (negro)
+ const logoDataUri = 'https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg'; // Reemplaza esto con tus datos de imagen en base64
+ doc.addImage(logoDataUri, 'PNG', 120, 0, 80, 80); // Ajusta las coordenadas y el tamaño según sea necesario
  
-  doc.text(`Información del Ticket`, 20, 10);
-  doc.text(`Cliente: ${ticket.cliente_id.nombre} - ${ticket.cliente_id.cedula} - ${ticket.cliente_id.telefono}`, 20, 20);
-  doc.text(`Vendedor: ${ticket.vendedor_id.nombre} - ${ticket.vendedor_id.telefono}`, 20, 30);
-  doc.text(`Bus: ${ticket.bus_id.empresa_asignada} - ${ticket.bus_id.placa} - N°${ticket.bus_id.numero_bus}`, 20, 40);
-  doc.text(`Ruta: ${ticket.ruta_id.origen} - ${ticket.ruta_id.destino}`, 20, 50);
-  doc.text(`Horario: ${ticket.ruta_id.horario_id.hora_partida} - ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 60);
-  doc.text(`N° Asiento: ${ticket.no_asiento}`, 20, 70);
-  doc.text(`Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 80);
+ 
+ // Título
+ doc.setFont('Helvetica', 'bold');
+ doc.setFontSize(25);
+ doc.setTextColor(0, 105, 217);
+ doc.text(`TransporteSA`, 18, 19);
 
-  doc.save(`ticket_${ticket._id}.pdf`);
+ // Títulos
+ doc.setFont('Helvetica', 'bold');
+ doc.setFontSize(15);
+ doc.setTextColor(30, 30, 30);
+ doc.text(`Información del Cliente:`, 20, 30);
+
+ //Normal
+ doc.setTextColor(30, 30, 30);
+ doc.setFont('Helvetica', 'normal');
+ doc.setFontSize(14);
+ doc.text(`-Nombre: ${ticket.cliente_id.nombre}`, 20, 38);
+ doc.text(`-C.C: ${ticket.cliente_id.cedula}`, 20, 46);
+ doc.text(`-Telefono: ${ticket.cliente_id.telefono}`, 20, 54);
+ doc.text(`-N° Asiento: ${ticket.no_asiento}`, 20, 63);
+ 
+ // Títulos
+ doc.setTextColor(30, 30, 30);
+ doc.setFont('Helvetica', 'bold');
+ doc.setFontSize(15);
+ doc.text(`Informacion sobre el Vendedor:`, 22, 81)
+ 
+ //Normal
+ doc.setTextColor(30, 30, 30);
+ doc.setFont('Helvetica', 'normal');
+ doc.setFontSize(14);
+ doc.text(`-Nombre: ${ticket.vendedor_id.nombre}`, 20, 89);
+ doc.text(`-Cedula: ${ticket.vendedor_id.cedula}`, 20, 97);
+
+ // Títulos
+ doc.setTextColor(30, 30, 30);
+ doc.setFont('Helvetica', 'bold');
+ doc.setFontSize(15);
+ doc.text(`Informacion del bus:`, 22, 110);
+
+ //Normal
+ doc.setTextColor(30, 30, 30);
+ doc.setFont('Helvetica', 'normal');
+ doc.setFontSize(14);
+ doc.text(`-Empresa encargada: ${ticket.bus_id.empresa_asignada}`, 20, 118);
+ doc.text(`-Placa: ${ticket.bus_id.placa}`, 20, 126);
+ doc.text(`-Nu° de bus: ${ticket.bus_id.numero_bus}`, 20, 134);
+ doc.text(`-Ruta del bus: ${ticket.ruta_id.origen} - ${ticket.ruta_id.destino}`, 20, 142 );
+ doc.text(`-Horario salida: ${ticket.ruta_id.horario_id.hora_partida} // Hora de llegada: ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 150);
+ doc.text(`-Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 158);
+
+
+
+ doc.setFont('Helvetica', 'bold');
+ doc.setFontSize(25);
+ doc.setTextColor(0, 105, 217);
+ doc.text(`¡Gracias por tu confianza!`, 20, 174);
+
+ doc.save(`ticket_${ticket._id}.pdf`);
 }
 </script>
     

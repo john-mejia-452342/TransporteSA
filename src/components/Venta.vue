@@ -38,7 +38,7 @@
         </div>
         <div v-if="showClienteDiv" class="cliente">
           
-            <h2 v-if="no_asiento" style="padding: 0;margin: 8px;" >Asiento N°{{no_asiento}}</h2>
+            <h2 v-if="no_asiento" class="asientoNumero" style="padding: 0;margin: 8px; font-family: 'Kanit', sans-serif;" >Asiento N°{{no_asiento}}</h2>
 
             <div class="btns">
               <q-btn class="bnt-bc" color="primary" label="Agregar Cliente ➕" @click="agregarCliente"/>
@@ -47,8 +47,8 @@
               <q-input filled v-model="cedula" label="Cedula del Cliente" type="number" style="width: 300px"/>
               <q-input filled v-model="nombre" label="Nombre del Cliente" type="text" style="width: 300px"/>
               <q-input filled v-model="telefono" label="Telefono del Cliente" type="number" style="width: 300px"/>
-              <q-btn class="btn-c" color="primary" label="Generar Ticket 💾" @click="CrearTicket()" />
-          
+              <q-btn class="btn-c" color="secondary" label="Generar Ticket 💾" @click="CrearTicket()" />
+              <q-btn class="btn-c" color="primary" label="Nueva Venta ➕" @click="nuevaVenta()" />
         </div>
       </div>
     </div>
@@ -212,10 +212,7 @@ async function CrearTicket() {
       cancelShow();
       greatMessage.value = "Ticket Agregado";
       showGreat();
-      fixed.value = false;
-      rutaBusFecha.value = false;
-      asientos.value = [];
-      showClienteDiv = false;
+      generarListaAsientos() 
     } catch (error) {
       console.log(error);
       cancelShow();
@@ -228,6 +225,20 @@ async function CrearTicket() {
     showBad();
   };
 };
+
+//Nueva Venta
+function nuevaVenta(){
+  fixed.value = false;
+  ruta.value = "";
+  bus.value = "";
+  fecha_departida.value = "";
+  rutaBusFecha.value = false;
+  asientos.value = [];
+  showClienteDiv = false;
+  cedula.value = "";
+  nombre.value = "";
+  telefono.value = "";
+}
 
 // Obtener Vendedor
 async function obtenerVendedor() {
@@ -388,6 +399,8 @@ watch(showClienteDiv, () => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;0,500;1,300;1,400&display=swap');
+
 .container-all {
   margin: 0;
   padding: 0;
@@ -509,6 +522,7 @@ watch(showClienteDiv, () => {
   flex-wrap: wrap;
   align-items: flex-end;
   width: 80%;
+  align-items: center;
 }
 
 
@@ -520,6 +534,28 @@ watch(showClienteDiv, () => {
 
   .busCliente {
     justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px){
+  .asientoNumero{
+    font-size: 50px;
+  }
+}
+
+@media (max-width: 792px){
+  .cliente{
+    width: 100%;
+  }
+}
+@media (max-width: 605px){
+  .asientoNumero{
+    font-size: 40px;
+  }
+}
+@media (max-width:502px){
+  .cliente{
     width: 100%;
   }
 }

@@ -183,6 +183,7 @@ async function editarAgregarBus() {
         showGreat();
         obtenerInfo();
       } catch (error) {
+        console.log(error);
         cancelShow();
         badMessage.value = error.response.data.error.errors[0].msg;
         showBad();
@@ -206,6 +207,7 @@ async function editarAgregarBus() {
           obtenerInfo();
           fixed.value = false;
         } catch (error) {
+          console.log(error);
           cancelShow();
           badMessage.value = error.response.data.error.errors[0].msg
           showBad();
