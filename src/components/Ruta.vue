@@ -33,7 +33,7 @@
       <h1>Rutas</h1>
 
       <div class="b-b">
-        <q-input class="bbuscar" v-model="searchrutas" label="Buscar por Cedula" style="width: 300px" @input="filtraruta" />
+        <q-input class="bbuscar" v-model="searchrutas" label="Buscar por Ciudad" style="width: 300px" @input="filtraruta" />
         <q-btn color="primary" label="Buscar" @click="filtraruta" class="btnbuscar" />
       </div>
 
