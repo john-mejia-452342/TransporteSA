@@ -25,9 +25,10 @@
     <!-- Tabla -->
     <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Conductores</h1>
-      <div class="b-b">
-        <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 300px" @input="filtrarconductores" />
-        <q-btn color="primary" label="Buscar" @click="filtrarconductores" class="btnbuscar" />
+
+        <!-- barra de busqueda -->
+        <div class="b-b">
+        <q-input class="bbuscar" v-model.lazy="searchCedula" label="Buscar por Cedula" style="width: 300px" />
       </div>
 
       <div class="btn-agregar">
@@ -88,15 +89,31 @@ let cambio = ref(0);
 let searchCedula = ref("");
 let pagination = ref({rowsPerPage: 0});
 
-// Filtro
 function filtrarconductores() {
   if (searchCedula.value.trim() === "") {
     rows.value = conductores.value;
   } else {
-    rows.value = conductores.value.filter((conductores) =>conductores.cedula.toString().includes(searchCedula.value.toString()));
-  };
-};
+    const searchTerm = searchCedula.value.trim().toLowerCase();
+    rows.value = conductores.value.filter((conductor) =>
+      conductor.cedula.toString().toLowerCase().includes(searchTerm)
+    );
+  }
+}
 
+// Watcher para cambios en searchCedula
+watch(() => searchCedula.value, () => {
+  filtrarconductores();
+});
+
+// Watcher para cambios en conductores
+watch(() => conductores.value, (newconductores) => {
+  rows.value = newconductores;
+});
+
+// Llamar a obtenerInfo al montar el componente
+onMounted(() => {
+  obtenerInfo();
+});
 // Obtener Conductores
 async function obtenerInfo() {
   try {
@@ -119,13 +136,13 @@ onMounted(async () => {
 
 // Datos Tabla
 const columns = [
-  { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
-  { name: "nombre", label: "Nombre", field: "nombre", sortable: true },
-  { name: "experiencia", label: "Experiencia", field: "experiencia" },
-  { name: "telefono", label: "Telefono", field: "telefono" },
-  { name: "estado", label: "Estado", field: "estado", sortable: true },
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-  { name: "opciones", label: "Opciones", sortable: false },
+  { name: "cedula", label: "Cedula", field: "cedula", sortable: true,align: "left"},
+  { name: "nombre", label: "Nombre", field: "nombre", sortable: true ,align: "left"},
+  { name: "experiencia", label: "Experiencia", field: "experiencia",align: "center" },
+  { name: "telefono", label: "Telefono", field: "telefono",align: "left" },
+  { name: "estado", label: "Estado", field: "estado", sortable: true,align: "left"},
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "center"},
+    { name: "opciones", label: "Opciones", sortable: false,align: "center" },
 ];
 
 // Agregar Conductor
@@ -298,11 +315,11 @@ function validar() {
     badMessage.value = "Ingrese el Nombre";
     nombre.value = ""
     showBad();
-  } else if (!experiencia.value || !experiencia.value.trim()) {
-    badMessage.value = "Digite la experiencia, por ejemplo (4)";
-    experiencia.value = ""
+  } else if(!experiencia.value || experiencia.value <= 0) {
+    badMessage.value = "Ingrese un número positivo mayor que cero";
+    experiencia.value = "";
     showBad();
-  } else if (!telefono.value) {
+} else if (!telefono.value) {
     badMessage.value = "Ingrese el Telefono";
     showBad();
   } else if (!telefonoRegex.test(telefono.value) || telefono.value.length !== 10) {

@@ -172,7 +172,7 @@ async function editarAgregarRuta() {
           origen: origen.value,
           destino: destino.value,
         });
-  
+        cancelShow();
         limpiar();
         greatMessage.value = "Ruta Agregada";
         showGreat();
@@ -206,8 +206,9 @@ async function editarAgregarRuta() {
         };
       };
     };
-    validacion.value = false
+    
   };
+  validacion.value = false
 };
 
 // Limpiar Casillas

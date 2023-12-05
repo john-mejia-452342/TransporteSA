@@ -27,9 +27,11 @@
     <!-- Tabla -->
     <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Vendedor</h1>
+
+      
+      <!-- barra de busqueda -->
       <div class="b-b">
-        <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 400px" @input="filtrarvendedores"/>
-        <q-btn color="primary" label="Buscar" @click="filtrarvendedores" class="btnbuscar"/>
+        <q-input class="bbuscar" v-model.lazy="searchCedula" label="Buscar por Cedula" style="width: 300px" />
       </div>
 
       <div class="btn-agregar">
@@ -89,16 +91,33 @@ let cambio = ref(0);
 let searchCedula = ref("");
 let pagination = ref({rowsPerPage: 0});
 
+filtrarvendedores
 
-// Filtro Vendedores por Cedula
 function filtrarvendedores() {
   if (searchCedula.value.trim() === "") {
-    rows.value = vendedores.value; 
+    rows.value = vendedores.value;
   } else {
-    rows.value = vendedores.value.filter((vendedores) =>vendedores.cedula.toString().includes(searchCedula.value.toString()));
-  };
-};
+    const searchTerm = searchCedula.value.trim().toLowerCase();
+    rows.value = vendedores.value.filter((cliente) =>
+      cliente.cedula.toString().toLowerCase().includes(searchTerm)
+    );
+  }
+}
 
+// Watcher para cambios en searchCedula
+watch(() => searchCedula.value, () => {
+  filtrarvendedores();
+});
+
+// Watcher para cambios en vendedores
+watch(() => vendedores.value, (newvendedores) => {
+  rows.value = newvendedores;
+});
+
+// Llamar a obtenerInfo al montar el componente
+onMounted(() => {
+  obtenerInfo();
+});
 // Obtener Vendedores
 async function obtenerInfo() {
   try {

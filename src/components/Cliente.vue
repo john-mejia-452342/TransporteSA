@@ -6,7 +6,7 @@
         <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup class="close-button"/>
+          <q-btn icon="close" flat round dense v-close-popup class="close-button" />
         </q-card-section>
         <q-separator />
         <q-card-section style="max-height: 100vh" class="modal-body">
@@ -18,7 +18,7 @@
 
         <q-card-actions align="right" class="modal-footer">
           <q-btn flat label="Cerrar" color="primary" v-close-popup class="action-button" />
-          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarCliente()" class="action-button"/>
+          <q-btn flat label="Guardar 💾" color="primary" @click="editarAgregarCliente()" class="action-button" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -26,27 +26,20 @@
     <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Clientes</h1>
 
+
+      <!-- barra de busqueda -->
       <div class="b-b">
-        <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 300px" @input="filtrarClientes"/>
-        <q-btn class="btnbuscar" color="primary" label="Buscar" @click="filtrarClientes"/>
+        <q-input class="bbuscar" v-model.lazy="searchCedula" label="Buscar por Cedula" style="width: 300px" />
       </div>
+
 
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarCliente()" />
       </div>
       <div class="q-pa-md">
-        <q-table
-          class="my-sticky-virtscroll-table"
-          virtual-scroll
-          flat bordered
-          v-model:pagination="pagination"
-          :rows-per-page-options="[0]"
-          :virtual-scroll-sticky-size-start="48"
-          row-key="index"
-          :rows="rows"
-          :columns="columns"
-          style="height: 52vh;"
-        >
+        <q-table class="my-sticky-virtscroll-table" virtual-scroll flat bordered v-model:pagination="pagination"
+          :rows-per-page-options="[0]" :virtual-scroll-sticky-size-start="48" row-key="index" :rows="rows"
+          :columns="columns" style="height: 52vh;">
           <template v-slot:body-cell-estado="props">
             <q-td :props="props">
               <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
@@ -55,8 +48,9 @@
           </template>
           <template v-slot:body-cell-opciones="props">
             <q-td :props="props" class="botones">
-              <q-btn color="white" text-color="black" label="🖋️" @click="editarCliente(props.row._id)"/>
-              <q-btn color="white" text-color="black" label="❌" @click="inactivarCliente(props.row._id)" v-if="props.row.estado == 1"/>
+              <q-btn color="white" text-color="black" label="🖋️" @click="editarCliente(props.row._id)" />
+              <q-btn color="white" text-color="black" label="❌" @click="inactivarCliente(props.row._id)"
+                v-if="props.row.estado == 1" />
               <q-btn color="white" text-color="black" label="✅" @click="activarCliente(props.row._id)" v-else />
             </q-td>
           </template>
@@ -84,24 +78,45 @@ let nombre = ref();
 let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
-let pagination = ref({rowsPerPage: 0});
+let pagination = ref({ rowsPerPage: 0 });
 
 
-// Filtrar Clientes
 function filtrarClientes() {
   if (searchCedula.value.trim() === "") {
-    rows.value = clientes.value; 
+    rows.value = clientes.value;
   } else {
-    rows.value = clientes.value.filter((cliente) =>cliente.cedula.toString().includes(searchCedula.value.toString()));
-  };
-};
+    const searchTerm = searchCedula.value.trim().toLowerCase();
+    rows.value = clientes.value.filter((cliente) =>
+      cliente.cedula.toString().toLowerCase().includes(searchTerm)
+    );
+  }
+}
+
+// Watcher para cambios en searchCedula
+watch(() => searchCedula.value, () => {
+  filtrarClientes();
+});
+
+// Watcher para cambios en clientes
+watch(() => clientes.value, (newClientes) => {
+  rows.value = newClientes;
+});
+
+// Llamar a obtenerInfo al montar el componente
+onMounted(() => {
+  obtenerInfo();
+});
+
+
+
+
 
 // Obtener Clientes 
 async function obtenerInfo() {
   try {
     await clienteStore.obtenerInfoClientes();
     clientes.value = clienteStore.clientes;
-    rows.value = clienteStore.clientes.slice().sort((a,b)=>{
+    rows.value = clienteStore.clientes.slice().sort((a, b) => {
       const dateA = new Date(a.createAT);
       const dateB = new Date(b.createAT);
       return dateB - dateA;
@@ -122,8 +137,8 @@ const columns = [
   { name: "nombre", label: "Nombre", field: "nombre", sortable: true },
   { name: "telefono", label: "Telefono", field: "telefono" },
   { name: "estado", label: "Estado", field: "estado", sortable: true },
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"), },
+  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false, },
 ];
 
 // Agregar Cliente
@@ -268,7 +283,7 @@ const showDefault = () => {
   });
 };
 // Cancelar Notificacion
-const cancelShow = ()=>{
+const cancelShow = () => {
   if (notification) {
     notification();
   };
@@ -279,8 +294,8 @@ let notification = ref(null);
 
 // Validar Campos
 function validar() {
-  const cedulaRegex = /^[0-9]+$/; 
-  const telefonoRegex = /^[0-9]+$/; 
+  const cedulaRegex = /^[0-9]+$/;
+  const telefonoRegex = /^[0-9]+$/;
 
   if (!cedula.value) {
     badMessage.value = "Ingrese la Cedula";
@@ -292,7 +307,7 @@ function validar() {
     badMessage.value = "Ingrese el Nombre ";
     nombre.value = ""
     showBad();
-  }else if (!telefono.value) {
+  } else if (!telefono.value) {
     badMessage.value = "Ingrese el Telefono";
     showBad();
   } else if (!telefonoRegex.test(telefono.value) || parseInt(telefono.value) < 0 || String(telefono.value).length !== 10) {
@@ -317,11 +332,13 @@ watch(fixed, () => {
   display: flex;
   justify-content: center;
 }
+
 .modal-container {
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .container-table {
   display: flex;
   justify-content: center;
@@ -365,6 +382,7 @@ watch(fixed, () => {
   position: relative;
   top: 7px;
 }
+
 .bbuscar {
   width: 170px;
   font-size: 18px;
@@ -373,6 +391,7 @@ watch(fixed, () => {
   position: relative;
   top: 6px;
 }
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -405,15 +424,15 @@ watch(fixed, () => {
   margin-left: 10px;
 }
 
-@media (max-width: 917px){
-  .btn-agregar{
+@media (max-width: 917px) {
+  .btn-agregar {
     margin: 10px;
     height: 35px;
   }
 }
 
-@media (max-width: 500px){
-  .container-table h1{
+@media (max-width: 500px) {
+  .container-table h1 {
     font-size: 60px;
   }
 }
