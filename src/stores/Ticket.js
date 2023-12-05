@@ -4,7 +4,8 @@ import { ref } from 'vue';
 
 
 export const useTicketStore = defineStore('ticket', () => {
-  const ticket = ref([])
+  const ticket = ref([]);
+  let ticketCreado = ref();
   const postTicket = async (data) => {
     try {
       // console.log(token); 
@@ -15,8 +16,11 @@ export const useTicketStore = defineStore('ticket', () => {
       //   }
       // };
       // console.log(config);
-
       let res = await axios.post("/ticket/agregar", data);
+      console.log(res);
+
+      ticketCreado.value = res.data.ticket._id;
+      console.log(ticketCreado.value);
       return res;
     } catch (error) {
       throw error;

@@ -378,23 +378,23 @@ function getFechaActual() {
   return `${year}-${month}-${day}`;
 };
 
-const styles = ref({
-  busCliente: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    alignItems: 'flex-end',
-  },
-  busClienteActive: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    alignItems: 'flex-end',
-  },
-});
+// const styles = ref({
+//   busCliente: {
+//     display: 'flex',
+//     flexWrap: 'wrap',
+//     alignItems: 'flex-end',
+//   },
+//   busClienteActive: {
+//     display: 'flex',
+//     flexWrap: 'wrap',
+//     justifyContent: 'space-around',
+//     alignItems: 'flex-end',
+//   },
+// });
 
-watch(showClienteDiv, () => {
-  clienteContainerClass.value = showClienteDiv ? "busClienteActive" : "busCliente";
-});
+// watch(showClienteDiv, () => {
+//   clienteContainerClass.value = showClienteDiv ? "busClienteActive" : "busCliente";
+// });
 
 </script>
 
@@ -411,6 +411,8 @@ watch(showClienteDiv, () => {
 
 
 .container-venta {
+
+
   width: 100%;
   display: flex;
   justify-content: center;
