@@ -9,9 +9,9 @@
           <q-btn icon="close" flat round dense v-close-popup class="close-button"/>
         </q-card-section>
         <q-separator />
-        <q-card-section style="max-height: 60vh" class="modal-body">
+        <q-card-section style="max-height: 100vh" class="modal-body">
           <q-input type="number" v-model="cedula" label="Cedula" class="modal-input" />
-          <q-input v-model="nombre" label="Nombre" class="modal-input" />
+          <q-input type="text" v-model="nombre" label="Nombre" class="modal-input" />
           <q-input type="number" v-model="telefono" label="Telefono" class="modal-input" />
         </q-card-section>
         <q-separator />
@@ -23,7 +23,7 @@
       </q-card>
     </q-dialog>
     <!-- Tabla -->
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%" >
+    <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Clientes</h1>
 
       <div class="b-b">
@@ -34,21 +34,34 @@
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarCliente()" />
       </div>
-      <q-table title="Clientes" :rows="rows" :columns="columns" row-key="name">
-        <template v-slot:body-cell-estado="props">
-          <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
-            <label for="" v-else style="color: red">Inactivo</label>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-opciones="props">
-          <q-td :props="props" class="botones">
-            <q-btn color="white" text-color="black" label="🖋️" @click="editarCliente(props.row._id)"/>
-            <q-btn color="white" text-color="black" label="❌" @click="inactivarCliente(props.row._id)" v-if="props.row.estado == 1"/>
-            <q-btn color="white" text-color="black" label="✅" @click="activarCliente(props.row._id)" v-else />
-          </q-td>
-        </template>
-      </q-table>
+      <div class="q-pa-md">
+        <q-table
+          class="my-sticky-virtscroll-table"
+          virtual-scroll
+          flat bordered
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="index"
+          :rows="rows"
+          :columns="columns"
+          style="height: 52vh;"
+        >
+          <template v-slot:body-cell-estado="props">
+            <q-td :props="props">
+              <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
+              <label for="" v-else style="color: red">Inactivo</label>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-opciones="props">
+            <q-td :props="props" class="botones">
+              <q-btn color="white" text-color="black" label="🖋️" @click="editarCliente(props.row._id)"/>
+              <q-btn color="white" text-color="black" label="❌" @click="inactivarCliente(props.row._id)" v-if="props.row.estado == 1"/>
+              <q-btn color="white" text-color="black" label="✅" @click="activarCliente(props.row._id)" v-else />
+            </q-td>
+          </template>
+        </q-table>
+      </div>
     </div>
   </div>
 </template>
@@ -71,6 +84,8 @@ let nombre = ref();
 let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
+let pagination = ref({rowsPerPage: 0});
+
 
 // Filtrar Clientes
 function filtrarClientes() {
@@ -86,7 +101,11 @@ async function obtenerInfo() {
   try {
     await clienteStore.obtenerInfoClientes();
     clientes.value = clienteStore.clientes;
-    rows.value = clienteStore.clientes;
+    rows.value = clienteStore.clientes.slice().sort((a,b)=>{
+      const dateA = new Date(a.createAT);
+      const dateB = new Date(b.createAT);
+      return dateB - dateA;
+    })
   } catch (error) {
     console.log(error);
   };
@@ -260,26 +279,29 @@ let notification = ref(null);
 
 // Validar Campos
 function validar() {
-  if (!cedula.value && !nombre.value && !telefono.value) {
-    badMessage.value = "Por favor rellene los campos";
-    showBad();
-  } else if (!cedula.value) {
+  const cedulaRegex = /^[0-9]+$/; 
+  const telefonoRegex = /^[0-9]+$/; 
+
+  if (!cedula.value) {
     badMessage.value = "Ingrese la Cedula";
     showBad();
-  } else if (!nombre.value) {
-    badMessage.value = "Ingrese el Nombre";
+  } else if (!cedulaRegex.test(cedula.value) || parseInt(cedula.value) < 0) {
+    badMessage.value = "La cedula debe contener solo dígitos positivos";
     showBad();
-  } else if (!telefono.value) {
+  } else if (!nombre.value || !nombre.value.trim()) {
+    badMessage.value = "Ingrese el Nombre ";
+    nombre.value = ""
+    showBad();
+  }else if (!telefono.value) {
     badMessage.value = "Ingrese el Telefono";
     showBad();
-  } else if (String(telefono.value).length !== 10) {
-    badMessage.value = "El telefono debe tener 10 Dígitos";
+  } else if (!telefonoRegex.test(telefono.value) || parseInt(telefono.value) < 0 || String(telefono.value).length !== 10) {
+    badMessage.value = "El telefono debe tener 10 dígitos y ser positivo";
     showBad();
   } else {
     validacion.value = true;
-  };
-};
-
+  }
+}
 // Limpiar el modal cuando se cierre mal
 watch(fixed, () => {
   if (fixed.value == false) {
@@ -315,6 +337,7 @@ watch(fixed, () => {
 
 .modal-content {
   width: 400px;
+  max-width: 90%;
 }
 
 .botones button {
@@ -326,13 +349,13 @@ watch(fixed, () => {
   margin-bottom: 5px;
   display: flex;
   justify-content: flex-end;
+  height: 35px;
 }
 
 .b-b {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 30px;
   gap: 5px;
 }
 
@@ -381,4 +404,42 @@ watch(fixed, () => {
 .action-button {
   margin-left: 10px;
 }
+
+@media (max-width: 917px){
+  .btn-agregar{
+    margin: 10px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 500px){
+  .container-table h1{
+    font-size: 60px;
+  }
+}
+</style>
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #00b4ff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody
+    /* height of all previous header rows */
+    scroll-margin-top: 48px
 </style>

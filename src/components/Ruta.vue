@@ -10,7 +10,7 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 60vh" class="modal-body">
+        <q-card-section style="max-height: 100vh" class="modal-body">
           <q-input  type="number"  v-model="precio"  label="Precio" class="modal-input" />
           <div class="q-pa modal-input">
             <div class="q-gutter">
@@ -29,7 +29,7 @@
       </q-card>
     </q-dialog>
     <!-- Tabla -->
-    <div  class="container-table"  style="height: 90vh; overflow-y: auto; width: 80%">
+    <div  class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Rutas</h1>
 
       <div class="b-b">
@@ -40,7 +40,19 @@
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarRuta()" />
       </div>
-      <q-table title="Rutas" :rows="rows" :columns="columns" row-key="name">
+      <div class="q-pa-md">
+        <q-table
+          class="my-sticky-virtscroll-table"
+          virtual-scroll
+          flat bordered
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="index"
+          :rows="rows"
+          :columns="columns"
+          style="height: 52vh;"
+        >
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
             <label for="" v-if="props.row.estado == 1" style="color: green"  >Activo</label>
@@ -55,6 +67,7 @@
           </q-td>
         </template>
       </q-table>
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +94,7 @@ let origen = ref("");
 let destino = ref("");
 let cambio = ref(0);
 let searchrutas = ref("");
+let pagination = ref({rowsPerPage: 0});
 
 // Filtar Rutas Por Origen
 function filtraruta() {
@@ -96,7 +110,11 @@ async function obtenerInfo() {
   try {
     await rutaStore.obtenerInfoRutas();
     rutas.value = rutaStore.rutas;
-    rows.value = rutaStore.rutas;
+    rows.value = rutaStore.rutas.slice().sort((a,b)=>{
+      const dateA = new Date(a.createAT);
+      const dateB = new Date(b.createAT);
+      return dateB - dateA;
+    });
   } catch (error) {
     console.log(error);
   };
@@ -106,7 +124,8 @@ async function obtenerInfo() {
 async function obtenerHorarios() {
   try {
     await horarioStore.obtenerInfoHorarios();
-    options.value = horarioStore.horarios.map((horario) => ({
+    const horariosActivos = horarioStore.horarios.filter(horario => horario.estado === true)
+    options.value = horariosActivos.map((horario) => ({
       label: `${horario.hora_partida} - ${horario.hora_llegada}`,
       value: String(horario._id),
     }));
@@ -296,20 +315,23 @@ let notification = ref(null);
 
 // Validar los Campos
 function validar() {
-  if (!precio.value && !horario.value && !origen.value && !destino.value) {
-    badMessage.value = "Por favor rellene los campos";
-    showBad();
-  } else if (!precio.value) {
+  const precioRegex =  /^[0-9]+$/;
+  
+  if (!precio.value) {
     badMessage.value = "Ingrese el Precio";
     showBad();
-  } else if (!horario.value) {
+  }else if(!precioRegex.test(precio.value) || parseInt(precio.value)){
+    badMessage.value = "El precio debe contener solo dígitos positivos";
+  }else if (!horario.value) {
     badMessage.value = "Eliga un Horario";
     showBad();
-  } else if (!origen.value) {
+  } else if (!origen.value || origen.value.trim()) {
     badMessage.value = "Digite el Origen";
+    origen.value = "";
     showBad();
-  }else if(!destino.value){
+  }else if(!destino.value || destino.value.trim()){
     badMessage.value = "Digite el Destino";
+    destino.value = "";
     showBad();
   } else {
     validacion.value = true;
@@ -324,17 +346,18 @@ watch(fixed, () => {
 });
 </script>
     
-  <style scoped>
+<style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Gabarito&display=swap");
+
 .container {
   display: flex;
   justify-content: center;
 }
 .modal-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .container-table {
   display: flex;
@@ -342,13 +365,16 @@ watch(fixed, () => {
   text-align: center;
   flex-direction: column;
 }
+
 .container-table h1 {
   font-family: "Gabarito", sans-serif;
   padding: 0;
   margin: 0;
 }
+
 .modal-content {
   width: 400px;
+  max-width: 90%;
 }
 
 .botones button {
@@ -358,33 +384,26 @@ watch(fixed, () => {
 .btn-agregar {
   width: 100%;
   margin-bottom: 5px;
-  display: flex;
+  display: flex;  
   justify-content: flex-end;
+  height: 35px;
 }
 
-.error{
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  color: red;
-  font-size: 18px;
-  text-align: center;    
-}
 .b-b {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 30px;
   gap: 5px;
 }
 
-.btnbuscar{
-  width:170px;
-  height:53px;
+.btnbuscar {
+  width: 170px;
+  height: 53px;
   position: relative;
   top: 7px;
 }
-.bbuscar{
+
+.bbuscar {
   width: 170px;
   font-size: 18px;
   background-color: rgba(5, 177, 245, 0.204);
@@ -393,34 +412,75 @@ watch(fixed, () => {
   top: 6px;
 }
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #3498db; 
-    color: #fff; 
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+}
 
-  .close-button {
-    color: #fff; 
-  }
+.close-button {
+  color: #fff;
+}
 
-  .modal-body {
-    padding: 20px;
-  }
+.modal-body {
+  padding: 20px;
+}
 
-  .modal-input {
-    width: 100%;
-    margin-bottom: 10px;
-  }
+.modal-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
 
-  .modal-footer {
-    padding: 10px;
-    display: flex;
-    justify-content: flex-end;
-  }
+.modal-footer {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
 
-  .action-button {
-    margin-left: 10px;
+.action-button {
+  margin-left: 10px;
+  
+}
+
+
+@media (max-width: 917px){
+  .btn-agregar{
+    margin: 10px;
+    height: 35px;
   }
+}
+
+@media (max-width: 500px){
+  .container-table h1{
+    font-size: 80px;
+  }
+}
+</style>
+
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #00b4ff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody
+    /* height of all previous header rows */
+    scroll-margin-top: 48px
 </style>

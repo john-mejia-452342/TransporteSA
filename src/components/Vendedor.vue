@@ -10,12 +10,12 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 60vh" class="modal-body">
-          <q-input type="text" v-model="cedula" label="Cedula" class="modal-input"/>
+        <q-card-section style="max-height: 100vh" class="modal-body">
+          <q-input type="number" v-model="cedula" label="Cedula" class="modal-input"/>
           <q-input type="text" v-model="nombre" label="Nombre" class="modal-input"/>
-          <q-input type="text" v-model="cuenta" label="Cuenta" class="modal-input"/>
+          <q-input type="text" v-model="cuenta" label="Usuario" class="modal-input"/>
           <q-input type="text" v-model="clave" label="Clave" class="modal-input" v-if="cambio == 0"/>
-          <q-input type="text" v-model="telefono" label="Telefono" class="modal-input"/>
+          <q-input type="number" v-model="telefono" label="Telefono" class="modal-input"/>
         </q-card-section>
         <q-separator />
         <q-card-actions align="right" class="modal-footer">
@@ -25,7 +25,7 @@
       </q-card>
     </q-dialog>
     <!-- Tabla -->
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
+    <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Vendedor</h1>
       <div class="b-b">
         <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 400px" @input="filtrarvendedores"/>
@@ -35,7 +35,19 @@
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarVendedor()"/>
       </div>
-      <q-table title="Vendedores" :rows="rows" :columns="columns" row-key="name">
+      <div class="q-pa-md">
+        <q-table
+          class="my-sticky-virtscroll-table"
+          virtual-scroll
+          flat bordered
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="index"
+          :rows="rows"
+          :columns="columns"
+          style="height: 52vh;"
+        >
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
             <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
@@ -50,6 +62,7 @@
           </q-td>
         </template>
       </q-table>
+      </div>
     </div>
   </div>
 </template>
@@ -74,6 +87,8 @@ let clave = ref();
 let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
+let pagination = ref({rowsPerPage: 0});
+
 
 // Filtro Vendedores por Cedula
 function filtrarvendedores() {
@@ -89,7 +104,11 @@ async function obtenerInfo() {
   try {
     await VendedoresStore.obtenerInfoVendedor();
     vendedores.value = VendedoresStore.vendedores;
-    rows.value = VendedoresStore.vendedores;
+    rows.value = VendedoresStore.vendedores.slice().sort((a,b)=>{
+      const dateA = new Date(a.createAT);
+      const dateB = new Date(b.createAT);
+      return dateB - dateA;
+    });
   } catch (error) {
     console.log(error);
   };
@@ -272,25 +291,31 @@ let notification = ref(null);
 
 // Validar los campos
 async function validar() {
-  if ( !cedula.value && !nombre.value && !cuenta.value && !clave.value && !telefono.value) {
-    badMessage.value = "Por favor rellene los campos";
-  } else if (!cedula.value) {
+  const cedulaRegex = /^[0-9]+$/;
+  const telefonoRegex = /^[0-9]+$/;
+  
+  if (!cedula.value) {
     badMessage.value = "Ingrese la Cedula";
     showBad();
-  } else if (!nombre.value) {
+  }else if(!cedulaRegex.test(cedula.value) || parseInt(cedula.value)<0){
+    badMessage.value = "La cedula debe contener solo dígitos positivos";
+  } else if (!nombre.value || !nombre.value.trim()) {
     badMessage.value = "Ingrese el Nombre";
+    nombre.value = "";
     showBad();
-  } else if (!cuenta.value) {
-    badMessage.value = "Ingrese su cuenta";
+  } else if (!cuenta.value || !cuenta.value.trim()) {
+    badMessage.value = "Ingrese su Usuario";
+    cuenta.value = "";
     showBad();
-  } else if (!clave.value) {  
+  } else if (!clave.value || !clave.value.trim()) {  
     badMessage.value = "Ingrese su clave";
+    clave.value = "";
     showBad();
   } else if (!telefono.value) {  
     badMessage.value = "Ingrese el Telefono";
     showBad();
-  } else if (telefono.value.length !== 10) {  
-    badMessage.value = "El telefono debe tener 10 Digitos";
+  } else if (!telefonoRegex.test(telefono.value) || telefono.value.length !== 10) {  
+    badMessage.value = "El telefono debe tener 10 dígitos y ser positivo";
     showBad();
   } else {
     validacion.value = true;
@@ -308,28 +333,33 @@ watch(fixed, () => {
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Gabarito&display=swap");
+
 .container {
   display: flex;
   justify-content: center;
 }
 .modal-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .container-table {
   display: flex;
   justify-content: center;
   text-align: center;
   flex-direction: column;
 }
+
 .container-table h1 {
   font-family: "Gabarito", sans-serif;
   padding: 0;
   margin: 0;
 }
+
 .modal-content {
   width: 400px;
+  max-width: 90%;
 }
 
 .botones button {
@@ -339,33 +369,26 @@ watch(fixed, () => {
 .btn-agregar {
   width: 100%;
   margin-bottom: 5px;
-  display: flex;
+  display: flex;  
   justify-content: flex-end;
+  height: 35px;
 }
 
-.error {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  color: red;
-  font-size: 18px;
-  text-align: center;
-}
 .b-b {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 30px;
   gap: 5px;
 }
 
-.btnbuscar{
-  width:170px;
-  height:53px;
+.btnbuscar {
+  width: 170px;
+  height: 53px;
   position: relative;
   top: 7px;
 }
-.bbuscar{
+
+.bbuscar {
   width: 170px;
   font-size: 18px;
   background-color: rgba(5, 177, 245, 0.204);
@@ -374,34 +397,75 @@ watch(fixed, () => {
   top: 6px;
 }
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #3498db; 
-    color: #fff; 
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+}
 
-  .close-button {
-    color: #fff; 
-  }
+.close-button {
+  color: #fff;
+}
 
-  .modal-body {
-    padding: 20px;
-  }
+.modal-body {
+  padding: 20px;
+}
 
-  .modal-input {
-    width: 100%;
-    margin-bottom: 10px;
-  }
+.modal-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
 
-  .modal-footer {
-    padding: 10px;
-    display: flex;
-    justify-content: flex-end;
-  }
+.modal-footer {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
 
-  .action-button {
-    margin-left: 10px;
+.action-button {
+  margin-left: 10px;
+  
+}
+
+
+@media (max-width: 917px){
+  .btn-agregar{
+    margin: 10px;
+    height: 35px;
   }
+}
+
+@media (max-width: 500px){
+  .container-table h1{
+    font-size: 60px;
+  }
+}
+</style>
+
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #00b4ff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody
+    /* height of all previous header rows */
+    scroll-margin-top: 48px
 </style>

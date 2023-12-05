@@ -1,49 +1,56 @@
 <template>
   <div class="container-all">
-    <div class="container">
+    <div class="container-venta">
       <div class="btn-generar">
         <q-btn color="primary" label="Generar Ticket" @click="mostrarModal" />
       </div>
       <!-- Modal -->
       <div class="container-cuestionario">
-        <div class="container-wrapper">
-          <div v-if="showmodal" class="column modal">
-            <q-select v-model="ruta" :options="optionsRutas" label="Rutas" />
-            <q-select v-model="bus" :options="optionsBuses" label="Buses" />
-            <q-input v-model="fecha_departida" filled type="date" hint="Fecha para Partida" style="width: 300px" />
-            <div class="options">
-              <q-btn flat label="Cerrar" color="primary" @click="cerrarModal" />
-              <q-btn flat label="Guardar 💾" color="primary" @click="generarTicketInfo()" />
-            </div>
+        <div v-if="rutaBusFecha" class="container-rutaBusFecha">
+          <div class="rutaBusFecha">
+            <q-select v-model="ruta" :options="optionsRutas" label="Rutas"  style="width: 300px;"/>
+            <q-select v-model="bus" :options="optionsBuses" label="Buses" style="width: 300px;" />
+            <q-input v-model="fecha_departida" filled type="date" hint="Fecha para Partida" style="width: 300px" :min="getFechaActual()"/>
           </div>
-        </div>
-        <div class="column container-info">
-          <div v-if="asientos.length" class="container-bus">
-            <div v-for="i in asientos" :key="i" class="container-asientos">
-              <button type="button" :value="i" @click="no_asiento = i"
-                :style="{ backgroundColor: no_asiento === i ? 'red' : puestos.includes(i) ? 'red' : 'initial', cursor: puestos.includes(i) ? 'not-allowed' : 'pointer', }">
-                {{ i }} 💺</button>
-            </div>
-          </div>
-          <div v-if="showClienteDiv" class="column cliente">
-            <div class="btns">
-              <router-link class="link" to="/cliente"><q-btn class="bnt-bc" color="primary"
-                  label="Agregar Cliente ➕"></q-btn></router-link>
-              <q-btn class="bnt-bc" color="primary" label="Buscar Cliente 🔎" @click="buscarCliente()" />
-            </div>
-
-            <q-input class="label" type="number" standout v-model="cedula" label="Cedula" placeholder="Cedula del cliente"
-              style="width: 300px" />
-            <q-input class="label" standout v-model="nombre" label="Nombre" placeholder="Nombre del cliente"
-              style="width: 300px" />
-            <q-input class="label" type="number" standout v-model="telefono" label="Telefono"
-              placeholder="Telefono del cliente" style="width: 300px" />
-            <q-btn class="btn-c" color="primary" label="Generar Ticket 💾" @click="CrearTicket()" />
-
+          <div class="options">
+            <q-btn label="Cerrar" color="primary" @click="cerrarModal" />
+            <q-btn label="Buscar" color="primary" @click="generarTicketInfo()" />
           </div>
         </div>
       </div>
+        
+ 
+      <div class="busCliente">
+        <div v-if="asientos.length" class="container-bus">
+          <div v-for="i in asientos" :key="i" class="container-asientos">
+            <button
+              type="button"
+              :value="i.numero"
+              @click="!i.ocupado && (no_asiento = i.numero)"
+              :style="{
+                backgroundColor: no_asiento === i.numero ? 'red' : i.ocupado ? 'red' : 'initial',
+                cursor: i.ocupado ? 'not-allowed' : 'pointer',
+              }"
+            >
+              {{ i.numero }} 💺
+            </button>
+          </div>
+        </div>
+        <div v-if="showClienteDiv" class="cliente">
+          
+            <h2 v-if="no_asiento" style="padding: 0;margin: 8px;" >Asiento N°{{no_asiento}}</h2>
 
+            <div class="btns">
+              <q-btn class="bnt-bc" color="primary" label="Agregar Cliente ➕" @click="agregarCliente"/>
+              <q-btn class="bnt-bc" color="primary" label="Buscar Cliente 🔎" @click="buscarCliente()" />
+            </div>
+              <q-input filled v-model="cedula" label="Cedula del Cliente" type="number" style="width: 300px"/>
+              <q-input filled v-model="nombre" label="Nombre del Cliente" type="text" style="width: 300px"/>
+              <q-input filled v-model="telefono" label="Telefono del Cliente" type="number" style="width: 300px"/>
+              <q-btn class="btn-c" color="primary" label="Generar Ticket 💾" @click="CrearTicket()" />
+          
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -61,7 +68,7 @@ import { useQuasar } from "quasar";
 const $q = useQuasar();
 const busStore = useBusStore();
 const rutaStore = useRutaStore();
-const clienteStrore = useClienteStore();
+const clienteStore = useClienteStore();
 const ticketStore = useTicketStore();
 const loginStore = useLoginStore();
 
@@ -72,7 +79,7 @@ let bus = ref("");
 let fecha_departida = ref("");
 let no_asiento = ref(0);
 let showClienteDiv = ref(false);
-let showmodal = ref(false);
+let rutaBusFecha = ref(false);
 let cedula = ref();
 let nombre = ref("");
 let telefono = ref();
@@ -89,13 +96,13 @@ let optionsBuses = ref([]);
 function mostrarModal() {
   obtenerRutas();
   fixed.value = true;
-  showmodal.value = true;
+  rutaBusFecha.value = true;
 };
 
 // Cerrar Modal
 function cerrarModal() {
   fixed.value = false;
-  showmodal.value = false;
+  rutaBusFecha.value = false;
 };
 
 // Obtener Buses, Rutas y clientes 
@@ -106,15 +113,16 @@ async function obtenerInfo() {
   await rutaStore.obtenerInfoRutas();
   rutas.value = rutaStore.rutas;
 
-  await clienteStrore.obtenerInfoClientes();
-  clientes.value = clienteStrore.clientes;
+  await clienteStore.obtenerInfoClientes();
+  clientes.value = clienteStore.clientes;
 };
 
 // Obtener Opciones de Rutas 
 async function obtenerRutas() {
   try {
     await rutaStore.obtenerInfoRutas();
-    optionsRutas.value = rutaStore.rutas.map((ruta) => ({
+    const rutasActivas = rutaStore.rutas.filter(ruta => ruta.estado === true);
+    optionsRutas.value = rutasActivas.map((ruta) => ({
       label: `${ruta.precio} - ${ruta.origen} - ${ruta.destino}`,
       value: String(ruta._id),
     }));
@@ -127,7 +135,8 @@ async function obtenerRutas() {
 async function obtenerBuses() {
   try {
     await busStore.obtenerInfoBuses();
-    optionsBuses.value = busStore.buses.map((bus) => ({
+    const busesActivos = busStore.buses.filter(bus => bus.estado === true);
+    optionsBuses.value = busesActivos.map((bus) => ({
       label: `${bus.placa} - ${bus.empresa_asignada} - ${bus.numero_bus}`,
       value: String(bus._id),
     }));
@@ -145,12 +154,13 @@ async function generarListaAsientos() {
       const numeroAsientos = busSeleccionado.cantidad_asientos;
       const listaAsientos = [];
       for (let i = 1; i <= numeroAsientos; i++) {
-        listaAsientos.push(Number(i));
-      };
+        const isOcupado = puestos.value.includes(i);
+        listaAsientos.push({ numero: i, ocupado: isOcupado });
+      }
       asientos.value = listaAsientos;
-    };
-  };
-};
+    }
+  }
+}
 
 
 let cliente_id = ref("");
@@ -158,15 +168,21 @@ let validacionCliente = ref(null)
 
 // Buscar Clientes 
 async function buscarCliente() {
-  const clienteEncontrado = clientes.value.find((cliente) => cliente.cedula == cedula.value || cliente.nombre == nombre.value || cliente.telefono == telefono.value);
+  const clienteEncontrado = clientes.value.find((cliente) => cliente.cedula == cedula.value);
+
   if (clienteEncontrado) {
-    cedula.value = clienteEncontrado.cedula;
-    nombre.value = clienteEncontrado.nombre;
-    telefono.value = clienteEncontrado.telefono;
-    cliente_id.value = clienteEncontrado._id;
-    greatMessage.value = "Cliente Encontrado";
-    showGreat();
-    validacionCliente.value = true;
+    if (clienteEncontrado.estado === true) {
+      cedula.value = clienteEncontrado.cedula;
+      nombre.value = clienteEncontrado.nombre;
+      telefono.value = clienteEncontrado.telefono;
+      cliente_id.value = clienteEncontrado._id;
+      greatMessage.value = "Cliente Encontrado";
+      showGreat();
+      validacionCliente.value = true;
+    }else{
+      badMessage.value = "Cliente Inactivado";
+      showBad();
+    }
   } else {
     badMessage.value = "No se encontro ningun cliente";
     showBad();
@@ -197,10 +213,11 @@ async function CrearTicket() {
       greatMessage.value = "Ticket Agregado";
       showGreat();
       fixed.value = false;
-      showmodal.value = false;
+      rutaBusFecha.value = false;
       asientos.value = [];
       showClienteDiv = false;
     } catch (error) {
+      console.log(error);
       cancelShow();
       badMessage.value = error.response.data.error.errors[0].msg;
       showBad();
@@ -216,6 +233,33 @@ async function CrearTicket() {
 async function obtenerVendedor() {
   vendedor.value = loginStore.vendedor;
 };
+
+// Agregar Cliente
+async function agregarCliente() {
+  try {
+    showDefault();
+    const response = await clienteStore.postCliente({
+      cedula: cedula.value,
+      nombre: nombre.value,
+      telefono: telefono.value,
+    });
+  
+    cancelShow();
+    // limpiar();
+    greatMessage.value = "Cliente Agregado";
+    
+    showGreat();
+    await obtenerInfo();
+    buscarCliente();
+  } catch (error) {
+    console.log(error);
+    cancelShow();
+    badMessage.value = error.response.data.error.errors[0].msg;
+    showBad();
+  };
+};
+
+
 
 let puestos = ref([]);
 // Buscar Asientos Disponibles
@@ -233,6 +277,7 @@ async function validarAsientos() {
       greatMessage.value = "Listado Puestos";
       showGreat();
     } catch (error) {
+      console.log(error);
       cancelShow();
       badMessage.value = error.response.data.error.errors[0].msg;
       showBad();
@@ -247,7 +292,6 @@ watch(ruta, () => {
 watch(no_asiento, () => {
   showClienteDiv = true;
 });
-
 onMounted(async () => {
   obtenerInfo();
   obtenerVendedor();
@@ -313,8 +357,36 @@ async function validar() {
     validacion.value = true;
   };
 };
+
+//Limite de fecha
+function getFechaActual() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const styles = ref({
+  busCliente: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    alignItems: 'flex-end',
+  },
+  busClienteActive: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    alignItems: 'flex-end',
+  },
+});
+
+watch(showClienteDiv, () => {
+  clienteContainerClass.value = showClienteDiv ? "busClienteActive" : "busCliente";
+});
+
 </script>
-  
+
 <style scoped>
 .container-all {
   margin: 0;
@@ -324,29 +396,8 @@ async function validar() {
   justify-content: center;
 }
 
-.container-wrapper {
-  display: flex;
-  max-width: 1200px;
-}
 
-.column {
-  flex: 1;
-  margin: 10px;
-  padding: 20px;
-  border-radius: 5px;
-}
-
-@media (max-width: 768px) {
-  .container-wrapper {
-    flex-direction: column;
-  }
-
-  .column {
-    width: 100%;
-  }
-}
-
-.container {
+.container-venta {
   width: 100%;
   display: flex;
   justify-content: center;
@@ -362,31 +413,14 @@ async function validar() {
   height: 50px;
 }
 
-.container-info {
-  display: flex;
-  width: 100%;
-  flex-direction: column;
-}
-
 .container-bus {
-  position: relative;
-  left: 100px;
-  height: auto;
-  width: 86%;
+  height: 100%;
+  width: 54%;
   display: flex;
-  flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-evenly;
+  justify-content: center;
   align-content: center;
 }
-
-@media (max-width: 1647){
-.container-bus{
-  width: 84%;
-}
-
-}
-
 
 
 .container-asientos {
@@ -411,7 +445,8 @@ async function validar() {
   flex-wrap: wrap;
   flex-direction: column;
   align-items: center;
-  margin-top: 80px;
+  width: 46%;
+  align-content: center;
 }
 
 .cliente input {
@@ -426,39 +461,66 @@ async function validar() {
   margin-top: 10px;
 }
 
-.label {
-  background-color: rgba(231, 222, 222, 0.329);
-  border-radius: 5px;
-  border: solid gray 1px;
-  margin: 1px;
+.rutaBusFecha {
+  background-color: #dbdbdb7a;
+  display: flex;
+  width: 90%;
+  justify-content: space-around;
+  padding: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 5px;
 }
 
-.modal {
-  border: solid rgb(0, 0, 0);
-  background-color: white;
-  display: flex;
-  align-content: center;
-  justify-content: space-between;
-  flex-direction: column;
-  height: 362px;
-  position: relative;
-  left: 50px;
-}
 
 .options {
   display: flex;
   justify-content: space-around;
 }
+.options button{
+  margin: 10px;
+}
 
 .btns {
-  width: 40%;
+  width: 80%;
   display: flex;
   justify-content: space-around;
   margin-bottom: 10px;
 }
 
+
 .container-cuestionario {
   display: flex;
   width: 100%;
+  flex-direction: column;
+  align-items: center;
   flex-wrap: wrap;
-}</style>
+}
+.container-rutaBusFecha{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.busCliente {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  width: 80%;
+}
+
+
+@media (max-width: 793px){
+  .container-bus{
+    height: auto;
+    width: 85%;
+  }
+
+  .busCliente {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>

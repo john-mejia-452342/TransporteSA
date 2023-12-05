@@ -9,10 +9,10 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 60vh" class="modal-body">
+        <q-card-section style="max-height: 100vh" class="modal-body">
           <q-input type="text" v-model="placa" label="Placa" class="modal-input"/>
           <q-input type="number" v-model="numero_bus" label="Número de Bus" class="modal-input"/>
-          <q-input type="text" v-model="cantidad_asientos" label="Cantidad de Asientos" class="modal-input"/>
+          <q-input type="number" v-model="cantidad_asientos" label="Cantidad de Asientos" class="modal-input"/>
           <q-input type="text" v-model="empresa_asignada" label="Empresa Asignada" class="modal-input"/>
           <div class="q-pa modal-input" >
             <div class="q-gutter">
@@ -29,7 +29,7 @@
       </q-card>
     </q-dialog>
     <!-- Tabla -->
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
+    <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Buses</h1>
       <div class="b-b">
         <q-input class="bbuscar" v-model="buscarplaca" label="Buscar por Placa" style="width: 300px" @input="filtrarbuses"/>
@@ -39,7 +39,19 @@
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarBus()" />
       </div>
-      <q-table title="Buses" :rows="rows" :columns="columns" row-key="name">
+      <div class="q-pa-md">
+        <q-table
+          class="my-sticky-virtscroll-table"
+          virtual-scroll
+          flat bordered
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="index"
+          :rows="rows"
+          :columns="columns"
+          style="height: 52vh;"
+        >
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
             <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
@@ -53,7 +65,9 @@
             <q-btn color="white" text-color="black" label="✅" @click="ActivarBus(props.row._id)" v-else/>
           </q-td>
         </template>
-      </q-table>
+        </q-table>
+        
+      </div>
     </div>
   </div>
 </template>
@@ -81,6 +95,7 @@ let cantidad_asientos = ref("");
 let empresa_asignada = ref("");
 let buscarplaca = ref("");
 
+let pagination = ref({rowsPerPage: 0});
 // Filtro 
 function filtrarbuses() {
   if (buscarplaca.value.trim() === "") {
@@ -97,17 +112,23 @@ async function obtenerInfo() {
   try {
     await busStore.obtenerInfoBuses();
     buses.value = busStore.buses;
-    rows.value = busStore.buses;
+    rows.value = busStore.buses.slice().sort((a, b) => {
+      const dateA = new Date(a.createAT);
+      const dateB = new Date(b.createAT);
+      return dateB - dateA;
+    });
   } catch (error) {
     console.log(error);
-  };
-};
+  }
+}
 
 // Obtener opciones de Conductores
 async function obtenerConductores() {
   try {
     await conductorStore.obtenerInfoConductores();
-    options.value = conductorStore.conductores.map((conductor) => ({
+    const conductoresActivos = conductorStore.conductores.filter(conductor => conductor.estado === true);
+    
+    options.value = conductoresActivos.map((conductor) => ({
       label: `${conductor.nombre} - ${conductor.cedula} - ${conductor.telefono}`,
       value: String(conductor._id),
     }));
@@ -220,7 +241,7 @@ async function EditarBus(id) {
     cantidad_asientos.value = busSeleccionado.cantidad_asientos;
     empresa_asignada.value = busSeleccionado.empresa_asignada;
     conductor.value = {
-      label: `${busSeleccionado.conductor_id} - ${busSeleccionado.conductor_id.telefono} - ${busSeleccionado.conductor_id.cedula}`,
+      label: `${busSeleccionado.conductor_id.nombre} - ${busSeleccionado.conductor_id.telefono} - ${busSeleccionado.conductor_id.cedula}`,
       value: String(busSeleccionado.conductor_id._id),
     };
   };
@@ -265,7 +286,7 @@ const showGreat = () => {
   notification = $q.notify({
     spinner: false,
     message: greatMessage,
-    timeout: 2000,
+    timeout: 3000,
     type: "positive",
   });
 };
@@ -275,7 +296,7 @@ const showBad = () => {
   notification = $q.notify({
     spinner: false,
     message: badMessage,
-    timeout: 2000,
+    timeout: 3000,
     type: "negative",
   });
 };
@@ -301,17 +322,28 @@ let validacion = ref(false);
 
 // Validar Campos 
 function validar() {
-  if ( !placa.value && !numero_bus.value && !cantidad_asientos.value && !empresa_asignada.value && !conductor.value) {
-    badMessage.value = "Por favor rellene los campos";
-    showBad();
-  } else if (!placa.value) {
+  placa.value = placa.value.trim().toUpperCase();
+  empresa_asignada.value = empresa_asignada.value.trim();
+  
+  const placaRegex = /^[A-Z]{3}\d{3}$/;
+
+  if (!placa.value) {
     badMessage.value = "Ingrese la Placa";
     showBad();
+  } else if (!placaRegex.test(placa.value)) {
+    badMessage.value = "La Placa debe contener tres letras en mayúscula seguidas de tres dígitos.";
+    showBad();
   } else if (!numero_bus.value) {
-    badMessage.value = "Ingrese el numero del bus";
+    badMessage.value = "Ingrese el número del bus";
+    showBad();
+  } else if (numero_bus.value < 0) {
+    badMessage.value = "El número del bus no puede ser negativo";
     showBad();
   } else if (!cantidad_asientos.value) {
     badMessage.value = "Ingrese la cantidad de asientos";
+    showBad();
+  } else if (cantidad_asientos.value < 0) {
+    badMessage.value = "La cantidad de asientos no puede ser negativa";
     showBad();
   } else if (!empresa_asignada.value) {
     badMessage.value = "Ingrese el nombre de la empresa";
@@ -321,8 +353,8 @@ function validar() {
     showBad();
   } else {
     validacion.value = true;
-  };
-};
+  }
+}
 
 // Limpiar el modal cuando se cierre mal
 watch(fixed, () => {
@@ -370,15 +402,15 @@ watch(fixed, () => {
 .btn-agregar {
   width: 100%;
   margin-bottom: 5px;
-  display: flex;
+  display: flex;  
   justify-content: flex-end;
+  height: 35px;
 }
 
 .b-b {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 30px;
   gap: 5px;
 }
 
@@ -427,5 +459,46 @@ watch(fixed, () => {
 
 .action-button {
   margin-left: 10px;
+  
 }
+
+
+@media (max-width: 917px){
+  .btn-agregar{
+    margin: 10px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 500px){
+  .container-table h1{
+    font-size: 80px;
+  }
+}
+</style>
+
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #00b4ff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody
+    /* height of all previous header rows */
+    scroll-margin-top: 48px
 </style>

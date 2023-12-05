@@ -10,24 +10,24 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 50vh" class="scroll">
-          <div class="q-pa" style="width: 300px;">
+        <q-card-section style="max-height: 100vh" class="scroll">
+          <div class="q-pa" style="width:100%;">
             <div class="q-gutter">
               <q-select v-model="vendedor" :options="optionsVendedor" label="Vendedor"/> 
             </div>
           </div>
-          <div class="q-pa" style="width: 300px;">
+          <div class="q-pa" style="width:100%;">
             <div class="q-gutter">
               <q-select v-model="cliente" :options="optionsCliente" label="Cliente"/> 
             </div>
           </div>
-          <div class="q-pa" style="width: 300px;">
+          <div class="q-pa" style="width:100%;">
             <div class="q-gutter">
               <q-select v-model="bus" :options="optionsBus" label="Bus"/> 
             </div>
           </div>
-          <q-input type="number" v-model="no_asiento" label="Numero Asiento" style="width: 300px" />
-          <q-input type="date" v-model="fecha_departida" label="Fecha Partida" style="width: 300px" />
+          <q-input type="number" v-model="no_asiento" label="Numero Asiento" style="width:100%" />
+          <q-input type="date" v-model="fecha_departida" label="Fecha Partida" style="width:100%" />
         </q-card-section>
         <q-separator />
 
@@ -37,14 +37,26 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
+    <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Tickets</h1>
       <div class="b-b">
         <q-input class="bbuscar" v-model="searchtieckets" label="Buscar por número de cédula del cliente" style="width: 300px" @input="filtrarticket"/>
         <q-btn color="primary" label="Buscar" @click="filtrarticket" class="btnbuscar"/>
       </div>
 
-      <q-table title="Tickets" :rows="rows" :columns="columns" row-key="name">
+      <div class="q-pa-md">
+        <q-table
+          class="my-sticky-virtscroll-table"
+          virtual-scroll
+          flat bordered
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="index"
+          :rows="rows"
+          :columns="columns"
+          style="height: 52vh;"
+        >
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
             <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
@@ -60,6 +72,7 @@
           </q-td>
         </template>
       </q-table>
+      </div>
     </div>
   </div>
 </template>
@@ -96,6 +109,8 @@ let bus = ref("");
 let no_asiento = ref(0);
 let fecha_departida = ref("");
 let searchtieckets = ref("");
+let pagination = ref({rowsPerPage: 0});
+
 
 // Filtrar por la Cedula del Cliente
 function filtrarticket() {
@@ -111,6 +126,7 @@ async function obtenerInfo() {
   try {
     await ticketStore.getTickets();
     tickets.value = ticketStore.ticket;
+    console.log(ticketStore.ticket);
     rows.value = ticketStore.ticket;
   } catch (error) {
     console.log(error);
@@ -182,7 +198,13 @@ const columns = [
   { name: "ruta_id", label: "Ruta Origen - Destino", field: (row) => `${row.ruta_id.origen} - ${row.ruta_id.destino}`,},
   { name: "ruta_id", label: "Horario Partida - Llegada", field: (row) =>   `${row.ruta_id.horario_id.hora_partida} - ${row.ruta_id.horario_id.hora_llegada}`,},
   { name: "no_asiento", label: "N° Asiento", field: "no_asiento", sortable: true,},
-  { name: "fecha_departida", label: "Fecha de partida", field: "fecha_departida", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
+  { 
+  name: "fecha_departida", 
+  label: "Fecha de partida", 
+  field: "fecha_departida", 
+  sortable: true, 
+  format: (val) => format(new Date(val), "yyyy-MM-dd"),
+},,
   { name: "estado", label: "Estado", field: "estado", sortable: true },
   { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
   { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
@@ -196,12 +218,14 @@ async function editarTicket() {
     if (validacion.value == true) {
       try {
         showDefault();
+        const asiento = `0${no_asiento.value}`
+        const asientoNumero = Number(asiento);
         await ticketStore.putEditarTicket(id, {
           vendedor_id: vendedor._rawValue.value,
           cliente_id: cliente._rawValue.value,
           ruta_id: ruta._rawValue.value,
           bus_id: bus._rawValue.value,
-          no_asiento: no_asiento.value,
+          no_asiento:asientoNumero,
           fecha_departida: fecha_departida.value,
         });
         cancelShow();
@@ -211,6 +235,7 @@ async function editarTicket() {
         obtenerInfo();
         fixed.value = false;
       } catch (error) {
+        console.log(error);
         cancelShow();
         badMessage.value = error.response.data.error.errors[0].msg;
         showBad();
@@ -384,10 +409,7 @@ function generarPDF(ticket) {
   doc.setFont('Helvetica', 'normal'); // Cambiar la fuente y el estilo
   doc.setFontSize(14); // Cambiar el tamaño del texto
   doc.setTextColor(30, 30, 30); // Establecer el color del texto en RGB (negro)
-  doc.setFontStyle('bold'); // Texto en negrita
-
-
-  
+ 
   doc.text(`Información del Ticket`, 20, 10);
   doc.text(`Cliente: ${ticket.cliente_id.nombre} - ${ticket.cliente_id.cedula} - ${ticket.cliente_id.telefono}`, 20, 20);
   doc.text(`Vendedor: ${ticket.vendedor_id.nombre} - ${ticket.vendedor_id.telefono}`, 20, 30);
@@ -403,6 +425,7 @@ function generarPDF(ticket) {
     
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Gabarito&display=swap");
+
 .container {
   display: flex;
   justify-content: center;
@@ -419,13 +442,16 @@ function generarPDF(ticket) {
   text-align: center;
   flex-direction: column;
 }
+
 .container-table h1 {
   font-family: "Gabarito", sans-serif;
   padding: 0;
   margin: 0;
 }
+
 .modal-content {
   width: 400px;
+  max-width: 90%;
 }
 
 .botones button {
@@ -435,17 +461,16 @@ function generarPDF(ticket) {
 .btn-agregar {
   width: 100%;
   margin-bottom: 5px;
-  display: flex;
+  display: flex;  
   justify-content: flex-end;
+  height: 35px;
 }
 
 .b-b {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 30px;
   gap: 5px;
-  margin-bottom: 30px;
 }
 
 .btnbuscar {
@@ -454,6 +479,7 @@ function generarPDF(ticket) {
   position: relative;
   top: 7px;
 }
+
 .bbuscar {
   width: 170px;
   font-size: 18px;
@@ -462,8 +488,6 @@ function generarPDF(ticket) {
   position: relative;
   top: 6px;
 }
-
-
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -494,5 +518,46 @@ function generarPDF(ticket) {
 
 .action-button {
   margin-left: 10px;
+  
 }
+
+
+@media (max-width: 917px){
+  .btn-agregar{
+    margin: 10px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 500px){
+  .container-table h1{
+    font-size: 80px;
+  }
+}
+</style>
+
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
+
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #00b4ff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody
+    /* height of all previous header rows */
+    scroll-margin-top: 48px
 </style>

@@ -10,9 +10,9 @@
         </q-card-section>
         <q-separator />
 
-        <q-card-section style="max-height: 60vh" class="modal-body">
-          <q-input v-model="hora_partida" label="Hora de partida" class="modal-input"  />
-          <q-input v-model="hora_llegada" label="Hora de llegada" class="modal-input"  />
+        <q-card-section style="max-height: 100vh" class="modal-body">
+          <q-input type="text" v-model="hora_partida" label="Hora de partida" class="modal-input"  />
+          <q-input type="text" v-model="hora_llegada" label="Hora de llegada" class="modal-input"  />
         </q-card-section>
 
         <q-separator />
@@ -23,8 +23,8 @@
       </q-card>
     </q-dialog>
     <!-- Tabla -->
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
-      <h1>Horario</h1>
+    <div class="container-table" style="min-height: 90vh; width: 80%">
+      <h1>Horarios</h1>
 
       <!-- <div class="b-b">
         <q-input class="bbuscar" v-model="searchhorario" label="Buscar por hora" style="width: 300px" @input="filtrarhora" />
@@ -36,7 +36,19 @@
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarHorario()" />
       </div>
-      <q-table title="Horarios" :rows="rows" :columns="columns" row-key="name">
+      <div class="q-pa-md">
+        <q-table
+          class="my-sticky-virtscroll-table"
+          virtual-scroll
+          flat bordered
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="index"
+          :rows="rows"
+          :columns="columns"
+          style="height: 52vh;"
+        >
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
             <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
@@ -52,6 +64,7 @@
           </q-td>
         </template>
       </q-table>
+      </div>
     </div>
   </div>
 </template>
@@ -72,6 +85,8 @@ let text = ref("");
 let hora_partida = ref();
 let hora_llegada = ref();
 let cambio = ref(0);
+let pagination = ref({rowsPerPage: 0});
+
 // let searchhorario = ref("");
 
 // function filtrarhora() {
@@ -90,7 +105,11 @@ async function obtenerInfo() {
   try {
     await horarioStore.obtenerInfoHorarios();
     horarios.value = horarioStore.horarios;
-    rows.value = horarioStore.horarios;
+    rows.value = horarioStore.horarios.slice().sort((a,b)=>{
+      const dateA = new Date(a.createAT);
+      const dateB = new Date(b.createAT);
+      return dateB - dateA;
+    });
   } catch (error) {
     console.log(error);
   };
@@ -264,14 +283,13 @@ let notification = ref(null);
 // Validacion de Campos
 function validar() {
   const timeFormat = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
-  if (!hora_partida.value && !hora_llegada.value) {
-    badMessage.value = "Ingrese la hora de Partida y Llegada";
-    showBad();
-  } else if (!hora_partida.value) {
+  if (!hora_partida.value || !hora_partida.value.trim()) {
     badMessage.value = "Ingrese la hora de Partida";
+    hora_partida.value="";
     showBad();
-  } else if (!hora_llegada.value) {
+  } else if (!hora_llegada.value || !hora_llegada.value.trim()) {
     badMessage.value = "Ingrese la hora de Llegada";
+    hora_llegada.value = "";
     showBad();
   } else if ( !timeFormat.test(hora_partida.value) || !timeFormat.test(hora_llegada.value)) {
     badMessage.value ="Ingrese las horas en el formato correcto, por ejemplo, 12:00:00 o 09:00:00";
@@ -295,13 +313,13 @@ watch(fixed, () => {
 .container {
   display: flex;
   justify-content: center;
-  min-height: 90vh;
 }
 .modal-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .container-table {
   display: flex;
   justify-content: center;
@@ -317,6 +335,7 @@ watch(fixed, () => {
 
 .modal-content {
   width: 400px;
+  max-width: 90%;
 }
 
 .botones button {
@@ -326,39 +345,103 @@ watch(fixed, () => {
 .btn-agregar {
   width: 100%;
   margin-bottom: 5px;
+  display: flex;  
+  justify-content: flex-end;
+  height: 35px;
+}
+
+.b-b {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btnbuscar {
+  width: 170px;
+  height: 53px;
+  position: relative;
+  top: 7px;
+}
+
+.bbuscar {
+  width: 170px;
+  font-size: 18px;
+  background-color: rgba(5, 177, 245, 0.204);
+  border-radius: 5px;
+  position: relative;
+  top: 6px;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #3498db;
+  color: #fff;
+}
+
+.close-button {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.modal-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.modal-footer {
+  padding: 10px;
   display: flex;
   justify-content: flex-end;
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #3498db; 
-    color: #fff; 
-  }
+.action-button {
+  margin-left: 10px;
+  
+}
 
-  .close-button {
-    color: #fff; 
-  }
 
-  .modal-body {
-    padding: 20px;
+@media (max-width: 917px){
+  .btn-agregar{
+    margin: 10px;
+    height: 35px;
   }
+}
 
-  .modal-input {
-    width: 100%;
-    margin-bottom: 10px;
+@media (max-width: 500px){
+  .container-table h1{
+    font-size: 80px;
   }
+}
+</style>
 
-  .modal-footer {
-    padding: 10px;
-    display: flex;
-    justify-content: flex-end;
-  }
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
 
-  .action-button {
-    margin-left: 10px;
-  }
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #00b4ff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody
+    /* height of all previous header rows */
+    scroll-margin-top: 48px
 </style>

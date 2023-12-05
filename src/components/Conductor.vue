@@ -9,11 +9,11 @@
           <q-btn icon="close" flat round dense v-close-popup class="close-button"  />
         </q-card-section>
         <q-separator />
-        <q-card-section style="max-height: 60vh" class="modal-body">
-          <q-input type="text" v-model="cedula" label="Cedula" class="modal-input"/>
+        <q-card-section style="max-height: 100vh" class="modal-body">
+          <q-input type="number" v-model="cedula" label="Cedula" class="modal-input"/>
           <q-input type="text" v-model="nombre" label="Nombre" class="modal-input"/>
-          <q-input type="text" v-model="experiencia" label="Experiencia" class="modal-input" />
-          <q-input type="text" v-model="telefono" label="Telefono" class="modal-input"/>
+          <q-input type="number" v-model="experiencia" label="Experiencia" class="modal-input" />
+          <q-input type="number" v-model="telefono" label="Telefono" class="modal-input"/>
         </q-card-section>
         <q-separator />
         <q-card-actions align="right" class="modal-footer">
@@ -23,7 +23,7 @@
       </q-card>
     </q-dialog>
     <!-- Tabla -->
-    <div class="container-table" style="height: 90vh; overflow-y: auto; width: 80%">
+    <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Conductores</h1>
       <div class="b-b">
         <q-input class="bbuscar" v-model="searchCedula" label="Buscar por Cedula" style="width: 300px" @input="filtrarconductores" />
@@ -33,7 +33,19 @@
       <div class="btn-agregar">
         <q-btn color="secondary" label="Agregar ➕" @click="agregarConductor()" />
       </div>
-      <q-table title="Conductores" :rows="rows" :columns="columns" row-key="name">
+      <div class="q-pa-md">
+        <q-table
+          class="my-sticky-virtscroll-table"
+          virtual-scroll
+          flat bordered
+          v-model:pagination="pagination"
+          :rows-per-page-options="[0]"
+          :virtual-scroll-sticky-size-start="48"
+          row-key="index"
+          :rows="rows"
+          :columns="columns"
+          style="height: 52vh;"
+        >
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
             <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
@@ -49,6 +61,7 @@
           </q-td>
         </template>
       </q-table>
+      </div>
     </div>
   </div>
 </template>
@@ -73,6 +86,7 @@ let experiencia = ref("");
 let telefono = ref("");
 let cambio = ref(0);
 let searchCedula = ref("");
+let pagination = ref({rowsPerPage: 0});
 
 // Filtro
 function filtrarconductores() {
@@ -88,7 +102,11 @@ async function obtenerInfo() {
   try {
     await conductorStore.obtenerInfoConductores();
     conductores.value = conductorStore.conductores;
-    rows.value = conductorStore.conductores;
+    rows.value = conductorStore.conductores.slice().sort((a,b)=>{
+      const dateA = new Date(a.createAT);
+      const dateB = new Date(b.createAT);
+      return dateB - dateA;
+    })
   } catch (error) {
     console.log(error);
   };
@@ -268,23 +286,27 @@ let notification = ref(null);
 
 // Validacion de campos
 function validar() {
-  if (!cedula.value && !nombre.value && !experiencia.value && !telefono.value) {
-    badMessage.value = "Por favor rellene los campos";
-    showBad();
-  } else if (!cedula.value) {
+  const cedulaRegex = /^[0-9]+$/;
+  const telefonoRegex = /^[0-9]+$/;
+
+  if (!cedula.value) {
     badMessage.value = "Ingrese la Cedula";
     showBad();
-  } else if (!nombre.value) {
+  }else if(!cedulaRegex.test(cedula.value) || parseInt(cedula.value)<0){
+    badMessage.value = "La cedula debe contener solo dígitos positivos";
+  }else if (!nombre.value || !nombre.value.trim()) {
     badMessage.value = "Ingrese el Nombre";
+    nombre.value = ""
     showBad();
-  } else if (!experiencia.value) {
-    badMessage.value = "Digite la experiencia, por ejemplo (4 años)";
+  } else if (!experiencia.value || !experiencia.value.trim()) {
+    badMessage.value = "Digite la experiencia, por ejemplo (4)";
+    experiencia.value = ""
     showBad();
   } else if (!telefono.value) {
     badMessage.value = "Ingrese el Telefono";
     showBad();
-  } else if (telefono.value.length !== 10) {
-    badMessage.value = "El telefono debe tener 10 Digitos";
+  } else if (!telefonoRegex.test(telefono.value) || telefono.value.length !== 10) {
+    badMessage.value = "El telefono debe tener 10 dígitos y ser positivo";
     showBad();
   } else {
     validacion.value = true;
@@ -326,6 +348,7 @@ watch(fixed, () => {
 
 .modal-content {
   width: 400px;
+  max-width: 90%;
 }
 
 .botones button {
@@ -337,13 +360,13 @@ watch(fixed, () => {
   margin-bottom: 5px;
   display: flex;
   justify-content: flex-end;
+  height: 35px;
 }
 
 .b-b {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  margin-top: 30px;
   gap: 5px;
 }
 
@@ -392,5 +415,46 @@ watch(fixed, () => {
   .action-button {
     margin-left: 10px;
   }
+  @media (max-width: 917px){
+    .btn-agregar{
+      margin: 10px;
+      height: 35px;
+    }
+  }
+  
+  @media (max-width: 625px){
+    .container-table h1{
+      font-size: 60px;
+    }
+  }
+  @media (max-width: 430px){
+    .container-table h1{
+      font-size: 40px;
+    }
+  }
+</style>
+<style lang="sass">
+.my-sticky-virtscroll-table
+  /* height or max-height is important */
+  height: 410px
 
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th /* bg color is important for th; just specify one */
+    background-color: #00b4ff
+
+  thead tr th
+    position: sticky
+    z-index: 1
+  /* this will be the loading indicator */
+  thead tr:last-child th
+    /* height of all previous header rows */
+    top: 48px
+  thead tr:first-child th
+    top: 0
+
+  /* prevent scrolling behind sticky top row on focus */
+  tbody
+    /* height of all previous header rows */
+    scroll-margin-top: 48px
 </style>
