@@ -81,6 +81,8 @@ function toggleLeftDrawer() {
 
 .link{
   text-decoration: none;
+  margin-bottom: 6px;
+
 }
 
 </style>

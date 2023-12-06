@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="contenedor2" v-for="(item, index) in content" :key="index">
-      <router-link :to="item.ruta" class="link">
+      <router-link :to="item.ruta" class="link-card">
         <div class="card">
           <div class="tools">
             <div class="circle">
@@ -108,7 +108,7 @@ let content = ref([
   height: 150px;
   width: 150px;
 }
-.link{
+.link-card{
     width: 257px;
     height: 290px;
 }
