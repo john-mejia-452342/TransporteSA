@@ -141,14 +141,14 @@ onMounted(async () => {
 
 // Datos tabla 
 const columns = [
-  { name: "precio", label: "Precio", field: "precio", sortable: true },
-  { name: "hora_partida", label: "Hora Partida", field: (row) => row.horario_id.hora_partida,},
-  { name: "hora_llegada", label: "Hora LLegada", field: (row) => row.horario_id.hora_llegada,},
-  { name: "origen", label: "Origen", field: "origen" },
-  { name: "destino", label: "Destino", field: "destino" },
-  { name: "estado", label: "Estado", field: "estado", sortable: true },
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-  { name: "opciones", label: "Opciones", sortable: false },
+  { name: "precio", label: "Precio", field: "precio", sortable: true, align: "left" },
+  { name: "hora_partida", label: "Hora Partida", field: (row) => row.horario_id.hora_partida,align: "left"},
+  { name: "hora_llegada", label: "Hora LLegada", field: (row) => row.horario_id.hora_llegada,align: "left"},
+  { name: "origen", label: "Origen", field: "origen",align: "left"},
+  { name: "destino", label: "Destino", field: "destino", align: "left" },
+  { name: "estado", label: "Estado", field: "estado", sortable: true , align: "left"},
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "center"},
+  { name: "opciones", label: "Opciones", sortable: false, align: "center"},
 ];
 
 // Agregar Ruta

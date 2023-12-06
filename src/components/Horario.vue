@@ -122,11 +122,11 @@ onMounted(async () => {
 
 // Datos tabla
 const columns = [
-  { name: "hora_partida", label: "Hora Partida", field: "hora_partida", sortable: true,},
-  { name: "hora_llegada", label: "Hora Llegada", field: "hora_llegada", sortable: true,},
-  { name: "estado", label: "Estado", field: "estado", sortable: true },
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
+  { name: "hora_partida", label: "Hora Partida", field: "hora_partida", sortable: true, align: "left"},
+  { name: "hora_llegada", label: "Hora Llegada", field: "hora_llegada", sortable: true, align: "left"},
+  { name: "estado", label: "Estado", field: "estado", sortable: true, align: "left"},
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "center"},
+  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false, align: "center"},
 ];
 
 // Agregar Horario

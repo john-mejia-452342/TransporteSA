@@ -140,13 +140,13 @@ onMounted(async () => {
 
 // Datos de la tabla
 const columns = [
-  { name: "cedula", label: "Cedula", field: "cedula", sortable: true },
-  { name: "nombre", label: "Nombre", field: "nombre", sortable: true },
-  { name: "cuenta", label: "Cuenta", field: "cuenta" },
-  { name: "telefono", label: "Telefono", field: "telefono" },
-  { name: "estado", label: "Estado", field: "estado", sortable: true },
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-  { name: "opciones", label: "Opciones", sortable: false },
+  { name: "cedula", label: "Cedula", field: "cedula", sortable: true, align: "left" },
+  { name: "nombre", label: "Nombre", field: "nombre", sortable: true, align: "left" },
+  { name: "cuenta", label: "Cuenta", field: "cuenta", align: "left"},
+  { name: "telefono", label: "Telefono", field: "telefono", align: "left" },
+  { name: "estado", label: "Estado", field: "estado", sortable: true, align: "left" },
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "center"},
+  { name: "opciones", label: "Opciones", sortable: false, align: "center" },
 ];
 
 // Agregar Vendedor
