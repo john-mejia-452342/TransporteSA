@@ -39,10 +39,11 @@
     </q-dialog> -->
     <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Tickets</h1>
-      <div class="b-b">
-        <q-input class="bbuscar" v-model="searchtieckets" label="Buscar por número de cédula del cliente" style="width: 300px" @input="filtrarticket"/>
-        <q-btn color="primary" label="Buscar" @click="filtrarticket" class="btnbuscar"/>
-      </div>
+
+      <!-- barra de busqueda -->
+      <!-- <div class="b-b">
+       <q-input class="bbuscar" v-model.lazy="searchtickets" label="Buscar por número de cédula del cliente" style="width: 300px" />
+      </div> -->
 
       <div class="q-pa-md">
         <q-table
@@ -108,18 +109,35 @@ let rows = ref([]);
 // let bus = ref("");
 // let no_asiento = ref(0);
 // let fecha_departida = ref("");
-let searchtieckets = ref("");
+// let searchtieckets = ref("");
 let pagination = ref({rowsPerPage: 0});
 
 
-// Filtrar por la Cedula del Cliente
-function filtrarticket() {
-  if (searchtieckets.value.trim() === "") {
-    rows.value = tickets.value;
-  } else {
-    rows.value = tickets.value.filter((ticket) =>ticket.cliente_id.cedula.toString().includes(searchtieckets.value.toString()));
-  };
-};
+// function filtrartickets() {
+//   if (searchtieckets.value.trim() === "") {
+//     rows.value = tickets.value;
+//   } else {
+//     const searchTerm = searchtieckets.value.trim().toLowerCase();
+//     rows.value = tickets.value.filter((cliente) =>
+//       cliente.cedula.toString().toLowerCase().includes(searchTerm)
+//     );
+//   }
+// }
+
+// // Watcher para cambios en searchtieckets
+// watch(() => searchtieckets.value, () => {
+//   filtrartickets();
+// });
+
+// // Watcher para cambios en tickets
+// watch(() => tickets.value, (newtickets) => {
+//   rows.value = newtickets;
+// });
+
+// // Llamar a obtenerInfo al montar el componente
+// onMounted(() => {
+//   obtenerInfo();
+// });
 
 // Obtener Tickets
 async function obtenerInfo() {

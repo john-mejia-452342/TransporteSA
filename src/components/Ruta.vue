@@ -31,10 +31,9 @@
     <!-- Tabla -->
     <div  class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Rutas</h1>
-
+      <!-- barra de busqueda -->
       <div class="b-b">
-        <q-input class="bbuscar" v-model="searchrutas" label="Buscar por Origen" style="width: 300px" @input="filtraruta" />
-        <q-btn color="primary" label="Buscar" @click="filtraruta" class="btnbuscar" />
+        <q-input class="bbuscar" v-model.lazy="searchrutas" label="Buscar por ciudad de origen" style="width: 300px" />
       </div>
 
       <div class="btn-agregar">
@@ -96,14 +95,33 @@ let cambio = ref(0);
 let searchrutas = ref("");
 let pagination = ref({rowsPerPage: 0});
 
-// Filtar Rutas Por Origen
-function filtraruta() {
+
+function filtrarutas() {
   if (searchrutas.value.trim() === "") {
     rows.value = rutas.value;
   } else {
-    rows.value = rutas.value.filter((rutas) =>rutas.origen.toString().includes(searchrutas.value.toString()));
-  };
-};
+    const searchTerm = searchrutas.value.trim().toLowerCase();
+    rows.value = rutas.value.filter((ruta) =>
+      ruta.origen.toLowerCase().includes(searchTerm)
+    );
+  }
+}
+
+// Watcher para cambios en searchrutas
+watch(() => searchrutas.value, () => {
+  filtrarutas();
+});
+
+// Watcher para cambios en rutas
+watch(() => rutas.value, (newrutas) => {
+  rows.value = newrutas;
+});
+
+// Llamar a obtenerInfo al montar el componente
+onMounted(() => {
+  obtenerInfo();
+});
+
 
 // Obtener Rutas
 async function obtenerInfo() {
