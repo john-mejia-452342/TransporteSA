@@ -195,23 +195,23 @@ onMounted(async () => {
 });
 
 const columns = [
-  { name: "cliente_id", label: "Info Cliente", field: (row) =>   `${row.cliente_id.nombre} - ${row.cliente_id.cedula}- ${row.cliente_id.telefono}`,},
-  { name: "bus_id", label: "Info Bus", field: (row) =>   `${row.bus_id.empresa_asignada} - ${row.bus_id.placa} - N°${row.bus_id.numero_bus} `,},
-  { name: "bus_id", label: "Info Conductor", field: (row) =>   `${row.bus_id.conductor_id.nombre} - ${row.bus_id.conductor_id.cedula} - N°${row.bus_id.conductor_id.telefono} `,},
-  { name: "vendedor_id", label: "Info Vendedor", field: (row) => `${row.vendedor_id.nombre} - ${row.vendedor_id.telefono}`,},
-  { name: "ruta_id", label: "Ruta Origen - Destino", field: (row) => `${row.ruta_id.origen} - ${row.ruta_id.destino}`,},
-  { name: "ruta_id", label: "Horario Partida - Llegada", field: (row) =>   `${row.ruta_id.horario_id.hora_partida} - ${row.ruta_id.horario_id.hora_llegada}`,},
-  { name: "no_asiento", label: "N° Asiento", field: "no_asiento", sortable: true,},
+  { name: "cliente_id", label: "Info Cliente", field: (row) =>   `${row.cliente_id.nombre} - ${row.cliente_id.cedula}- ${row.cliente_id.telefono}`, align: "left"},
+  { name: "bus_id", label: "Info Bus", field: (row) =>   `${row.bus_id.empresa_asignada} - ${row.bus_id.placa} - N°${row.bus_id.numero_bus} `,align: "left"},
+  { name: "bus_id", label: "Info Conductor", field: (row) =>   `${row.bus_id.conductor_id.nombre} - ${row.bus_id.conductor_id.cedula} - N°${row.bus_id.conductor_id.telefono} `,align: "left"},
+  { name: "vendedor_id", label: "Info Vendedor", field: (row) => `${row.vendedor_id.nombre} - ${row.vendedor_id.telefono}`,align: "left"},
+  { name: "ruta_id", label: "Ruta Origen - Destino", field: (row) => `${row.ruta_id.origen} - ${row.ruta_id.destino}`,align: "left"},
+  { name: "ruta_id", label: "Horario Partida - Llegada", field: (row) =>   `${row.ruta_id.horario_id.hora_partida} - ${row.ruta_id.horario_id.hora_llegada}`,align: "left"},
+  { name: "no_asiento", label: "N° Asiento", field: "no_asiento", sortable: true,align: "center"},
   { 
   name: "fecha_departida", 
   label: "Fecha de partida", 
   field: "fecha_departida", 
   sortable: true, 
-  format: (val) => format(new Date(val), "yyyy-MM-dd"),
+  format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "left"
 },,
-  { name: "estado", label: "Estado", field: "estado", sortable: true },
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),},
-  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,},
+  { name: "estado", label: "Estado", field: "estado", sortable: true, align: "left"},
+  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "center"},
+  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,align: "center"},
 ];
 
 // Editar Ticket Funcionamiento
