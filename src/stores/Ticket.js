@@ -5,7 +5,7 @@ import { ref } from 'vue';
 
 export const useTicketStore = defineStore('ticket', () => {
   const ticket = ref([]);
-  let ticketCreado = ref();
+  let ticketCreado = ref([]);
   const postTicket = async (data) => {
     try {
       // console.log(token); 
@@ -17,9 +17,9 @@ export const useTicketStore = defineStore('ticket', () => {
       // };
       // console.log(config);
       let res = await axios.post("/ticket/agregar", data);
-      console.log(res);
+      console.log(res.data.ticket);
 
-      ticketCreado.value = res.data.ticket._id;
+      ticketCreado.value = res.data.ticket
       console.log(ticketCreado.value);
       return res;
     } catch (error) {
@@ -75,7 +75,7 @@ export const useTicketStore = defineStore('ticket', () => {
   }
 
   return {
-    ticket,puestos,
+    ticket,puestos,ticketCreado,
     postTicket, getTickets, putEditarTicket, putInactivarTicket, putActivarTicket, buscarTickets
   };
 });

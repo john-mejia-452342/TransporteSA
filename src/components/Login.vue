@@ -95,7 +95,12 @@ async function validar() {
       if (notification) {
         notification();
       }
-      badMessage.value = error.response.data.msg;
+      if(error){
+        badMessage.value = error;
+      }else if(!badMessage.value){
+        badMessage.value = error.response.data.msg;
+      }
+      
       showBad();
     };
   };

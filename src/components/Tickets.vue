@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- Modal -->
-    <q-dialog v-model="fixed" class="modal-container">
+    <!-- <q-dialog v-model="fixed" class="modal-container">
       <q-card class="modal-content">
         <q-card-section class="modal-header">
           <div class="text-h6">{{ text }}</div>
@@ -36,7 +36,7 @@
           <q-btn flat label="Guardar 💾" color="primary" @click="editarTicket()"/>
         </q-card-actions>
       </q-card>
-    </q-dialog>
+    </q-dialog> -->
     <div class="container-table" style="min-height: 90vh; width: 80%">
       <h1>Tickets</h1>
       <div class="b-b">
@@ -96,18 +96,18 @@ const ticketStore = useTicketStore();
 
 let tickets = ref([]);
 let rows = ref([]);
-let fixed = ref(false);
-let text = ref("");
-let optionsVendedor = ref([]);
-let optionsCliente = ref([]);
-let optionsBus = ref([]);
-let optionsRutas = ref([]);
-let ruta = ref("");
-let vendedor = ref("");
-let cliente = ref("");
-let bus = ref("");
-let no_asiento = ref(0);
-let fecha_departida = ref("");
+// let fixed = ref(false);
+// let text = ref("");
+// let optionsVendedor = ref([]);
+// let optionsCliente = ref([]);
+// let optionsBus = ref([]);
+// let optionsRutas = ref([]);
+// let ruta = ref("");
+// let vendedor = ref("");
+// let cliente = ref("");
+// let bus = ref("");
+// let no_asiento = ref(0);
+// let fecha_departida = ref("");
 let searchtieckets = ref("");
 let pagination = ref({rowsPerPage: 0});
 
@@ -131,7 +131,6 @@ async function obtenerInfo() {
       const dateB = new Date(b.createAT);
       return dateB - dateA;
     });
-    console.log(rows.value);
   } catch (error) {
     console.log(error);
   };

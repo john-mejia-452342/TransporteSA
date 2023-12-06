@@ -3,6 +3,7 @@ import axios from 'axios'
 import {ref} from'vue'
 import { useRouter } from 'vue-router';
 
+
 export const useLoginStore = defineStore('Login', ()=>{
     const token = ref()
     let vendedor = ref([])
@@ -14,17 +15,25 @@ export const useLoginStore = defineStore('Login', ()=>{
             let res = await axios.post("/vendedor/vendedor_datos", data);
             vendedor.value = res.data.vendedor
             token.value = res.data.token
-            router.push('/main')
+
+            if(vendedor.value.estado === false){
+                throw "Vendedor Inactivado"
+            }else{
+                router.push('/main')
+            }
+            
             
             return res
         } catch (error) {
-            console.log(error);
             throw error
         }
     }
 
     return{
         token,vendedor,
-        Login
+        Login,
     }
+
+    
 })
+
