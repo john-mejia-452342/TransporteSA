@@ -315,7 +315,7 @@ function validar() {
     badMessage.value = "Ingrese el Nombre";
     nombre.value = ""
     showBad();
-  } else if(!experiencia.value || experiencia.value <= 0) {
+  } else if(!experiencia.value || experiencia.value < 0) {
     badMessage.value = "Ingrese un número positivo mayor que cero";
     experiencia.value = "";
     showBad();
@@ -333,7 +333,9 @@ function validar() {
 // Limpiar el modal cuando se cierre mal
 watch(fixed, () => {
   if (fixed.value == false) {
-    limpiar();
+    if (cambio.value === 1) {
+      limpiar();
+    };
   };
 });
 </script>

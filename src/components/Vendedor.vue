@@ -344,7 +344,9 @@ async function validar() {
 // Limpiar el modal cuando se cierre mal
 watch(fixed, () => {
   if (fixed.value == false) {
-    limpiar();
+    if (cambio.value === 1) {
+      limpiar();
+    };
   };
 });
 

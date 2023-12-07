@@ -317,73 +317,73 @@ function generarTicket(){
   doc.setTextColor(0, 105, 217);
   doc.text(`TransporteSA`, 18, 19);
 
+
+  // Títulos
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text(`Informacion del bus:`, 22, 30);
+
+ //Normal
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'normal');
+  doc.setFontSize(14);
+  doc.text(`-Empresa encargada: ${ticket.value.bus_id.empresa_asignada}`, 20, 38);
+  doc.text(`-Placa: ${ticket.value.bus_id.placa}`, 20, 46);
+  doc.text(`-N° de bus: ${ticket.value.bus_id.numero_bus}`, 20, 54);
+  doc.text(`-Origen: ${ticket.value.ruta_id.origen}`, 20, 62 );
+  doc.text(`-Destino: ${ticket.value.ruta_id.destino}`, 20, 70 );
+  doc.text(`-Horario salida: ${ticket.value.ruta_id.horario_id.hora_partida}`, 20, 78);
+  doc.text(`-Hora de llegada: ${ticket.value.ruta_id.horario_id.hora_llegada}`, 20, 86);
+  doc.text(`-Fecha de Partida: ${format(new Date(ticket.value.fecha_departida), "yyyy-MM-dd")}`, 20, 94);
+  doc.text(`-Fecha-Hora Venta: ${format(new Date(ticket.value.fechahora_venta),"yyyy-MM-dd")} - ${format(new Date(ticket.value.fechahora_venta),'HH:mm:ss')}`, 20, 102)
+
   // Títulos
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(30, 30, 30);
-  doc.text(`Información del Cliente:`, 20, 30);
+  doc.text(`Información del Cliente:`, 20, 120);
 
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.value.cliente_id.nombre}`, 20, 38);
-  doc.text(`-C.C: ${ticket.value.cliente_id.cedula}`, 20, 46);
-  doc.text(`-Telefono: ${ticket.value.cliente_id.telefono}`, 20, 54);
-  doc.text(`-N° Asiento: ${ticket.value.no_asiento}`, 20, 63);
+  doc.text(`-Nombre: ${ticket.value.cliente_id.nombre}`, 20, 128);
+  doc.text(`-C.C: ${ticket.value.cliente_id.cedula}`, 20, 136);
+  doc.text(`-Telefono: ${ticket.value.cliente_id.telefono}`, 20, 144);
+  doc.text(`-N° Asiento: ${ticket.value.no_asiento}`, 20, 152);
   
   // Títulos
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(`Informacion sobre el Vendedor:`, 22, 81)
+  doc.text(`Informacion sobre el Vendedor:`, 22, 170)
   
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.value.vendedor_id.nombre}`, 20, 89);
-  doc.text(`-Telefono: ${ticket.value.vendedor_id.telefono}`, 20, 97);
+  doc.text(`-Nombre: ${ticket.value.vendedor_id.nombre}`, 20, 178);
+  doc.text(`-Telefono: ${ticket.value.vendedor_id.telefono}`, 20, 186);
 
     // Títulos
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(`Informacion del Conductor:`, 22, 110);
+  doc.text(`Informacion del Conductor:`, 22, 204);
 
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.value.bus_id.conductor_id.nombre}`, 20, 118);
-  doc.text(`-Telefono: ${ticket.value.bus_id.conductor_id.telefono}`, 20, 126);
+  doc.text(`-Nombre: ${ticket.value.bus_id.conductor_id.nombre}`, 20, 212);
+  doc.text(`-Telefono: ${ticket.value.bus_id.conductor_id.telefono}`, 20, 220);
   
-  // Títulos
-  doc.setTextColor(30, 30, 30);
-  doc.setFont('Helvetica', 'bold');
-  doc.setFontSize(15);
-  doc.text(`Informacion del bus:`, 22, 139);
-
-  //Normal
-  doc.setTextColor(30, 30, 30);
-  doc.setFont('Helvetica', 'normal');
-  doc.setFontSize(14);
-  doc.text(`-Empresa encargada: ${ticket.value.bus_id.empresa_asignada}`, 20, 147);
-  doc.text(`-Placa: ${ticket.value.bus_id.placa}`, 20, 155);
-  doc.text(`-Nu° de bus: ${ticket.value.bus_id.numero_bus}`, 20, 163);
-  doc.text(`-Ruta del bus: ${ticket.value.ruta_id.origen} - ${ticket.value.ruta_id.destino}`, 20, 171 );
-  doc.text(`-Horario salida: ${ticket.value.ruta_id.horario_id.hora_partida} // Hora de llegada: ${ticket.value.ruta_id.horario_id.hora_llegada}`, 20, 179);
-  doc.text(`-Fecha de Partida: ${format(new Date(ticket.value.fecha_departida), "yyyy-MM-dd")}`, 20, 187);
-
-
-
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(25);
   doc.setTextColor(0, 105, 217);
-  doc.text(`¡Gracias por tu confianza!`, 20, 203);
-
+  doc.text(`¡Gracias por tu confianza!`, 20, 240);
   doc.save(`ticket_${ticket.value._id}.pdf`);
-
 }
 
 watch(ruta, () => {

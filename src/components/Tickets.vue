@@ -41,44 +41,37 @@
       <h1>Tickets</h1>
 
       <!-- barra de busqueda -->
-      <!-- <div class="b-b">
-       <q-input class="bbuscar" v-model.lazy="searchtickets" label="Buscar por número de cédula del cliente" style="width: 300px" />
-      </div> -->
+      <div class="b-b">
+        <q-input class="bbuscar" v-model.lazy="searchtieckets" label="Buscar por número de cédula del cliente"
+          style="width: 300px" />
+      </div>
 
       <div class="q-pa-md">
-        <q-table
-          class="my-sticky-virtscroll-table"
-          virtual-scroll
-          flat bordered
-          v-model:pagination="pagination"
-          :rows-per-page-options="[0]"
-          :virtual-scroll-sticky-size-start="48"
-          row-key="index"
-          :rows="rows"
-          :columns="columns"
-          style="height: 52vh;"
-        >
-        <template v-slot:body-cell-estado="props">
-          <q-td :props="props">
-            <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
-            <label for="" v-else style="color: red">Inactivo</label>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-opciones="props">
-          <q-td :props="props" class="botones">
-            <!-- <q-btn color="white" text-color="black" label="🖋️" @click="EditarTicket(props.row._id)"/> -->
-            <q-btn color="white" text-color="black" label="📄" @click="generarPDF(props.row)"/>
-            <q-btn color="white" text-color="black" label="❌" @click="InactivarTicket(props.row._id)" v-if="props.row.estado == 1"/>
-            <q-btn color="white" text-color="black" label="✅" @click="ActivarTicket(props.row._id)" v-else/>
-          </q-td>
-        </template>
-      </q-table>
+        <q-table class="my-sticky-virtscroll-table" virtual-scroll flat bordered v-model:pagination="pagination"
+          :rows-per-page-options="[0]" :virtual-scroll-sticky-size-start="48" row-key="index" :rows="rows"
+          :columns="columns" style="height: 52vh;">
+          <template v-slot:body-cell-estado="props">
+            <q-td :props="props">
+              <label for="" v-if="props.row.estado == 1" style="color: green">Activo</label>
+              <label for="" v-else style="color: red">Inactivo</label>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-opciones="props">
+            <q-td :props="props" class="botones">
+              <!-- <q-btn color="white" text-color="black" label="🖋️" @click="EditarTicket(props.row._id)"/> -->
+              <q-btn color="white" text-color="black" label="📄" @click="generarPDF(props.row)" />
+              <q-btn color="white" text-color="black" label="❌" @click="InactivarTicket(props.row._id)"
+                v-if="props.row.estado == 1" />
+              <q-btn color="white" text-color="black" label="✅" @click="ActivarTicket(props.row._id)" v-else />
+            </q-td>
+          </template>
+        </q-table>
       </div>
     </div>
   </div>
 </template>
     
-  <script setup>
+<script setup>
 import { ref, onMounted, watch } from "vue";
 import { format } from "date-fns";
 // import { useBusStore } from "../stores/Bus.js";
@@ -87,7 +80,7 @@ import { useTicketStore } from "../stores/Ticket.js";
 // import { useClienteStore } from "../stores/Cliente.js";
 // import { useRutaStore } from "../stores/Ruta.js";
 import { useQuasar } from "quasar";
- import { jsPDF } from "jspdf";
+import { jsPDF } from "jspdf";
 const $q = useQuasar();
 // const busStore = useBusStore();
 const ticketStore = useTicketStore();
@@ -109,35 +102,29 @@ let rows = ref([]);
 // let bus = ref("");
 // let no_asiento = ref(0);
 // let fecha_departida = ref("");
-// let searchtieckets = ref("");
-let pagination = ref({rowsPerPage: 0});
+let searchtieckets = ref("");
+let pagination = ref({ rowsPerPage: 0 });
 
 
-// function filtrartickets() {
-//   if (searchtieckets.value.trim() === "") {
-//     rows.value = tickets.value;
-//   } else {
-//     const searchTerm = searchtieckets.value.trim().toLowerCase();
-//     rows.value = tickets.value.filter((cliente) =>
-//       cliente.cedula.toString().toLowerCase().includes(searchTerm)
-//     );
-//   }
-// }
+function filtrartickets() {
+  if (searchtieckets.value.trim() === "") {
+    rows.value = tickets.value;
+  } else {
+    const searchTerm = searchtieckets.value.trim().toLowerCase();
+    rows.value = tickets.value.filter((ticket) =>
+      ticket.cliente_id.cedula.toString().toLowerCase().includes(searchTerm)
+    );
+  }
+}
+// Watcher para cambios en searchtieckets
+watch(() => searchtieckets.value, () => {
+  filtrartickets();
+});
 
-// // Watcher para cambios en searchtieckets
-// watch(() => searchtieckets.value, () => {
-//   filtrartickets();
-// });
-
-// // Watcher para cambios en tickets
-// watch(() => tickets.value, (newtickets) => {
-//   rows.value = newtickets;
-// });
-
-// // Llamar a obtenerInfo al montar el componente
-// onMounted(() => {
-//   obtenerInfo();
-// });
+// Watcher para cambios en tickets
+watch(() => tickets.value, (newtickets) => {
+  rows.value = newtickets;
+});
 
 // Obtener Tickets
 async function obtenerInfo() {
@@ -149,6 +136,8 @@ async function obtenerInfo() {
       const dateB = new Date(b.createAT);
       return dateB - dateA;
     });
+    console.log(tickets);
+
   } catch (error) {
     console.log(error);
   };
@@ -213,23 +202,23 @@ onMounted(async () => {
 });
 
 const columns = [
-  { name: "cliente_id", label: "Info Cliente", field: (row) =>   `${row.cliente_id.nombre} - ${row.cliente_id.cedula}- ${row.cliente_id.telefono}`, align: "left"},
-  { name: "bus_id", label: "Info Bus", field: (row) =>   `${row.bus_id.empresa_asignada} - ${row.bus_id.placa} - N°${row.bus_id.numero_bus} `,align: "left"},
-  { name: "bus_id", label: "Info Conductor", field: (row) =>   `${row.bus_id.conductor_id.nombre} - ${row.bus_id.conductor_id.cedula} - N°${row.bus_id.conductor_id.telefono} `,align: "left"},
-  { name: "vendedor_id", label: "Info Vendedor", field: (row) => `${row.vendedor_id.nombre} - ${row.vendedor_id.telefono}`,align: "left"},
-  { name: "ruta_id", label: "Ruta Origen - Destino", field: (row) => `${row.ruta_id.origen} - ${row.ruta_id.destino}`,align: "left"},
-  { name: "ruta_id", label: "Horario Partida - Llegada", field: (row) =>   `${row.ruta_id.horario_id.hora_partida} - ${row.ruta_id.horario_id.hora_llegada}`,align: "left"},
-  { name: "no_asiento", label: "N° Asiento", field: "no_asiento", sortable: true,align: "center"},
-  { 
-  name: "fecha_departida", 
-  label: "Fecha de partida", 
-  field: "fecha_departida", 
-  sortable: true, 
-  format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "left"
-},,
-  { name: "estado", label: "Estado", field: "estado", sortable: true, align: "left"},
-  { name: "createAT", label: "Fecha de Creación", field: "createAT", sortable: true, format: (val) => format(new Date(val), "yyyy-MM-dd"),align: "center"},
-  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false,align: "center"},
+  { name: "cliente_id", label: "Info Cliente", field: (row) => `${row.cliente_id.nombre} - ${row.cliente_id.cedula}- ${row.cliente_id.telefono}`, align: "left" },
+  { name: "bus_id", label: "Info Bus", field: (row) => `${row.bus_id.empresa_asignada} - ${row.bus_id.placa} - N°${row.bus_id.numero_bus} `, align: "left" },
+  { name: "bus_id", label: "Info Conductor", field: (row) => `${row.bus_id.conductor_id.nombre} - ${row.bus_id.conductor_id.cedula} - N°${row.bus_id.conductor_id.telefono} `, align: "left" },
+  { name: "vendedor_id", label: "Info Vendedor", field: (row) => `${row.vendedor_id.nombre} - ${row.vendedor_id.telefono}`, align: "left" },
+  { name: "ruta_id", label: "Ruta Origen - Destino", field: (row) => `${row.ruta_id.origen} - ${row.ruta_id.destino}`, align: "left" },
+  { name: "ruta_id", label: "Horario Partida - Llegada", field: (row) => `${row.ruta_id.horario_id.hora_partida} - ${row.ruta_id.horario_id.hora_llegada}`, align: "left" },
+  { name: "no_asiento", label: "N° Asiento", field: "no_asiento", sortable: true, align: "center" },
+  {
+    name: "fecha_departida",
+    label: "Fecha de partida",
+    field: "fecha_departida",
+    sortable: true,
+    format: (val) => format(new Date(val), "yyyy-MM-dd"), align: "left"
+  }, ,
+  { name: "estado", label: "Estado", field: "estado", sortable: true, align: "left" },
+  { name: "createAT", label: "Fecha de Creación", field: (row) => `${format(new Date(row.createAT), "yyyy-MM-dd")} - ${format(new Date(row.createAT), 'HH:mm:ss')}`, sortable: true, align: "center" },
+  { name: "opciones", label: "Opciones", field: (row) => null, sortable: false, align: "center" },
 ];
 
 // Editar Ticket Funcionamiento
@@ -376,7 +365,7 @@ const showDefault = () => {
 };
 
 // Cancelar Notificacion
-const cancelShow = ()=>{
+const cancelShow = () => {
   if (notification) {
     notification();
   };
@@ -423,86 +412,91 @@ let notification = ref(null);
 // Hacer PDF 
 // Hacer PDF 
 function generarPDF(ticket) {
- 
- const doc = new jsPDF();
 
- const logoDataUri = 'https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg'; 
- doc.addImage(logoDataUri, 'PNG', 120, 0, 80, 80);
- 
- 
- // Título
- doc.setFont('Helvetica', 'bold');
- doc.setFontSize(25);
- doc.setTextColor(0, 105, 217);
- doc.text(`TransporteSA`, 18, 19);
+  const doc = new jsPDF();
 
- // Títulos
- doc.setFont('Helvetica', 'bold');
- doc.setFontSize(15);
- doc.setTextColor(30, 30, 30);
- doc.text(`Información del Cliente:`, 20, 30);
+  const logoDataUri = 'https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg';
+  doc.addImage(logoDataUri, 'PNG', 120, 0, 80, 80);
 
- //Normal
- doc.setTextColor(30, 30, 30);
- doc.setFont('Helvetica', 'normal');
- doc.setFontSize(14);
- doc.text(`-Nombre: ${ticket.cliente_id.nombre}`, 20, 38);
- doc.text(`-C.C: ${ticket.cliente_id.cedula}`, 20, 46);
- doc.text(`-Telefono: ${ticket.cliente_id.telefono}`, 20, 54);
- doc.text(`-N° Asiento: ${ticket.no_asiento}`, 20, 63);
- 
- // Títulos
- doc.setTextColor(30, 30, 30);
- doc.setFont('Helvetica', 'bold');
- doc.setFontSize(15);
- doc.text(`Informacion sobre el Vendedor:`, 22, 81)
- 
- //Normal
- doc.setTextColor(30, 30, 30);
- doc.setFont('Helvetica', 'normal');
- doc.setFontSize(14);
- doc.text(`-Nombre: ${ticket.vendedor_id.nombre}`, 20, 89);
- doc.text(`-Telefono: ${ticket.vendedor_id.telefono}`, 20, 97);
+
+  // Título
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(25);
+  doc.setTextColor(0, 105, 217);
+  doc.text(`TransporteSA`, 18, 19);
+
 
   // Títulos
- doc.setTextColor(30, 30, 30);
- doc.setFont('Helvetica', 'bold');
- doc.setFontSize(15);
- doc.text(`Informacion del Conductor:`, 22, 110);
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text(`Informacion del bus:`, 22, 30);
 
- //Normal
- doc.setTextColor(30, 30, 30);
- doc.setFont('Helvetica', 'normal');
- doc.setFontSize(14);
- doc.text(`-Nombre: ${ticket.bus_id.conductor_id.nombre}`, 20, 118);
- doc.text(`-Telefono: ${ticket.bus_id.conductor_id.telefono}`, 20, 126);
- 
- // Títulos
- doc.setTextColor(30, 30, 30);
- doc.setFont('Helvetica', 'bold');
- doc.setFontSize(15);
- doc.text(`Informacion del bus:`, 22, 139);
+  //Normal
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'normal');
+  doc.setFontSize(14);
+  doc.text(`-Empresa encargada: ${ticket.bus_id.empresa_asignada}`, 20, 38);
+  doc.text(`-Placa: ${ticket.bus_id.placa}`, 20, 46);
+  doc.text(`-N° de bus: ${ticket.bus_id.numero_bus}`, 20, 54);
+  doc.text(`-Origen: ${ticket.ruta_id.origen}`, 20, 62);
+  doc.text(`-Destino: ${ticket.ruta_id.destino}`, 20, 70);
+  doc.text(`-Horario salida: ${ticket.ruta_id.horario_id.hora_partida}`, 20, 78);
+  doc.text(`-Hora de llegada: ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 86);
+  doc.text(`-Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 94);
+  doc.text(`-Fecha-Hora Venta: ${format(new Date(ticket.fechahora_venta), "yyyy-MM-dd")} - ${format(new Date(ticket.fechahora_venta), 'HH:mm:ss')}`, 20, 102)
 
- //Normal
- doc.setTextColor(30, 30, 30);
- doc.setFont('Helvetica', 'normal');
- doc.setFontSize(14);
- doc.text(`-Empresa encargada: ${ticket.bus_id.empresa_asignada}`, 20, 147);
- doc.text(`-Placa: ${ticket.bus_id.placa}`, 20, 155);
- doc.text(`-Nu° de bus: ${ticket.bus_id.numero_bus}`, 20, 163);
- doc.text(`-Ruta del bus: ${ticket.ruta_id.origen} - ${ticket.ruta_id.destino}`, 20, 171 );
- doc.text(`-Horario salida: ${ticket.ruta_id.horario_id.hora_partida} // Hora de llegada: ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 179);
- doc.text(`-Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 187);
+  // Títulos
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.setTextColor(30, 30, 30);
+  doc.text(`Información del Cliente:`, 20, 120);
+
+  //Normal
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'normal');
+  doc.setFontSize(14);
+  doc.text(`-Nombre: ${ticket.cliente_id.nombre}`, 20, 128);
+  doc.text(`-C.C: ${ticket.cliente_id.cedula}`, 20, 136);
+  doc.text(`-Telefono: ${ticket.cliente_id.telefono}`, 20, 144);
+  doc.text(`-N° Asiento: ${ticket.no_asiento}`, 20, 152);
+
+  // Títulos
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text(`Informacion sobre el Vendedor:`, 22, 170)
+
+  //Normal
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'normal');
+  doc.setFontSize(14);
+  doc.text(`-Nombre: ${ticket.vendedor_id.nombre}`, 20, 178);
+  doc.text(`-Telefono: ${ticket.vendedor_id.telefono}`, 20, 186);
+
+  // Títulos
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(15);
+  doc.text(`Informacion del Conductor:`, 22, 204);
+
+  //Normal
+  doc.setTextColor(30, 30, 30);
+  doc.setFont('Helvetica', 'normal');
+  doc.setFontSize(14);
+  doc.text(`-Nombre: ${ticket.bus_id.conductor_id.nombre}`, 20, 212);
+  doc.text(`-Telefono: ${ticket.bus_id.conductor_id.telefono}`, 20, 220);
 
 
 
- doc.setFont('Helvetica', 'bold');
- doc.setFontSize(25);
- doc.setTextColor(0, 105, 217);
- doc.text(`¡Gracias por tu confianza!`, 20, 203);
 
- doc.save(`ticket_${ticket._id}.pdf`);
+  doc.setFont('Helvetica', 'bold');
+  doc.setFontSize(25);
+  doc.setTextColor(0, 105, 217);
+  doc.text(`¡Gracias por tu confianza!`, 20, 240);
+  doc.save(`ticket_${ticket._id}.pdf`);
 }
+
 </script>
     
 <style scoped>
@@ -512,6 +506,7 @@ function generarPDF(ticket) {
   display: flex;
   justify-content: center;
 }
+
 .modal-container {
   display: flex;
   align-items: center;
@@ -543,7 +538,7 @@ function generarPDF(ticket) {
 .btn-agregar {
   width: 100%;
   margin-bottom: 5px;
-  display: flex;  
+  display: flex;
   justify-content: flex-end;
   height: 35px;
 }
@@ -570,6 +565,7 @@ function generarPDF(ticket) {
   position: relative;
   top: 6px;
 }
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -600,19 +596,19 @@ function generarPDF(ticket) {
 
 .action-button {
   margin-left: 10px;
-  
+
 }
 
 
-@media (max-width: 917px){
-  .btn-agregar{
+@media (max-width: 917px) {
+  .btn-agregar {
     margin: 10px;
     height: 35px;
   }
 }
 
-@media (max-width: 500px){
-  .container-table h1{
+@media (max-width: 500px) {
+  .container-table h1 {
     font-size: 80px;
   }
 }

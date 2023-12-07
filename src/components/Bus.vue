@@ -343,13 +343,9 @@ function validar() {
   placa.value = placa.value.trim().toUpperCase();
   empresa_asignada.value = empresa_asignada.value.trim();
 
-  const placaRegex = /^[A-Z]{3}\d{3}$/;
 
   if (!placa.value) {
     badMessage.value = "Ingrese la Placa";
-    showBad();
-  } else if (!placaRegex.test(placa.value)) {
-    badMessage.value = "La Placa debe contener tres letras en mayúscula seguidas de tres dígitos.";
     showBad();
   } else if (!numero_bus.value) {
     badMessage.value = "Ingrese el número del bus";
@@ -377,7 +373,9 @@ function validar() {
 // Limpiar el modal cuando se cierre mal
 watch(fixed, () => {
   if (fixed.value == false) {
-    limpiar();
+    if (cambio.value === 1) {
+      limpiar();
+    };
   };
 });
 </script>
