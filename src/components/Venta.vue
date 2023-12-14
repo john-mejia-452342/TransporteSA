@@ -13,7 +13,7 @@
             <q-input v-model="fecha_departida" filled type="date" hint="Fecha para Partida" style="width: 300px" :min="getFechaActual()"/>
           </div>
           <div class="options">
-            <q-btn label="Cerrar" color="primary" @click="cerrarModal" />
+            <!-- <q-btn label="Cerrar" color="primary" @click="cerrarModal" /> -->
             <q-btn label="Buscar" color="primary" @click="generarTicketInfo()" />
           </div>
         </div>
@@ -104,10 +104,10 @@ function mostrarModal() {
 };
 
 // Cerrar Modal
-function cerrarModal() {
-  fixed.value = false;
-  rutaBusFecha.value = false;
-};
+// function cerrarModal() {
+//   fixed.value = false;
+//   rutaBusFecha.value = false;
+// };
 
 // Obtener Buses, Rutas y clientes 
 async function obtenerInfo() {
@@ -125,11 +125,23 @@ async function obtenerInfo() {
 async function obtenerRutas() {
   try {
     await rutaStore.obtenerInfoRutas();
-    const rutasActivas = rutaStore.rutas.filter(ruta => ruta.estado === true);
-    optionsRutas.value = rutasActivas.map((ruta) => ({
-      label: `${ruta.precio} - ${ruta.origen} - ${ruta.destino}`,
-      value: String(ruta._id),
-    }));
+    const rutasActivas = rutaStore.rutas.filter((ruta) => ruta.estado === true);
+
+    optionsRutas.value = rutasActivas.map((ruta) => {
+      const precioNumber = parseFloat(ruta.precio);
+
+      const precioFormateado = !isNaN(precioNumber)
+        ? precioNumber.toLocaleString("es-CO", {
+            style: "currency",
+            currency: "COP",
+          })
+        : ruta.precio;
+
+      return {
+        label: `${precioFormateado} - ${ruta.origen} - ${ruta.destino}`,
+        value: String(ruta._id),
+      };
+    });
   } catch (error) {
     console.log(error);
   };
@@ -307,6 +319,15 @@ function generarTicket(){
   ticket.value = ticketStore.ticketCreado;
   const doc = new jsPDF();
 
+  const precioNumber = parseFloat(ticket.value.ruta_id.precio);
+
+  const precioFormateado = !isNaN(precioNumber)
+    ? precioNumber.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+      })
+    : ticket.value.ruta_id.precio;
+
   const logoDataUri = 'https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg'; 
   doc.addImage(logoDataUri, 'PNG', 120, 0, 80, 80);
   
@@ -322,7 +343,7 @@ function generarTicket(){
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(`Informacion del bus:`, 22, 30);
+  doc.text(`Informacion General:`, 22, 30);
 
  //Normal
   doc.setTextColor(30, 30, 30);
@@ -331,58 +352,59 @@ function generarTicket(){
   doc.text(`-Empresa encargada: ${ticket.value.bus_id.empresa_asignada}`, 20, 38);
   doc.text(`-Placa: ${ticket.value.bus_id.placa}`, 20, 46);
   doc.text(`-N° de bus: ${ticket.value.bus_id.numero_bus}`, 20, 54);
-  doc.text(`-Origen: ${ticket.value.ruta_id.origen}`, 20, 62 );
-  doc.text(`-Destino: ${ticket.value.ruta_id.destino}`, 20, 70 );
-  doc.text(`-Horario salida: ${ticket.value.ruta_id.horario_id.hora_partida}`, 20, 78);
-  doc.text(`-Hora de llegada: ${ticket.value.ruta_id.horario_id.hora_llegada}`, 20, 86);
-  doc.text(`-Fecha de Partida: ${format(new Date(ticket.value.fecha_departida), "yyyy-MM-dd")}`, 20, 94);
-  doc.text(`-Fecha-Hora Venta: ${format(new Date(ticket.value.fechahora_venta),"yyyy-MM-dd")} - ${format(new Date(ticket.value.fechahora_venta),'HH:mm:ss')}`, 20, 102)
+  doc.text(`-Costo: ${precioFormateado}`, 20, 62);
+  doc.text(`-Origen: ${ticket.value.ruta_id.origen}`, 20, 70 );
+  doc.text(`-Destino: ${ticket.value.ruta_id.destino}`, 20, 78 );
+  doc.text(`-Horario salida: ${ticket.value.ruta_id.horario_id.hora_partida}`, 20, 86);
+  doc.text(`-Hora de llegada: ${ticket.value.ruta_id.horario_id.hora_llegada}`, 20, 94);
+  doc.text(`-Fecha de Partida: ${format(new Date(ticket.value.fecha_departida), "yyyy-MM-dd")}`, 20, 102);
+  doc.text(`-Fecha-Hora Venta: ${format(new Date(ticket.value.fechahora_venta),"yyyy-MM-dd")} - ${format(new Date(ticket.value.fechahora_venta),'HH:mm:ss')}`, 20, 110)
 
   // Títulos
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(30, 30, 30);
-  doc.text(`Información del Cliente:`, 20, 120);
+  doc.text(`Información del Cliente:`, 20, 128);
 
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.value.cliente_id.nombre}`, 20, 128);
-  doc.text(`-C.C: ${ticket.value.cliente_id.cedula}`, 20, 136);
-  doc.text(`-Telefono: ${ticket.value.cliente_id.telefono}`, 20, 144);
-  doc.text(`-N° Asiento: ${ticket.value.no_asiento}`, 20, 152);
+  doc.text(`-Nombre: ${ticket.value.cliente_id.nombre}`, 20, 136);
+  doc.text(`-C.C: ${ticket.value.cliente_id.cedula}`, 20, 144);
+  doc.text(`-Telefono: ${ticket.value.cliente_id.telefono}`, 20, 152);
+  doc.text(`-N° Asiento: ${ticket.value.no_asiento}`, 20, 160);
   
   // Títulos
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(`Informacion sobre el Vendedor:`, 22, 170)
+  doc.text(`Informacion sobre el Vendedor:`, 22, 178)
   
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.value.vendedor_id.nombre}`, 20, 178);
-  doc.text(`-Telefono: ${ticket.value.vendedor_id.telefono}`, 20, 186);
+  doc.text(`-Nombre: ${ticket.value.vendedor_id.nombre}`, 20, 186);
+  doc.text(`-Telefono: ${ticket.value.vendedor_id.telefono}`, 20, 194);
 
     // Títulos
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(`Informacion del Conductor:`, 22, 204);
+  doc.text(`Informacion del Conductor:`, 22, 212);
 
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.value.bus_id.conductor_id.nombre}`, 20, 212);
-  doc.text(`-Telefono: ${ticket.value.bus_id.conductor_id.telefono}`, 20, 220);
+  doc.text(`-Nombre: ${ticket.value.bus_id.conductor_id.nombre}`, 20, 220);
+  doc.text(`-Telefono: ${ticket.value.bus_id.conductor_id.telefono}`, 20, 228);
   
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(25);
   doc.setTextColor(0, 105, 217);
-  doc.text(`¡Gracias por tu confianza!`, 20, 240);
+  doc.text(`¡Gracias por tu confianza!`, 20, 248);
   doc.save(`ticket_${ticket.value._id}.pdf`);
 }
 

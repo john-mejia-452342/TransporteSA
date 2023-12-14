@@ -131,13 +131,8 @@ async function obtenerInfo() {
   try {
     await ticketStore.getTickets();
     tickets.value = ticketStore.ticket;
-    rows.value = ticketStore.ticket.slice().sort((a, b) => {
-      const dateA = new Date(a.createAT);
-      const dateB = new Date(b.createAT);
-      return dateB - dateA;
-    });
+    rows.value = ticketStore.ticket.reverse();
     console.log(tickets);
-
   } catch (error) {
     console.log(error);
   };
@@ -206,7 +201,23 @@ const columns = [
   { name: "bus_id", label: "Info Bus", field: (row) => `${row.bus_id.empresa_asignada} - ${row.bus_id.placa} - N°${row.bus_id.numero_bus} `, align: "left" },
   { name: "bus_id", label: "Info Conductor", field: (row) => `${row.bus_id.conductor_id.nombre} - ${row.bus_id.conductor_id.cedula} - N°${row.bus_id.conductor_id.telefono} `, align: "left" },
   { name: "vendedor_id", label: "Info Vendedor", field: (row) => `${row.vendedor_id.nombre} - ${row.vendedor_id.telefono}`, align: "left" },
-  { name: "ruta_id", label: "Ruta Origen - Destino", field: (row) => `${row.ruta_id.origen} - ${row.ruta_id.destino}`, align: "left" },
+  {
+  name: "ruta_id",
+  label: "Ruta Precio - Origen - Destino",
+  field: (row) => {
+    const precioNumber = parseFloat(row.ruta_id.precio);
+
+    const precioFormateado = !isNaN(precioNumber)
+      ? precioNumber.toLocaleString("es-CO", {
+          style: "currency",
+          currency: "COP",
+        })
+      : row.ruta_id.precio;
+
+    return `${precioFormateado} - ${row.ruta_id.origen} - ${row.ruta_id.destino}`;
+  },
+  align: "left",
+},
   { name: "ruta_id", label: "Horario Partida - Llegada", field: (row) => `${row.ruta_id.horario_id.hora_partida} - ${row.ruta_id.horario_id.hora_llegada}`, align: "left" },
   { name: "no_asiento", label: "N° Asiento", field: "no_asiento", sortable: true, align: "center" },
   {
@@ -414,6 +425,14 @@ let notification = ref(null);
 function generarPDF(ticket) {
 
   const doc = new jsPDF();
+  const precioNumber = parseFloat(ticket.ruta_id.precio);
+
+  const precioFormateado = !isNaN(precioNumber)
+    ? precioNumber.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+      })
+    : ticket.ruta_id.precio;
 
   const logoDataUri = 'https://static.vecteezy.com/system/resources/thumbnails/007/794/726/small/travel-bus-illustration-logo-on-light-background-free-vector.jpg';
   doc.addImage(logoDataUri, 'PNG', 120, 0, 80, 80);
@@ -439,53 +458,54 @@ function generarPDF(ticket) {
   doc.text(`-Empresa encargada: ${ticket.bus_id.empresa_asignada}`, 20, 38);
   doc.text(`-Placa: ${ticket.bus_id.placa}`, 20, 46);
   doc.text(`-N° de bus: ${ticket.bus_id.numero_bus}`, 20, 54);
-  doc.text(`-Origen: ${ticket.ruta_id.origen}`, 20, 62);
-  doc.text(`-Destino: ${ticket.ruta_id.destino}`, 20, 70);
-  doc.text(`-Horario salida: ${ticket.ruta_id.horario_id.hora_partida}`, 20, 78);
-  doc.text(`-Hora de llegada: ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 86);
-  doc.text(`-Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 94);
-  doc.text(`-Fecha-Hora Venta: ${format(new Date(ticket.fechahora_venta), "yyyy-MM-dd")} - ${format(new Date(ticket.fechahora_venta), 'HH:mm:ss')}`, 20, 102)
+  doc.text(`-Costo: ${precioFormateado}`, 20, 62);
+  doc.text(`-Origen: ${ticket.ruta_id.origen}`, 20, 70);
+  doc.text(`-Destino: ${ticket.ruta_id.destino}`, 20, 78);
+  doc.text(`-Horario salida: ${ticket.ruta_id.horario_id.hora_partida}`, 20, 86);
+  doc.text(`-Hora de llegada: ${ticket.ruta_id.horario_id.hora_llegada}`, 20, 94);
+  doc.text(`-Fecha de Partida: ${format(new Date(ticket.fecha_departida), "yyyy-MM-dd")}`, 20, 102);
+  doc.text(`-Fecha-Hora Venta: ${format(new Date(ticket.fechahora_venta), "yyyy-MM-dd")} - ${format(new Date(ticket.fechahora_venta), 'HH:mm:ss')}`, 20, 110)
 
   // Títulos
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(30, 30, 30);
-  doc.text(`Información del Cliente:`, 20, 120);
+  doc.text(`Información del Cliente:`, 20, 128);
 
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.cliente_id.nombre}`, 20, 128);
-  doc.text(`-C.C: ${ticket.cliente_id.cedula}`, 20, 136);
-  doc.text(`-Telefono: ${ticket.cliente_id.telefono}`, 20, 144);
-  doc.text(`-N° Asiento: ${ticket.no_asiento}`, 20, 152);
+  doc.text(`-Nombre: ${ticket.cliente_id.nombre}`, 20, 136);
+  doc.text(`-C.C: ${ticket.cliente_id.cedula}`, 20, 144);
+  doc.text(`-Telefono: ${ticket.cliente_id.telefono}`, 20, 152);
+  doc.text(`-N° Asiento: ${ticket.no_asiento}`, 20, 160);
 
   // Títulos
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(`Informacion sobre el Vendedor:`, 22, 170)
+  doc.text(`Informacion sobre el Vendedor:`, 22, 178)
 
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.vendedor_id.nombre}`, 20, 178);
-  doc.text(`-Telefono: ${ticket.vendedor_id.telefono}`, 20, 186);
+  doc.text(`-Nombre: ${ticket.vendedor_id.nombre}`, 20, 186);
+  doc.text(`-Telefono: ${ticket.vendedor_id.telefono}`, 20, 194);
 
   // Títulos
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(15);
-  doc.text(`Informacion del Conductor:`, 22, 204);
+  doc.text(`Informacion del Conductor:`, 22, 212);
 
   //Normal
   doc.setTextColor(30, 30, 30);
   doc.setFont('Helvetica', 'normal');
   doc.setFontSize(14);
-  doc.text(`-Nombre: ${ticket.bus_id.conductor_id.nombre}`, 20, 212);
-  doc.text(`-Telefono: ${ticket.bus_id.conductor_id.telefono}`, 20, 220);
+  doc.text(`-Nombre: ${ticket.bus_id.conductor_id.nombre}`, 20, 220);
+  doc.text(`-Telefono: ${ticket.bus_id.conductor_id.telefono}`, 20, 228);
 
 
 
@@ -493,7 +513,7 @@ function generarPDF(ticket) {
   doc.setFont('Helvetica', 'bold');
   doc.setFontSize(25);
   doc.setTextColor(0, 105, 217);
-  doc.text(`¡Gracias por tu confianza!`, 20, 240);
+  doc.text(`¡Gracias por tu confianza!`, 20, 248);
   doc.save(`ticket_${ticket._id}.pdf`);
 }
 

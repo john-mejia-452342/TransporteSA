@@ -159,7 +159,25 @@ onMounted(async () => {
 
 // Datos tabla 
 const columns = [
-  { name: "precio", label: "Precio", field: "precio", sortable: true, align: "left" },
+  {
+  name: "precio",
+  label: "Precio",
+  field: "precio",
+  sortable: true,
+  align: "left",
+  format: (val) => {
+    const precioNumber = parseFloat(val);
+
+    if (!isNaN(precioNumber)) {
+      return precioNumber.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+      });
+    } else {
+      return val;
+    }
+  },
+},
   { name: "hora_partida", label: "Hora Partida", field: (row) => row.horario_id.hora_partida,align: "left"},
   { name: "hora_llegada", label: "Hora LLegada", field: (row) => row.horario_id.hora_llegada,align: "left"},
   { name: "origen", label: "Origen", field: "origen",align: "left"},
